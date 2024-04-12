@@ -124,11 +124,10 @@ class AuthController extends Controller
     {
         $data = $request->all();
         $validator = Validator::make($data, [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
+            'full_name' => 'required|string',
             'email' => 'sometimes|email|unique:users',
             'phone' => 'sometimes|numeric|digits_between:4,12|unique:users',
-            'country_code' => 'required|numeric',
+            'country_code' => 'sometimes|numeric',
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
         ],[
@@ -146,36 +145,30 @@ class AuthController extends Controller
         }
         try
         {
-            AppUser::where('phone',$request->phone)->where('country_code',$request->country_code)->delete();
+            $fullname = $words = explode(" ", $data['full_name']);
+            $firstname = $fullname['0']?? '';
+            $lastname = $fullname['1']?? '';
+
+
+            if(isset($data['phone'])){
+                AppUser::where('phone',$data['phone'])->where('country_code',$data['country_code'])->delete();
+            }else{
+                AppUser::where('email',$data['email'])->delete();
+            }
 
             $app_user = new AppUser();
-            $app_user->first_name = $request->first_name;
-            $app_user->last_name = $request->last_name;
-            $app_user->full_name = $request->first_name.' '.$request->last_name;
-            $app_user->slug = Helper::slug('users',$app_user->full_name);
-            $app_user->email = $request->email;
-            $app_user->phone = $request->phone;
-            $app_user->password = 'goliath@123#';
-            $app_user->country_code = $request->country_code;
-            $app_user->device_type = $request->device_type ?? '';
-            $app_user->device_token = $request->device_token ?? '';
+            $app_user->first_name = $firstname;
+            $app_user->last_name = $lastname;
+            $app_user->full_name = $data['full_name'];
+            $app_user->slug = Helper::slug('users',$data['full_name']);
+            $app_user->email = $request->email?? '';
+            $app_user->phone = $request->phone?? '';
+            $app_user->country_code = $request->country_code?? '91';
+            $app_user->device_type = $request->device_type;
+            $app_user->device_token = $request->device_token;
             $app_user->save();
 
-
-            // $code = rand(1000,9999);
-            $code = '1234';
-            $date = date('Y-m-d H:i:s');
-            $currentDate = strtotime($date);
-            $futureDate = $currentDate+(60*120);
-            $phone_user = PhoneOtp::where('country_code',$data['country_code'])->where('phone',$data['phone'])->first();
-            if(!$phone_user){
-                $phone_user = new PhoneOtp();
-            }
-            $phone_user->phone = $data['phone'];
-            $phone_user->country_code = $data['country_code'];
-            $phone_user->otp = $code;
-            $phone_user->otp_expire_time = $futureDate;
-            $phone_user->save();
+            dd($app_user);
 
             return response()->json([
                 'status' => true,
