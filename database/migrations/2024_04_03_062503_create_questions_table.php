@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
             $table->string('question');
-            $table->enum('question_type',['dot_ball','boundary','wicket','run'])->default('dot_ball');
+            $table->enum('question_type',['dot_ball','boundary','wicket','run','no_ball','wide'])->default('dot_ball');
             $table->enum('status',['active','inactive'])->default('active');
-            $table->enum('conditions',['greater_than','less_than','equal','greater_than_equal','less_than_equal','not_equal'])->default('equal');
+            $table->enum('conditions',['greater_than','less_than','equal','greater_than_equal','less_than_equal','not_equal','even','odd'])->default('equal');
             $table->integer('quantity')->default('0');
             $table->timestamps();
             $table->softDeletes();
