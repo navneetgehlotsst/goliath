@@ -53,3 +53,17 @@ $response = $kernel->handle(
 )->send();
 
 $kernel->terminate($request, $response);
+
+
+
+/*
+ * --------------------------------------------------------------------
+ * REMOVE index.php from URI
+ * --------------------------------------------------------------------
+ */
+if (strpos($_SERVER['REQUEST_URI'],'index.php') !== FALSE )
+{
+    $new_uri = preg_replace('#index\.php\/?#', '', $_SERVER['REQUEST_URI']);
+    return abort(404);
+    die();
+}

@@ -37,4 +37,16 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/web.php'));
         });
     }
+
+
+    protected function removeIndexFromUrl()
+    {
+        if (Str::contains(request()->getRequestUri(), '/index.php/')) {
+            $url = str_replace('index.php/', '', request()->getRequestUri());
+
+            if (strlen($url) > 0) {
+                return abort(404);
+            }
+        }
+    }
 }
