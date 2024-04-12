@@ -25,15 +25,6 @@ class UserSeeder extends Seeder
             'password' => Hash::make('123456'),
             'phone' => '8000000000',
             'role' => 'admin',
-            'address' => '115 Pitt Street, Sydney NSW, Australia',
-            'area' => '115 Pitt St',
-            'city' => 'Sydney',
-            'state' => 'NSW',
-            'country' => 'Australia',
-            'country_code' => '1',
-            'zipcode' => '2000',
-            'latitude' => '-33.8664701',
-            'longitude' => '151.2081952',
             'status' => 'active',
         ]);
     }

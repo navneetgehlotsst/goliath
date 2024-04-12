@@ -134,6 +134,8 @@ class AuthController extends Controller
         ],[
             'email.email' => 'Invalid email format. Please try again',
             'email.unique' => 'This email is already registered. Please sign in or use a different email',
+            'phone.phone' => 'Invalid phone format. Please try again',
+            'phone.unique' => 'This phone is already registered. Please sign in or use a different phone',
         ]);
 
         if($validator->fails()){
