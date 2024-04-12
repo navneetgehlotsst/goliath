@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('email')->unique()->nullable();
             $table->string('phone')->unique()->nullable();
+            $table->integer('country_code')->default(61);
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
