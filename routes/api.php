@@ -28,13 +28,12 @@ Route::post('/contact', [ContactController::class, 'submitContact']);
 
 Route::group(['prefix'=>'auth'], function(){
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/verify-otp', [AuthController::class, 'verifyotp']);
+    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('/login', [AuthController::class, 'login']);
 });
 
 Route::middleware('jwt.verify')->group(function() {
     Route::get('/user', [AuthController::class, 'getUser']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/update-profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
