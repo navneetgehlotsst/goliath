@@ -27,18 +27,14 @@ Route::get('/splash-screen', [AuthController::class, 'splashScreens']);
 Route::post('/contact', [ContactController::class, 'submitContact']);
 
 Route::group(['prefix'=>'auth'], function(){
-    Route::post('/send-phone-otp', [AuthController::class, 'sendPhoneOtp']);
-    Route::post('/verify-phone-otp', [AuthController::class, 'verifyPhoneOtp']);
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/verify-register', [AuthController::class, 'verifyRegister']);
+    Route::post('/verify-otp', [AuthController::class, 'verifyotp']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/set-forgot-password', [AuthController::class, 'setForgotPassword']);
 });
 
 Route::middleware('jwt.verify')->group(function() {
     Route::get('/user', [AuthController::class, 'getUser']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
-    Route::post('/change-password', [AuthController::class, 'changePassword']);
     Route::post('/update-profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);

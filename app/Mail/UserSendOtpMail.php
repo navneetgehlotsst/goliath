@@ -20,7 +20,7 @@ class UserSendOtpMail extends Mailable
      */
     public $user;
     public $code;
-    
+
     public function __construct($user,$code)
     {
         $this->user = $user;
@@ -44,12 +44,12 @@ class UserSendOtpMail extends Mailable
      *
      * @return \Illuminate\Mail\Mailables\Content
      */
-    public function content()
-    {
-        return new Content(
-            view: 'web.email.user_send_otp',
-        );
-    }
+    // public function content()
+    // {
+    //     return new Content(
+    //         view: 'web.email.user_send_otp',
+    //     );
+    // }
 
     /**
      * Get the attachments for the message.
@@ -59,5 +59,19 @@ class UserSendOtpMail extends Mailable
     public function attachments()
     {
         return [];
+    }
+
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->from('sender@example.com')->view('web.email.user_send_otp')->with([
+            'email' => $this->user['name'],
+            'code' => $this->user['otp'],
+        ]);
     }
 }
