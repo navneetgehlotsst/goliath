@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\HowToPlayController;
 
 
 
@@ -25,6 +26,7 @@ use App\Http\Controllers\Api\UserController;
 
 Route::get('/splash-screen', [AuthController::class, 'splashScreens']);
 Route::post('/contact', [ContactController::class, 'submitContact']);
+Route::post('/how-to-play', [HowToPlayController::class, 'howToPlay']);
 
 Route::group(['prefix'=>'auth'], function(){
     Route::post('/register', [AuthController::class, 'register']);

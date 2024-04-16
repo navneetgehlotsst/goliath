@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\QuestionsController;
+use App\Http\Controllers\Admin\HowToPlayController;
 
 /*
 |--------------------------------------------------------------------------
@@ -74,6 +75,16 @@ Route::name('admin.')->prefix('admin')->group(function () {
             Route::get("contacts/all", [ContactController::class, 'getallcontact'])->name('allcontact');
 
             Route::delete("contacts/delete/{id}", [ContactController::class, 'destroy'])->name('destroy');
+        });
+
+
+        Route::name('how-to-play.')->group(function () {
+
+            Route::get("list", [HowToPlayController::class, 'index'])->name('index');
+
+            Route::get("how-to-play/all", [HowToPlayController::class, 'getallhowtoplay'])->name('allhowtoplay');
+
+            Route::delete("how-to-play/delete/{id}", [HowToPlayController::class, 'destroy'])->name('destroy');
         });
 
 

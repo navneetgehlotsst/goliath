@@ -97,7 +97,15 @@
 				<i class="menu-icon tf-icons bx bx-envelope"></i>
 				<div data-i18n="Contacts">Contacts</div>
 			</a>
-		</li> 
+		</li>
+
+
+        <li class="menu-item {{ request()->is('admin/how-to-play') ? 'active' : ''}}">
+			<a href="{{route('admin.how-to-play.index')}}" class="menu-link">
+				<i class="menu-icon tf-icons bx bx-envelope"></i>
+				<div data-i18n="HowToPLay">How to Play</div>
+			</a>
+		</li>
 
 		 @php
             $pages = Helper::pages();
@@ -118,7 +126,7 @@
 					</li>
                 @endforeach
 			</ul>
-		</li> 
+		</li>
 
 	</ul>
 </aside>
