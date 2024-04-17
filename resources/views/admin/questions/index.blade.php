@@ -17,9 +17,10 @@
                     <table class="table table-bordered" id="QuestionsTable">
                         <thead>
                             <tr>
+                                <th>S.no.</th>
                                 <th>Question</th>
+                                <th>Question Type</th>
                                 <th>Type</th>
-                                <th>Status</th>
                                 <th>Conditions</th>
                                 <th>Quantity</th>
                                 {{--  <th>Action</th>  --}}
@@ -49,13 +50,16 @@ $('#QuestionsTable').DataTable({
     columns: [
 
         {
+            data: "id",
+        },
+        {
             data: "question",
         },
         {
             data: "question_type",
         },
         {
-            data: "status",
+            data: "type",
         },
         {
             data: "conditions",

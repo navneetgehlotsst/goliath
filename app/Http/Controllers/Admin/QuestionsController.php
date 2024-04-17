@@ -19,7 +19,7 @@ class QuestionsController extends Controller
     }
 
     public function getallquestions(Request $request){
-        $questions = Question::orderBy('id','desc')->get();
+        $questions = Question::orderBy('id','asc')->get();
         return response()->json(['data' => $questions]);
     }
 }

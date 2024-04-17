@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 @section('style')
 
-@endsection  
+@endsection
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
@@ -17,7 +17,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
-                                    <th>View</th>
+                                    <th>Phone</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -54,12 +54,7 @@ $('#usersTable').DataTable({
             }
         },
         {
-            data: "view",
-            render: (data,type,row) => {
-                let url = '{{ route("admin.users.show", ":userId") }}';
-                url = url.replace(':userId', row.id);
-                return '<a href="'+url+'" class="btn btn-sm btn-primary">View</a>';
-            }
+            data: "phone",
         },
         {
             data: "status",
@@ -96,7 +91,7 @@ function userStatus(userid,status){
         message = 'User cannot login after Inactive!';
     }
 
-    
+
     Swal.fire({
         title: 'Are you sure?',
         text: message,

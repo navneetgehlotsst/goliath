@@ -1,0 +1,11 @@
+.app-brand-logo.demo img {
+    width: 150px;
+    margin: 0 auto;
+    text-align: center;
+    max-width: 100%;
+}
+
+
+.dashboard-logo {
+    width: 67px !important;
+}
