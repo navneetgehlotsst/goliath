@@ -40,8 +40,8 @@ class AuthController extends Controller
         $data = $request->all();
         $validator = Validator::make($data, [
             'full_name' => 'required|string',
-            'email' => 'sometimes|email|unique:users',
-            'phone' => 'sometimes|numeric|digits_between:4,12|unique:users',
+            'email' => 'nullable|email|unique:users',
+            'phone' => 'nullable|numeric|digits_between:4,12|unique:users',
             'country_code' => 'sometimes|numeric',
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
@@ -71,9 +71,7 @@ class AuthController extends Controller
             $futureDate = $currentDate+(60*120);
 
             if(isset($data['phone'])){
-
-
-                AppUser::where('phone',$data['phone'])->where('country_code',$data['country_code'])->delete();
+                AppUser::where('phone',$data['phone'])->delete();
             }else{
                 AppUser::where('email',$data['email'])->delete();
             }
@@ -83,8 +81,8 @@ class AuthController extends Controller
             $app_user->last_name = $lastname;
             $app_user->full_name = $data['full_name'];
             $app_user->slug = Helper::slug('users',$data['full_name']);
-            $app_user->email = $request->email?? '';
-            $app_user->phone = $request->phone?? '';
+            $app_user->email = $request->email?? null;
+            $app_user->phone = $request->phone?? null;
             $app_user->country_code = $request->country_code?? '91';
             $app_user->otp = $code;
             $app_user->otp_expired = $futureDate;
@@ -132,16 +130,15 @@ class AuthController extends Controller
 
         $date = date('Y-m-d H:i:s');
         $currentTime = strtotime($date);
-
-        if ($data['type'] == "login") {
+            if ($data['type'] == "login") {
             if(isset($data['phone'])){
-                $appuser = User::where('phone',$data['phone'])->where('country_code',$data['country_code'])->where('otp',$data['otp'])->first();
+                $appuser = User::where('phone',$data['phone'])->where('otp',$data['otp'])->first();
             }else{
                 $appuser = User::where('email',$data['email'])->where('otp',$data['otp'])->first();
             }
         }else {
             if(isset($data['phone'])){
-                $appuser = AppUser::where('phone',$data['phone'])->where('country_code',$data['country_code'])->where('otp',$data['otp'])->first();
+                $appuser = AppUser::where('phone',$data['phone'])->where('otp',$data['otp'])->first();
             }else{
                 $appuser = AppUser::where('email',$data['email'])->where('otp',$data['otp'])->first();
             }
@@ -168,9 +165,9 @@ class AuthController extends Controller
                 $user->first_name = $appuser->first_name;
                 $user->last_name = $appuser->last_name;
                 $user->full_name = $appuser->full_name;
-                $user->email = $appuser->email;
+                $user->email = $appuser->email ?? null;
                 $user->slug = $appuser->slug;
-                $user->phone = $appuser->phone;
+                $user->phone = $appuser->phone ?? null;
                 $user->device_type = $appuser->device_type ?? '';
                 $user->device_token = $appuser->device_token ?? '';
                 $user->role = 'user';
@@ -245,7 +242,7 @@ class AuthController extends Controller
         try
         {
             if(isset($data['phone'])){
-                $user = User::where('phone',$data['phone'])->where('country_code',$data['country_code'])->where('role','user')->first();
+                $user = User::where('phone',$data['phone'])->where('role','user')->first();
             }else{
                 $user = User::where('email',$data['email'])->first();
             }
