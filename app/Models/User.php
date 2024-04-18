@@ -48,13 +48,13 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->getKey();
     }
-    
+
     public function getJWTCustomClaims()
     {
         return [];
     }
 
-    
+
 
     public function getAvatarFullPathAttribute()
     {
@@ -64,5 +64,24 @@ class User extends Authenticatable implements JWTSubject
             return "";
         }
     }
+
+
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'full_name',
+        'slug',
+        'email',
+        'phone',
+        'country_code',
+        'role',
+        'type',
+        'otp',
+        'otp_expired',
+        'avatar',
+        'device_token',
+        'device_type',
+        'status'
+    ];
 
 }
