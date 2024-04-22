@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('check_otps', function (Blueprint $table) {
             $table->id();
+            $table->integer('country_code');
             $table->string('data');
             $table->integer('otp');
             $table->integer('otp_expire_time');

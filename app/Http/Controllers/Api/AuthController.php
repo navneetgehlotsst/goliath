@@ -70,13 +70,18 @@ class AuthController extends Controller
             // Generate OTP
             $otp = '1234';
             $otpExpiry = now()->addMinutes(120);
+            if (strstr($data['country_code'],"+")) {
+                $countrycode = trim($data['country_code'],"+");
+            } else {
+                $countrycode = $data['country_code'];
+            }
 
             // Begin transaction
             DB::beginTransaction();
 
             if ($data['type'] == 'login') {
                 if(isset($data['phone'])){
-                    $user = User::where('phone',$data['phone'])->where('country_code',$data['country_code'])->where('role','user')->first();
+                    $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
                 }else{
                     $user = User::where('email',$data['email'])->where('role','user')->first();
                 }
@@ -97,6 +102,7 @@ class AuthController extends Controller
                 ]);
 
                 $checkotp = new CheckOtp();
+                $checkotp->country_code = $countrycode ?? null;
                 $checkotp->data = $data['phone'] ?? $data['email'];
                 $checkotp->otp = $otp;
                 $checkotp->otp_expire_time = $otpExpiry;
@@ -105,7 +111,7 @@ class AuthController extends Controller
                 $dataUser['usredetail'] = [
                     'email' => $data['email'] ?? "",
                     'phone' => $data['phone'] ?? "",
-                    'country_code' => $data['country_code'] ?? "",
+                    'country_code' => '+'.$countrycode ?? "",
                     'device_type' => $data['device_type'],
                     'device_token' => $data['device_token'],
                     'type' => $data['type'],
@@ -113,6 +119,7 @@ class AuthController extends Controller
             } else {
 
                 $checkotp = new CheckOtp();
+                $checkotp->country_code = $countrycode ?? null;
                 $checkotp->data = $data['phone'] ?? $data['email'];
                 $checkotp->otp = $otp;
                 $checkotp->otp_expire_time = $otpExpiry;
@@ -121,7 +128,7 @@ class AuthController extends Controller
                     'full_name' => $data['full_name'],
                     'email' => $data['email'] ?? "",
                     'phone' => $data['phone'] ?? "",
-                    'country_code' => $data['country_code'] ?? "",
+                    'country_code' => '+'.$countrycode ?? "",
                     'device_type' => $data['device_type'],
                     'device_token' => $data['device_token'],
                     'type' => $data['type'],
@@ -235,11 +242,17 @@ class AuthController extends Controller
             return ApiResponse::errorResponse($validator->errors()->first());
         }
 
+        if (strstr($data['country_code'],"+")) {
+            $countrycode = trim($data['country_code'],"+");
+        } else {
+            $countrycode = $data['country_code'];
+        }
+
         // Common user retrieval logic
         $userQuery = CheckOtp::where('otp', $data['otp']);
 
         if (isset($data['phone'])) {
-            $userQuery->where('data', $data['phone']);
+            $userQuery->where('data', $data['phone'])->where('country_code', $countrycode);
         } else {
             $userQuery->where('data', $data['email']);
         }
@@ -255,21 +268,20 @@ class AuthController extends Controller
         if ($currentTimestamp > $otp->otp_expire_time) {
             return ApiResponse::errorResponse('Otp time has expired.');
         }
-
+        CheckOtp::find($otp->id)->forceDelete();
         try {
             if($data['type'] == 'login'){
                 DB::beginTransaction();
-
                 // Otp Delete
-                CheckOtp::find($otp->id)->delete();
+                //CheckOtp::where('id', $otp->id)->forceDelete();
                 if(isset($data['phone'])){
-                    $user = User::where('phone',$data['phone'])->where('country_code',$data['country_code'])->where('role','user')->first();
+                    $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
                 }else{
                     $user = User::where('email',$data['email'])->where('role','user')->first();
                 }
 
             }else{
-                CheckOtp::find($otp->id)->delete();
+
                 $fullName = explode(" ", $data['full_name']);
                 $firstName = $fullName[0] ?? '';
                 $lastName = $fullName[1] ?? '';
@@ -282,14 +294,14 @@ class AuthController extends Controller
                 $user->slug = Helper::slug('users', $data['full_name']);
                 $user->email = $data['email'] ?? null;
                 $user->phone = $data['phone'] ?? null;
-                $user->country_code = $data['country_code'] ?? '91';
+                $user->country_code = $countrycode ?? '91';
                 $user->device_type = $data['device_type'] ?? null;
                 $user->device_token = $data['device_token'] ?? null;
                 $user->save();
             }
 
              // Make User Login
-             $input = isset($data['phone']) ? ['phone' => $data['phone'], 'country_code' => $data['country_code']] : ['email' => $data['email']];
+             $input = isset($data['phone']) ? ['phone' => $data['phone'], 'country_code' => $countrycode] : ['email' => $data['email']];
              $token = JWTAuth::fromUser($user);
 
              $dataResponse = [
@@ -521,7 +533,7 @@ class AuthController extends Controller
         $user->full_name = $user->full_name ?? "";
         $user->email = $user->email ?? "";
         $user->phone = $user->phone ?? "";
-        $user->country_code = $user->country_code ?? "";
+        $user->country_code = '+'.$user->country_code ?? "";
 
         return $user;
     }
