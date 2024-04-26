@@ -9,3 +9,29 @@
 .dashboard-logo {
     width: 67px !important;
 }
+
+aside#layout-menu {
+    background-color: #3F8BCA !important;
+}
+
+
+.bg-menu-theme .menu-inner > .menu-item.active > .menu-link {
+    color: #d5cec4;
+    background-color: rgb(15 15 38 / 16%) !important;
+}
+
+
+a.menu-link {
+    color: #fff !important;
+}
+
+
+.app-brand-text.demo {
+    font-size: 1.75rem;
+    letter-spacing: -0.5px;
+    text-transform: capitalize;
+}
+
+.bg-menu-theme .menu-text {
+    color: #ffffff;
+}

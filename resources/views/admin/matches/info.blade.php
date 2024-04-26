@@ -63,29 +63,43 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
-            <div class="card">
-                <h5 class="card-header">Match Questions</h5>
-                <div class="table-responsive text-nowrap">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Over</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0">
-                        @foreach ($addQuestionsdata as  $addQuestion)
-                            <tr>
-                                <td>{{ $addQuestion->over }}</td>
-                                <td><a href="" class="btn btn-secondary">Change Question</a></td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                  </table>
+        <div class="col-12">
+            <div class="card mb-4">
+              <div class="card-body">
+                <div class="row gy-3">
+                  <div class="col-md-12">
+                    <h6>Match Question</h6>
+                    <div class="demo-inline-spacing">
+                        <span class="badge rounded-pill bg-label-danger">Completed Over</span>
+                        <span class="badge rounded-pill bg-danger">On Going Over</span>
+                        <span class="badge rounded-pill bg-success">Selected Over</span>
+                        <span class="badge rounded-pill bg-label-success">Upcoming Over</span>
+                        <span class="badge rounded-pill bg-secondary">Pridicted Over</span>
+                        <span class="badge rounded-pill bg-label-warning">Available Over</span>
+                    </div>
+                  </div>
+                  <div class="col-xl-6">
+                    <div class="text-light small fw-medium mb-2">Innings 1</div>
+                    <div class="demo-inline-spacing">
+                      <p>
+                        <span class="badge badge-center rounded-pill bg-primary">1</span>
+                        <span class="badge badge-center rounded-pill bg-label-primary">1</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-xl-6">
+                    <div class="text-light small fw-medium mb-2">Innings 2</div>
+                    <div class="demo-inline-spacing">
+                      <p>
+                        <span class="badge badge-center rounded-pill bg-primary">1</span>
+                        <span class="badge badge-center rounded-pill bg-label-primary">1</span>
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-        </div>
+            </div>
+          </div>
     </div>
 </div>
 

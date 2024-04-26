@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class MatchInnings extends Model
 {
     use HasFactory;
+
+    public function overs() {
+        return $this->morphMany(InningsOver::class, 'overable');
+    }
 }

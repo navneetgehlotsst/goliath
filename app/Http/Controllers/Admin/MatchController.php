@@ -4,8 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\AddQuestionToMatch;
-use App\Models\Question;
+use App\Models\{
+    Question,
+    MatchInnings,
+    InningsOver,
+    OverQuestions
+
+};
 
 class MatchController extends Controller
 {
@@ -53,53 +58,88 @@ class MatchController extends Controller
 
     public function matchInfo($id)
     {
-        $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
-        $apiurl = "https://rest.entitysport.com/v2/matches/$id/scorecard/?token=$token";
+        // try {
+            $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
+            $apiurl = "https://rest.entitysport.com/v2/matches/$id/scorecard/?token=$token";
 
-        $curl = curl_init();
+            $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $apiurl,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $apiurl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+            ));
 
-        $matchresponse = curl_exec($curl);
-        curl_close($curl);
+            $matchresponse = curl_exec($curl);
+            curl_close($curl);
 
-        $matchresponsedata = json_decode($matchresponse, true);
-        $matchdata = $matchresponsedata['response'];
+            $matchresponsedata = json_decode($matchresponse, true);
+            $matchdata = $matchresponsedata['response'];
 
-        $format = $matchdata['format'];
-        $overlimt = ($format == '7' || $format == '1') ? 50 : 20;
+            $format = $matchdata['format'];
 
-        // Fetch existing questions for the match
-        $existingQuestions = AddQuestionToMatch::where('matchid', $matchdata['match_id'])->exists();
+            // Determine over limit based on match format
+            $overlimit = ($format == '7' || $format == '1') ? 50 : (($format == '3' || $format == '6' || $format == '8') ? 20 : 90);
 
-        if (!$existingQuestions) {
-            // Prepare question IDs
-            $questionIds = Question::where('type', 'initial')->pluck('id')->toArray();
+            // Check if questions exist for the match
+            $existingQuestions = MatchInnings::where('match_id', $matchdata['match_id'])->exists();
 
-            // Prepare data for insertion
-            $dataToCreate = [];
-            foreach (range(1, $overlimt) as $i) {
-                $dataToCreate[] = [
-                    'matchid' => $matchdata['match_id'],
-                    'questionid' => implode(',', $questionIds),
-                    'over' => $i,
-                ];
+            if (!$existingQuestions) {
+                // Prepare question IDs
+                $questionIds = Question::where('type', 'initial')->pluck('id')->toArray();
+
+                // Insert match innings
+                $inningsToCreate = [];
+                foreach (range(1, 2) as $i) {
+                    $inningsToCreate[] = [
+                        'match_id' => $matchdata['match_id'],
+                        'innings' => $i,
+                    ];
+                }
+                MatchInnings::insert($inningsToCreate);
+
+                // Insert innings overs and associate questions
+                foreach (MatchInnings::where('match_id', $matchdata['match_id'])->get() as $matchInning) {
+                    $inningsOverToCreate = [];
+                    foreach (range(1, $overlimit) as $j) {
+                        $inningOver = InningsOver::create([
+                            'match_innings_id' => $matchInning->id,
+                            'overs' => $j,
+                        ]);
+                        // Associate questions
+                        foreach ($questionIds as $questionId) {
+                            OverQuestions::create([
+                                'innings_over_id' => $inningOver->id,
+                                'question_id' => $questionId,
+                            ]);
+                        }
+                    }
+                }
             }
-            // Insert data into database
-            AddQuestionToMatch::insert($dataToCreate);
-        }
+            $matchdata['match_id'];
+            $matchInning = MatchInnings::where('match_id', $matchdata['match_id']);
+            if ($matchInning) {
+                // Retrieve overs for the match inning
+                $overs = $matchInning->overs()->with('questions')->get();
 
-        // Fetch added questions for the match
-        $addQuestionsdata = AddQuestionToMatch::where('matchid', $matchdata['match_id'])->groupBy('over')->get();
+                foreach ($overs as $over) {
+                    echo "Over ID: " . $over->id . "\n";
+                    foreach ($over->questions as $question) {
+                        echo "Question: " . $question->question_text . "\n";
+                    }
+                }
+                dd($overs);
+            } else {
+                echo "Match inning not found.";
+            }
 
+            return view('admin.matches.info', compact('matchdata'));
+        // } catch (\Throwable $th) {
+        //     dd($th);
+        // }
 
-        return view('admin.matches.info' , compact('matchdata','addQuestionsdata'));
     }
 
 }

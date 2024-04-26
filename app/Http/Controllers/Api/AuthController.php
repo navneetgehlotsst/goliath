@@ -48,7 +48,7 @@ class AuthController extends Controller
         ];
 
         $typeSpecificRules = [
-            'full_name' => 'string|nullable',
+            'full_name' => 'nullable',
             'email' => 'nullable|email',
             'phone' => 'nullable|numeric|digits_between:4,12',
             'country_code' => 'numeric',
@@ -486,6 +486,7 @@ class AuthController extends Controller
             'full_name' => 'sometimes|string',
             'email'     =>  'sometimes|email|unique:users,email,'.$id,
             'phone'     =>  'sometimes|numeric|digits_between:4,12|unique:users,phone,'.$id,
+            'country_code'     =>  'sometimes',
             'avatar'  =>  'sometimes|mimes:jpeg,jpg,png|max:5000',
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
