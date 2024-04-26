@@ -42,19 +42,20 @@ class AuthController extends Controller
         $data = $request->all();
 
         $commonRules = [
-            'full_name' => 'sometimes|string',
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
             'type' => 'required|in:login,register',
         ];
 
         $typeSpecificRules = [
+            'full_name' => 'string|nullable',
             'email' => 'nullable|email',
             'phone' => 'nullable|numeric|digits_between:4,12',
             'country_code' => 'numeric',
         ];
 
         if ($data['type'] == 'register') {
+            $typeSpecificRules['full_name'] .= '|required';
             $typeSpecificRules['email'] .= '|unique:users';
             $typeSpecificRules['phone'] .= '|unique:users';
             $typeSpecificRules['country_code'] .= '|sometimes';
@@ -70,10 +71,14 @@ class AuthController extends Controller
             // Generate OTP
             $otp = '1234';
             $otpExpiry = now()->addMinutes(120);
-            if (strstr($data['country_code'],"+")) {
-                $countrycode = trim($data['country_code'],"+");
-            } else {
-                $countrycode = $data['country_code'];
+            if(isset($data['country_code'])){
+                if (strstr($data['country_code'],"+")) {
+                    $countrycode = trim($data['country_code'],"+");
+                } else {
+                    $countrycode = $data['country_code'];
+                }
+            }else{
+                $countrycode = "";
             }
 
             // Begin transaction
@@ -108,7 +113,7 @@ class AuthController extends Controller
                 $checkotp->otp_expire_time = $otpExpiry;
                 $checkotp->save();
 
-                $dataUser['usredetail'] = [
+                $dataUser['user'] = [
                     'email' => $data['email'] ?? "",
                     'phone' => $data['phone'] ?? "",
                     'country_code' => '+'.$countrycode ?? "",
@@ -125,7 +130,7 @@ class AuthController extends Controller
                 $checkotp->otp_expire_time = $otpExpiry;
                 $checkotp->save();
                 $dataUser = [
-                    'full_name' => $data['full_name'],
+                    'full_name' => $data['full_name'] ?? "",
                     'email' => $data['email'] ?? "",
                     'phone' => $data['phone'] ?? "",
                     'country_code' => '+'.$countrycode ?? "",
@@ -225,12 +230,14 @@ class AuthController extends Controller
         ];
 
         $typeSpecificRules = [
+            'full_name' => 'string|nullable',
             'email' => 'nullable|email',
             'phone' => 'nullable|numeric|digits_between:4,12',
             'country_code' => 'numeric',
         ];
 
         if ($data['type'] == 'register') {
+            $typeSpecificRules['full_name'] .= '|required';
             $typeSpecificRules['email'] .= '|unique:users';
             $typeSpecificRules['phone'] .= '|unique:users';
             $typeSpecificRules['country_code'] .= '|sometimes';
@@ -241,11 +248,12 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return ApiResponse::errorResponse($validator->errors()->first());
         }
-
-        if (strstr($data['country_code'],"+")) {
-            $countrycode = trim($data['country_code'],"+");
-        } else {
-            $countrycode = $data['country_code'];
+        if(isset($data['country_code'])){
+            if (strstr($data['country_code'],"+")) {
+                $countrycode = trim($data['country_code'],"+");
+            } else {
+                $countrycode = $data['country_code'];
+            }
         }
 
         // Common user retrieval logic
@@ -527,7 +535,7 @@ class AuthController extends Controller
 
 
     public function getUserDetail($user_id){
-        $user = User::select('id','full_name','email','phone','country_code')->where('id',$user_id)->first();
+        $user = User::select('id','full_name','email','phone','country_code','avatar')->where('id',$user_id)->first();
 
         $user->id = $user->id ?? "";
         $user->full_name = $user->full_name ?? "";

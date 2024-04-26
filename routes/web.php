@@ -96,7 +96,7 @@ Route::name('admin.')->prefix('admin')->group(function () {
         });
 
         Route::prefix('matches')->name('matches.')->group(function () {
-            Route::get('index/{key}', [MatchController::class, 'index'])->name('index');
+            Route::get('index/{cid}/{page}', [MatchController::class, 'index'])->name('index');
             Route::get('match-info/{key}', [MatchController::class, 'matchInfo'])->name('match.info');
         });
     });

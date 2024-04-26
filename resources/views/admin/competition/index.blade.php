@@ -32,25 +32,25 @@
 
 
             {{-- Get Compition Data --}}
-            <div class="card">
+            <div class="card d-none" id="competitionlist">
                 <h5 class="card-header">Competitions List</h5>
                 <div class="table-responsive text-nowrap">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Competition id</th>
-                            <th>Title</th>
-                            <th>Category</th>
-                            <th>Format</th>
-                            <th>Date Start / Date End</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0" id="competitions_data">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Competition id</th>
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Format</th>
+                                <th>Date Start / Date End</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-border-bottom-0" id="competitions_data">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -79,8 +79,10 @@
                     tableBody.empty(); // Clear existing data
 
                     $.each(response, function(index, row){
-                        var matchurl = '{{route("admin.matches.index",":cId")}}';
+                        $("#competitionlist").removeClass("d-none");
+                        var matchurl = "{{ route('admin.matches.index', [':cId', ':pagedata']) }}";
                         matchurl = matchurl.replace(':cId', row.cid);
+                        matchurl = matchurl.replace(':pagedata', page);
                         var newRow = $('<tr>');
                         newRow.append($('<td>').text(row.cid));
                         newRow.append($('<td>').text(row.title));

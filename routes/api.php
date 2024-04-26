@@ -2,10 +2,14 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\ContactController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\HowToPlayController;
+
+
+use App\Http\Controllers\Api\{
+    AuthController,
+    ContactController,
+    UserController,
+    HowToPlayController,
+};
 
 
 
@@ -28,11 +32,11 @@ Route::get('/splash-screen', [AuthController::class, 'splashScreens']);
 Route::post('/contact', [ContactController::class, 'submitContact']);
 Route::post('/how-to-play', [HowToPlayController::class, 'howToPlay']);
 
-Route::group(['prefix'=>'auth'], function(){
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/send-otp', [AuthController::class, 'sendOtp']);
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
-    Route::post('/login', [AuthController::class, 'login']);
+Route::prefix('auth')->controller(AuthController::class)->group(function () {
+    Route::post('/register', 'register');
+    Route::post('/send-otp', 'sendOtp');
+    Route::post('/verify-otp', 'verifyOtp');
+    Route::post('/login', 'login');
 });
 
 Route::middleware('jwt.verify')->group(function() {

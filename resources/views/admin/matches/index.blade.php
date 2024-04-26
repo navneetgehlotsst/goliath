@@ -10,45 +10,164 @@
         <span class="text-primary fw-light">Matches</span>
     </h5>
     <div class="row">
-        <div class="col-md-12">
-            {{-- Get Matches Data --}}
+        {{-- <div class="col-md-12">
             <div class="card">
                 <h5 class="card-header">Matches List</h5>
                 <div class="table-responsive text-nowrap">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Match id</th>
-                            <th>Title</th>
-                            <th>Short Title</th>
-                            <th>Sub Title</th>
-                            <th>Format</th>
-                            <th>Note</th>
-                            <th>Match Date / Time</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0" id="matches_data">
-                        @foreach ($matchdata as $matchdatas)
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>{{$matchdatas['match_id']}}</td>
-                                <td>{{$matchdatas['title']}}</td>
-                                <td>{{$matchdatas['short_title']}}</td>
-                                <td>{{$matchdatas['subtitle']}}</td>
-                                <td>{{$matchdatas['format_str']}}</td>
-                                <td>{{$matchdatas['status_note']}}</td>
-                                <td>{{$matchdatas['date_start_ist']}}</td>
-                                <td>{{$matchdatas['status_str']}}</td>
-                                <td><a href="{{ route('admin.matches.match.info', $matchdatas['match_id'] ) }}" class="btn btn-primary">Match Info</a></td>
+                                <th scope="col" class="col-3">Title</th>
+                                <th scope="col" class="col-3">Short Title</th>
+                                <th scope="col" class="col-3">Format</th>
+                                <th scope="col" class="col-3">Match Date / Time</th>
+                                <th scope="col" class="col-3">Status</th>
+                                <th scope="col" class="col-3">Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="table-border-bottom-0" id="matches_data">
+                            @foreach ($matchdata as $matchdatas)
+                                @if ($matchdatas['status'] != '2')
+                                    <tr>
+                                        <td>{{$matchdatas['title']}}</td>
+                                        <td><img src="{{$matchdatas['teama']['logo_url']}}" alt="" width="10%"> V/S <img src="{{$matchdatas['teamb']['logo_url']}}" alt="" width="10%"></td>
+                                        <td>{{$matchdatas['format_str']}}</td>
+                                        <td>{{$matchdatas['date_start_ist']}}</td>
+                                        <td>{{$matchdatas['status_str']}}</td>
+                                        <td><a href="{{ route('admin.matches.match.info', $matchdatas['match_id'] ) }}" class="btn btn-primary">Match Info</a></td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div> --}}
 
-        </div>
+        {{-- <div class="col-lg-12">
+            <div class="demo-inline-spacing d-flex justify-content-end">
+              <nav aria-label="Page navigation">
+                <ul class="pagination">
+                  @for ($pages = 1 ; $pages <= $pagecount ; $pages++ )
+                    <li class="page-item @if ($pages == $page) active @endif">
+                        <a class="page-link" href="{{ route('admin.matches.index', ['cid' => $cId, 'page' => $pages]) }}">{{ $pages }}</a>
+                    </li>
+                  @endfor
+                </ul>
+              </nav>
+            </div>
+        </div> --}}
+
+        <div class="col-xl-12">
+            <div class="nav-align-top mb-4">
+              <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-home" aria-controls="navs-top-home" aria-selected="true">Live</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-profile" aria-controls="navs-top-profile" aria-selected="false" tabindex="-1">Scheduled</button>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade active show" id="navs-top-home" role="tabpanel">
+                    @if($matchliveddata)
+                        <div class="col-md-12">
+                            <div class="card">
+                                <h5 class="card-header">Matches List</h5>
+                                <div class="table-responsive text-nowrap">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="col-3">Title</th>
+                                                <th scope="col" class="col-3">Short Title</th>
+                                                <th scope="col" class="col-3">Format</th>
+                                                <th scope="col" class="col-3">Match Date / Time</th>
+                                                <th scope="col" class="col-3">Status</th>
+                                                <th scope="col" class="col-3">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0" id="matches_data">
+                                            @foreach ($matchliveddata as $matchlivedatas)
+                                                <tr>
+                                                    <td>{{$matchlivedatas['title']}}</td>
+                                                    <td><img src="{{$matchlivedatas['teama']['logo_url']}}" alt="" width="10%"> V/S <img src="{{$matchlivedatas['teamb']['logo_url']}}" alt="" width="10%"></td>
+                                                    <td>{{$matchlivedatas['format_str']}}</td>
+                                                    <td>{{$matchlivedatas['date_start_ist']}}</td>
+                                                    <td>{{$matchlivedatas['status_str']}}</td>
+                                                    <td><a href="{{ route('admin.matches.match.info', $matchlivedatas['match_id'] ) }}" class="btn btn-primary">Match Info</a></td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    @else
+                        <div class="col-lg-12">
+                            <div class="demo-inline-spacing d-flex">
+                                <p>No Matches Found</p>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+                <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
+                    @if($matchscheduleddata)
+                        <div class="col-md-12">
+                            <div class="card">
+                                <h5 class="card-header">Matches List</h5>
+                                <div class="table-responsive text-nowrap">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="col-3">Title</th>
+                                                <th scope="col" class="col-3">Short Title</th>
+                                                <th scope="col" class="col-3">Format</th>
+                                                <th scope="col" class="col-3">Match Date / Time</th>
+                                                <th scope="col" class="col-3">Status</th>
+                                                <th scope="col" class="col-3">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0" id="matches_data">
+                                            @foreach ($matchscheduleddata as $scheduledmatchdatas)
+                                                <tr>
+                                                    <td>{{$scheduledmatchdatas['title']}}</td>
+                                                    <td><img src="{{$scheduledmatchdatas['teama']['logo_url']}}" alt="" width="10%"> V/S <img src="{{$scheduledmatchdatas['teamb']['logo_url']}}" alt="" width="10%"></td>
+                                                    <td>{{$scheduledmatchdatas['format_str']}}</td>
+                                                    <td>{{$scheduledmatchdatas['date_start_ist']}}</td>
+                                                    <td>{{$scheduledmatchdatas['status_str']}}</td>
+                                                    <td><a href="{{ route('admin.matches.match.info', $scheduledmatchdatas['match_id'] ) }}" class="btn btn-primary">Match Info</a></td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="demo-inline-spacing d-flex justify-content-end">
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                @for ($pages = 1 ; $pages <= $scheduledpagecount ; $pages++ )
+                                    <li class="page-item @if ($pages == $page) active @endif">
+                                        <a class="page-link" href="{{ route('admin.matches.index', ['cid' => $cId, 'page' => $pages]) }}">{{ $pages }}</a>
+                                    </li>
+                                @endfor
+                                </ul>
+                            </nav>
+                            </div>
+                        </div>
+                    @else
+                        <div class="col-lg-12">
+                            <div class="demo-inline-spacing d-flex">
+                                <p>No Matches Found</p>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+              </div>
+            </div>
+          </div>
     </div>
 </div>
 
