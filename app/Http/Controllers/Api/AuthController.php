@@ -48,7 +48,7 @@ class AuthController extends Controller
         ];
 
         $typeSpecificRules = [
-            'full_name' => 'nullable',
+            'full_name' => 'string|nullable',
             'email' => 'nullable|email',
             'phone' => 'nullable|numeric|digits_between:4,12',
             'country_code' => 'numeric',
@@ -486,7 +486,6 @@ class AuthController extends Controller
             'full_name' => 'sometimes|string',
             'email'     =>  'sometimes|email|unique:users,email,'.$id,
             'phone'     =>  'sometimes|numeric|digits_between:4,12|unique:users,phone,'.$id,
-            'country_code'     =>  'sometimes',
             'avatar'  =>  'sometimes|mimes:jpeg,jpg,png|max:5000',
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
@@ -536,7 +535,7 @@ class AuthController extends Controller
 
 
     public function getUserDetail($user_id){
-        $user = User::select('id','full_name','email','phone','country_code','avatar')->where('id',$user_id)->first();
+        $user = User::select('id','full_name','email','phone','country_code')->where('id',$user_id)->first();
 
         $user->id = $user->id ?? "";
         $user->full_name = $user->full_name ?? "";

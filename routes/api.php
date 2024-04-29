@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\{
     ContactController,
     UserController,
     HowToPlayController,
+    CompetitionController,
+    MatchesController
 };
 
 
@@ -44,5 +46,6 @@ Route::middleware('jwt.verify')->group(function() {
     Route::post('/update-profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
-
+    Route::post('/competition-list', [CompetitionController::class, 'competitionList']);
+    Route::post('/matches-list', [MatchesController::class, 'matchesList']);
 });
