@@ -68,7 +68,7 @@
               <div class="card-body">
                 <div class="row gy-3">
                   <div class="col-md-12">
-                    <h6>Match Question</h6>
+                    <h6>Match Innings</h6>
                     <div class="demo-inline-spacing">
                         <span class="badge rounded-pill bg-label-danger">Completed Over</span>
                         <span class="badge rounded-pill bg-danger">On Going Over</span>
@@ -79,20 +79,26 @@
                     </div>
                   </div>
                   <div class="col-xl-6">
-                    <div class="text-light small fw-medium mb-2">Innings 1</div>
+                    <div class="mb-2 fw-bolder">Innings 1</div>
                     <div class="demo-inline-spacing">
                       <p>
-                        <span class="badge badge-center rounded-pill bg-primary">1</span>
-                        <span class="badge badge-center rounded-pill bg-label-primary">1</span>
+                        @foreach ($GetMatchdata as $matchdatainningsone)
+                            @if ($matchdatainningsone->innings == '1' )
+                                <a href="{{ route('admin.matches.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}" class="badge badge-center rounded-pill bg-primary mb-2 text-white">{{$matchdatainningsone->overs}}</a>
+                            @endif
+                        @endforeach
                       </p>
                     </div>
                   </div>
                   <div class="col-xl-6">
-                    <div class="text-light small fw-medium mb-2">Innings 2</div>
+                    <div class="mb-2 fw-bolder">Innings 2</div>
                     <div class="demo-inline-spacing">
                       <p>
-                        <span class="badge badge-center rounded-pill bg-primary">1</span>
-                        <span class="badge badge-center rounded-pill bg-label-primary">1</span>
+                        @foreach ($GetMatchdata as $matchdatainningstwo)
+                            @if ($matchdatainningstwo->innings == '2' )
+                                <a href="{{ route('admin.matches.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}" class="badge badge-center rounded-pill bg-primary mb-2 text-white">{{$matchdatainningstwo->overs}}</a>
+                            @endif
+                        @endforeach
                       </p>
                     </div>
                   </div>

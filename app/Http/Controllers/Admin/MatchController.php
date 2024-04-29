@@ -58,7 +58,7 @@ class MatchController extends Controller
 
     public function matchInfo($id)
     {
-        // try {
+        try {
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
             $apiurl = "https://rest.entitysport.com/v2/matches/$id/scorecard/?token=$token";
 
@@ -118,28 +118,43 @@ class MatchController extends Controller
                     }
                 }
             }
-            $matchdata['match_id'];
-            $matchInning = MatchInnings::where('match_id', $matchdata['match_id']);
-            if ($matchInning) {
-                // Retrieve overs for the match inning
-                $overs = $matchInning->overs()->with('questions')->get();
 
-                foreach ($overs as $over) {
-                    echo "Over ID: " . $over->id . "\n";
-                    foreach ($over->questions as $question) {
-                        echo "Question: " . $question->question_text . "\n";
-                    }
-                }
-                dd($overs);
-            } else {
-                echo "Match inning not found.";
-            }
+            $GetMatchdata = MatchInnings::select('match_innings.id as match_innings_id', 'match_innings.match_id', 'match_innings.innings', 'innings_overs.overs', 'innings_overs.id as innings_overs_id')->where('match_innings.match_id', $matchdata['match_id'])->join('innings_overs', 'match_innings.id', '=', 'innings_overs.match_innings_id')->get();
 
-            return view('admin.matches.info', compact('matchdata'));
-        // } catch (\Throwable $th) {
-        //     dd($th);
-        // }
+            return view('admin.matches.info', compact('matchdata','GetMatchdata'));
+        } catch (\Throwable $th) {
+            dd($th);
+        }
 
+    }
+
+    public function matchQuestion($overid){
+
+        try {
+            $inningsQuestionsData = OverQuestions::select('over_questions.*','questions.question')->where('innings_over_id', $overid)->join('questions', 'over_questions.question_id', '=', 'questions.id')->get();
+            $questionList = Question::where('type', 'supplementry')->get();
+
+            return view('admin.matches.questionchange', compact('inningsQuestionsData','questionList'));
+        } catch (\Throwable $th) {
+            dd($th);
+        }
+    }
+
+
+    public function changeQuestion(Request $request){
+        try {
+            // Validate incoming request data if needed
+            $validatedData = $request->validate([
+                'questionid' => 'required',
+            ]);
+
+            $inningsQuestionsData = OverQuestions::where('id', $request->inningquestion)->update(['question_id' => $request->questionid]);
+
+            return response()->json(['message' => 'Question CHnage successfully'], 200);
+
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
 
 }
