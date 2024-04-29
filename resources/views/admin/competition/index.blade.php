@@ -21,9 +21,8 @@
                     @endphp
                     <div>
                         <select class="form-select" id="competitions_type" name="competitions_type">
-                            <option selected="">Select Option</option>
-                            @foreach ( $competitionsByStatus as $competitions)
-                                <option value="{{$competitions}}">{{$competitions}}</option>
+                            @foreach ( $competitionsByStatus as $key => $competitions)
+                                <option value="{{$key}}">{{$competitions}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -32,19 +31,18 @@
 
 
             {{-- Get Compition Data --}}
-            <div class="card d-none" id="competitionlist">
+            <div class="card" id="competitionlist">
                 <h5 class="card-header">Competitions List</h5>
                 <div class="table-responsive text-nowrap">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>Competition id</th>
-                                <th>Title</th>
+                                <th>Competitions</th>
                                 <th>Category</th>
                                 <th>Format</th>
                                 <th>Date Start / Date End</th>
                                 <th>Status</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody class="table-border-bottom-0" id="competitions_data">
@@ -65,10 +63,7 @@
 @section('script')
 <script>
     $(document).ready(function(){
-        $('#competitions_type').change(function(){
-            var status = $(this).val();
-            var page  = '1';
-
+        function populateTable(status, page) {
             $.ajax({
                 url: "{{ route('admin.competition.get.data') }}",
                 type: "GET",
@@ -80,25 +75,33 @@
 
                     $.each(response, function(index, row){
                         $("#competitionlist").removeClass("d-none");
-                        var matchurl = "{{ route('admin.matches.index', [':cId', ':pagedata']) }}";
+                        var matchurl = "{{ route('admin.match.index', [':cId', ':pagedata']) }}";
                         matchurl = matchurl.replace(':cId', row.cid);
                         matchurl = matchurl.replace(':pagedata', page);
                         var newRow = $('<tr>');
-                        newRow.append($('<td>').text(row.cid));
+                        newRow.append($('<td>').html('<a href="'+matchurl+'" class="link-primary">'+row.cid+'</a>'));
                         newRow.append($('<td>').text(row.title));
                         newRow.append($('<td>').text(row.category));
                         newRow.append($('<td>').text(row.game_format));
                         newRow.append($('<td>').text(row.datestart+' / '+row.dateend));
                         newRow.append($('<td>').text(row.status));
-                        newRow.append($('<td>').html('<a href="'+matchurl+'" class="link-primary">Competition Matches</a>'));
                         // Add more columns as needed
                         tableBody.append(newRow);
                     });
                 }
             });
+        }
 
+        // Call populateTable on document ready
+        populateTable($('#competitions_type').val(), '1');
+
+        $('#competitions_type').change(function(){
+            var status = $(this).val();
+            var page = '1';
+            populateTable(status, page);
         });
     });
+
 </script>
 
 @endsection

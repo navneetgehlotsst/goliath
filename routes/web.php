@@ -95,10 +95,10 @@ Route::name('admin.')->prefix('admin')->group(function () {
             Route::get('getdata', [CompetitionController::class, 'getData'])->name('get.data');
         });
 
-        Route::prefix('matches')->name('matches.')->group(function () {
+        Route::prefix('match')->name('match.')->group(function () {
             Route::get('index/{cid}/{page}', [MatchController::class, 'index'])->name('index');
-            Route::get('match-info/{key}', [MatchController::class, 'matchInfo'])->name('info');
-            Route::get('match-question/{overid}', [MatchController::class, 'matchQuestion'])->name('question');
+            Route::get('info/{key}', [MatchController::class, 'matchInfo'])->name('info');
+            Route::get('question/{overid}', [MatchController::class, 'matchQuestion'])->name('question');
             Route::post('change-question', [MatchController::class, 'changeQuestion'])->name('chnagequestion');
         });
     });

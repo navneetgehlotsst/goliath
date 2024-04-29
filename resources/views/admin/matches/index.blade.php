@@ -10,7 +10,7 @@
         <span class="text-primary fw-light">Matches</span>
     </h5>
     <div class="row">
-        
+
 
         <div class="col-xl-12">
             <div class="nav-align-top mb-4">
@@ -89,7 +89,7 @@
                                                     <td>{{$scheduledmatchdatas['format_str']}}</td>
                                                     <td>{{$scheduledmatchdatas['date_start_ist']}}</td>
                                                     <td>{{$scheduledmatchdatas['status_str']}}</td>
-                                                    <td><a href="{{ route('admin.matches.info', $scheduledmatchdatas['match_id'] ) }}" class="btn btn-primary">Match Info</a></td>
+                                                    <td><a href="{{ route('admin.match.info', $scheduledmatchdatas['match_id'] ) }}" class="btn btn-primary">Match Info</a></td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -104,7 +104,7 @@
                                 <ul class="pagination">
                                 @for ($pages = 1 ; $pages <= $scheduledpagecount ; $pages++ )
                                     <li class="page-item @if ($pages == $page) active @endif">
-                                        <a class="page-link" href="{{ route('admin.matches.index', ['cid' => $cId, 'page' => $pages]) }}">{{ $pages }}</a>
+                                        <a class="page-link" href="{{ route('admin.match.index', ['cid' => $cId, 'page' => $pages]) }}">{{ $pages }}</a>
                                     </li>
                                 @endfor
                                 </ul>

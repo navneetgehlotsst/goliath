@@ -94,7 +94,7 @@
             e.preventDefault();
             $.ajax({
                 type: "POST",
-                url: "{{ route('admin.matches.chnagequestion') }}",
+                url: "{{ route('admin.match.chnagequestion') }}",
                 data: $(this).serialize(),
                 success: function(response){
                     console.log(response.message);

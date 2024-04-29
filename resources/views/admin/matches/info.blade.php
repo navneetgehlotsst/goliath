@@ -21,6 +21,9 @@
                             <h6 class="text-center">
                                 {{$matchdata['short_title']}}
                             </h6>
+                            <h6 class="text-center">
+                                {{$matchdata['venue']['name']}}, {{$matchdata['venue']['location']}}
+                            </h6>
                         </div>
                         {{-- team A Data --}}
                         <div class="col-md-6 text-center">
@@ -55,8 +58,10 @@
                                 @elseif ($matchdata['status_str'] == 'Completed')
                                     <span class="badge bg-label-success">{{$matchdata['status_str']}}</span>
                                 @else
-                                <span class="badge bg-label-danger">{{$matchdata['status_str']}}</span>
+                                    <span class="badge bg-label-danger">{{$matchdata['status_str']}}</span>
                                 @endif
+                                <br>
+                                <span>Date & Time :- {{$matchdata['date_start_ist']}}</span>
                             </div>
                         </div>
                     </div>
@@ -84,7 +89,7 @@
                       <p>
                         @foreach ($GetMatchdata as $matchdatainningsone)
                             @if ($matchdatainningsone->innings == '1' )
-                                <a href="{{ route('admin.matches.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}" class="badge badge-center rounded-pill bg-primary mb-2 text-white">{{$matchdatainningsone->overs}}</a>
+                                <a href="{{ route('admin.match.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}" class="badge badge-center rounded-pill bg-primary mb-2 text-white">{{$matchdatainningsone->overs}}</a>
                             @endif
                         @endforeach
                       </p>
@@ -96,7 +101,7 @@
                       <p>
                         @foreach ($GetMatchdata as $matchdatainningstwo)
                             @if ($matchdatainningstwo->innings == '2' )
-                                <a href="{{ route('admin.matches.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}" class="badge badge-center rounded-pill bg-primary mb-2 text-white">{{$matchdatainningstwo->overs}}</a>
+                                <a href="{{ route('admin.match.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}" class="badge badge-center rounded-pill bg-primary mb-2 text-white">{{$matchdatainningstwo->overs}}</a>
                             @endif
                         @endforeach
                       </p>

@@ -106,8 +106,11 @@ class Helper
 
 
     public static function getCompetitionsStatus(){
-        $matchbystatus = array('fixture', 'live');
-
+        //$matchbystatus = array('live','fixture');
+        $matchbystatus =[
+            'live' => 'Live',
+            'fixture' => 'Upcoming',
+        ];
         return $matchbystatus;
     }
 
