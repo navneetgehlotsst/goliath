@@ -48,7 +48,7 @@
                                                     <td>{{$matchlivedatas['format_str']}}</td>
                                                     <td>{{$matchlivedatas['date_start_ist']}}</td>
                                                     <td>{{$matchlivedatas['status_str']}}</td>
-                                                    <td><a href="{{ route('admin.matches.info', $matchlivedatas['match_id'] ) }}" class="btn btn-primary">Match Info</a></td>
+                                                    <td><a href="{{ route('admin.match.info', $matchlivedatas['match_id'] ) }}" class="btn btn-primary">Match Info</a></td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

@@ -35,3 +35,8 @@ a.menu-link {
 .bg-menu-theme .menu-text {
     color: #ffffff;
 }
+
+.matchdisable {
+    pointer-events: none;
+    cursor: default;
+}

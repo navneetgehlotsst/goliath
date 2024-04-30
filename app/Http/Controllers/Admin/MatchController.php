@@ -78,6 +78,7 @@ class MatchController extends Controller
             $matchresponsedata = json_decode($matchresponse, true);
             $matchdata = $matchresponsedata['response'];
 
+
             $format = $matchdata['format'];
 
             // Determine over limit based on match format
@@ -150,7 +151,7 @@ class MatchController extends Controller
 
             $inningsQuestionsData = OverQuestions::where('id', $request->inningquestion)->update(['question_id' => $request->questionid]);
 
-            return response()->json(['message' => 'Question CHnage successfully'], 200);
+            return response()->json(['message' => 'Question Change successfully'], 200);
 
         } catch (\Throwable $th) {
             dd($th);

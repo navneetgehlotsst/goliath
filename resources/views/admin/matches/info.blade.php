@@ -62,12 +62,21 @@
                                 @endif
                                 <br>
                                 <span>Date & Time :- {{$matchdata['date_start_ist']}}</span>
+                                <br>
+                                <span>{{$matchdata['toss']['text'] ?? ''}}</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        @php
+            if($matchdata['live_inning_number'] == ""){
+                echo "not started";
+            }else{
+                echo "started";
+            }
+        @endphp
         <div class="col-12">
             <div class="card mb-4">
               <div class="card-body">
@@ -88,7 +97,7 @@
                     <div class="demo-inline-spacing">
                       <p>
                         @foreach ($GetMatchdata as $matchdatainningsone)
-                            @if ($matchdatainningsone->innings == '1' )
+                            @if ($matchdatainningsone->innings == $matchdata['live_inning_number'] )
                                 <a href="{{ route('admin.match.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}" class="badge badge-center rounded-pill bg-primary mb-2 text-white">{{$matchdatainningsone->overs}}</a>
                             @endif
                         @endforeach
@@ -100,7 +109,7 @@
                     <div class="demo-inline-spacing">
                       <p>
                         @foreach ($GetMatchdata as $matchdatainningstwo)
-                            @if ($matchdatainningstwo->innings == '2' )
+                            @if ($matchdatainningstwo->innings == $matchdata['live_inning_number'] )
                                 <a href="{{ route('admin.match.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}" class="badge badge-center rounded-pill bg-primary mb-2 text-white">{{$matchdatainningstwo->overs}}</a>
                             @endif
                         @endforeach
