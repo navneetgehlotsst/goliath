@@ -95,7 +95,7 @@ class AddQuestionToMatch extends Command
                                     'innings' => $i,
                                 ];
                             }
-                            MatchInnings::create($inningsToCreate);
+                            MatchInnings::insert($inningsToCreate);
 
                             foreach (MatchInnings::where('match_id', $matchscheduleddatavalue['match_id'])->get() as $matchInning) {
                                 $inningsOverToCreate = [];
