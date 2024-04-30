@@ -50,11 +50,12 @@
                 <script src="{{asset('assets/admin/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')}}"></script>
                 <script src="{{asset('assets/admin/vendor/js/menu.js')}}"></script>
                 <script src="{{asset('assets/admin/vendor/libs/apex-charts/apexcharts.js')}}"></script>
-                <script src="{{asset('assets/admin/js/main.js')}}"></script>
                 <script src="{{asset('assets/admin/js/dataTable.js')}}"></script>
                 <script src="{{asset('assets/admin/js/bootstrapDataTable.js')}}"></script>
+                <script src="{{asset('assets/admin/js/tables-datatables-basic.js')}}"></script>
                 <script src="{{asset('assets/admin/js/dashboards-analytics.js')}}"></script>
                 <script src="{{asset('assets/admin/js/moment.min.js')}}"></script>
+                <script src="{{asset('assets/admin/js/main.js')}}"></script>
                 <script async defer src="https://buttons.github.io/buttons.js"></script>
                 @yield('script')
                 @include('admin.layouts.elements.sweet_alerts')
