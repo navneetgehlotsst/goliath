@@ -16,8 +16,8 @@ class MatchController extends Controller
 {
     public function index($cId , $page)
     {
-        $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
-        $pagedatacount = 10;
+            $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
+            $pagedatacount = 10;
         //Scheduled data
             $apiurlScheduled = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$pagedatacount&paged=$page&status=1";
 
