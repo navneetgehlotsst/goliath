@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 use App\Models\{
-    CompetitionList,
-    CompetitionMatchesList
+    Competition,
+    CompetitionMatches
 };
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -54,7 +54,7 @@ class InsertCompetitionList extends Command
             $competitionIds = array_column($compdata, 'cid');
 
             // Fetch existing competitions
-            $existingCompetitions = CompetitionList::whereIn('competiton_id', $competitionIds)->get()->keyBy('competiton_id');
+            $existingCompetitions = Competition::whereIn('competiton_id', $competitionIds)->get()->keyBy('competiton_id');
 
             foreach ($compdata as $value) {
                 $competitiondata = [
@@ -72,7 +72,7 @@ class InsertCompetitionList extends Command
                     $existingCompetitions[$value['cid']]->update($competitiondata);
                 } else {
                     // Create new competition
-                    CompetitionList::create($competitiondata);
+                    Competition::create($competitiondata);
                 }
                 $cId = $value['cid'];
                 $pagedatacount = 100;
@@ -96,7 +96,7 @@ class InsertCompetitionList extends Command
                 $matchesIds = array_column($matchesData, 'match_id');
 
                 // Fetch existing matches
-                $existingMatches = CompetitionMatchesList::whereIn('match_id', $matchesIds)->get()->keyBy('match_id');
+                $existingMatches = CompetitionMatches::whereIn('match_id', $matchesIds)->get()->keyBy('match_id');
 
                 foreach ($matchesData as $matchvalue) {
                     $dateTime = $matchvalue['date_start'];
@@ -120,7 +120,7 @@ class InsertCompetitionList extends Command
                         $existingCompetitions[$matchvalue['match_id']]->update($matchesdata);
                     } else {
                         // Create new matches
-                        CompetitionMatchesList::create($matchesdata);
+                        CompetitionMatches::create($matchesdata);
                     }
                 }
             }

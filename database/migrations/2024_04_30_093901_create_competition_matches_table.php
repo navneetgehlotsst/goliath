@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('competition_matches_lists', function (Blueprint $table) {
+        Schema::create('competition_matches', function (Blueprint $table) {
             $table->id();
             $table->integer('competiton_id')->default('0');
             $table->integer('match_id')->default('0');
