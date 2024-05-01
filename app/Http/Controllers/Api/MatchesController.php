@@ -107,7 +107,9 @@ class MatchesController extends Controller
             $over = [];
             foreach ($matchInningsData as $matchInningskey => $matchInningsvalue) {
                 $over = [];
-                if($matchInningsvalue->innings == $matchdata['latest_inning_number']){
+                if($matchdata['latest_inning_number'] = '0'){
+                    $inningsstatus = "Ongoing";
+                }elseif($matchInningsvalue->innings == $matchdata['latest_inning_number']){
                     $inningsstatus = "Ongoing";
                 }else{
                     $inningsstatus = "";
@@ -145,6 +147,7 @@ class MatchesController extends Controller
                         }
                     }
                     $over[] = [
+                        "over_id" => $matchInningsOversvalue->id,
                         "over_number" => $matchInningsOversvalue->overs,
                         "over_status" => $status
                     ];
