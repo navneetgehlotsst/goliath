@@ -17,8 +17,10 @@ return new class extends Migration
             $table->integer('match_id')->default('0');
             $table->string('match');
             $table->string('teama_name');
+            $table->string('teama_short_name');
             $table->string('teama_img');
             $table->string('teamb_name');
+            $table->string('teamb_short_name');
             $table->string('teamb_img');
             $table->string('formate');
             $table->string('match_start_date');

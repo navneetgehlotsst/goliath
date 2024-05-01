@@ -106,18 +106,19 @@ class InsertCompetitionList extends Command
                         'match_id' => $matchvalue['match_id'],
                         'match' => $matchvalue['title'],
                         'teama_name' => $matchvalue['teama']['name'],
+                        'teama_short_name' => $matchvalue['teama']['short_name'],
                         'teama_img' => $matchvalue['teama']['logo_url'],
                         'teamb_name' => $matchvalue['teamb']['name'],
+                        'teamb_short_name' => $matchvalue['teamb']['short_name'],
                         'teamb_img' => $matchvalue['teamb']['logo_url'],
                         'formate' => $matchvalue['format_str'],
                         'match_start_date' => $datearray['0'],
                         'match_start_time' => $datearray['1'],
                         'status' => $matchvalue['status_str'],
                     ];
-
                     if ($existingMatches->has($matchvalue['match_id'])) {
                         // Update existing matches
-                        $existingCompetitions[$matchvalue['match_id']]->update($matchesdata);
+                        $existingMatches[$matchvalue['match_id']]->update($matchesdata);
                     } else {
                         // Create new matches
                         CompetitionMatches::create($matchesdata);

@@ -25,26 +25,36 @@ class MatchController extends Controller
     {
         try {
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
-            $apiurl = "https://rest.entitysport.com/v2/matches/$id/scorecard/?token=$token";
 
-            $curl = curl_init();
+            // Function to make curl requests
+            function makeCurlRequest($url) {
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                ));
+                $response = curl_exec($curl);
+                curl_close($curl);
+                return json_decode($response, true);
+            }
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => $apiurl,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-            ));
+            // Get match data
+            $matchdata = makeCurlRequest("https://rest.entitysport.com/v2/matches/$id/scorecard/?token=$token")['response'];
 
-            $matchresponse = curl_exec($curl);
-            curl_close($curl);
+            // Get live match data
+            $matchdatalive = makeCurlRequest("https://rest.entitysport.com/v2/matches/$id/live/?token=$token")['response'];
 
-            $matchresponsedata = json_decode($matchresponse, true);
-            $matchdata = $matchresponsedata['response'];
+            $currentover = $matchdatalive['live_score']['overs'] ?? "0";
 
+            // Calculate current over final
+            $currentoverfinal = ($currentover != floor($currentover)) ? ceil($currentover) : $currentover;
 
             $format = $matchdata['format'];
+            // $maxOver = $matchdata['innings'];
+            // dd($maxOver);
 
             // Determine over limit based on match format
             $overlimit = ($format == '7' || $format == '1') ? 50 : (($format == '3' || $format == '6' || $format == '8') ? 20 : 90);
@@ -85,9 +95,13 @@ class MatchController extends Controller
                 }
             }
 
-            $GetMatchdata = MatchInnings::select('match_innings.id as match_innings_id', 'match_innings.match_id', 'match_innings.innings', 'innings_overs.overs', 'innings_overs.id as innings_overs_id')->where('match_innings.match_id', $matchdata['match_id'])->join('innings_overs', 'match_innings.id', '=', 'innings_overs.match_innings_id')->get();
+            $GetMatchdata = MatchInnings::select('match_innings.id as match_innings_id', 'match_innings.match_id', 'match_innings.innings', 'innings_overs.overs', 'innings_overs.id as innings_overs_id')
+                ->where('match_innings.match_id', $matchdata['match_id'])
+                ->join('innings_overs', 'match_innings.id', '=', 'innings_overs.match_innings_id')
+                ->get();
 
-            return view('admin.matches.info', compact('matchdata','GetMatchdata'));
+            return view('admin.matches.info', compact('matchdata', 'GetMatchdata', 'currentoverfinal'));
+
         } catch (\Throwable $th) {
             dd($th);
         }
