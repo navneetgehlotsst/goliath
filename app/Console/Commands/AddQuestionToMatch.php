@@ -33,11 +33,11 @@ class AddQuestionToMatch extends Command
     public function handle()
     {
         try {
-            $status = 'live';
+            $currentYear = Carbon::now()->year;
             $page = 1;
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
-            $perPage = 30;
-            $apiurl = "https://rest.entitysport.com/v2/competitions?token=$token&per_page=$perPage&paged=$page&status=$status";
+            $perPage = 500;
+            $apiurl = "https://rest.entitysport.com/v2/seasons/$currentYear/competitions?token=$token&per_page=$perPage";
 
             $curl = curl_init();
 
@@ -60,7 +60,7 @@ class AddQuestionToMatch extends Command
             foreach ($compdata as $compdatakey => $compdatavalue) {
                 $cId = $compdatavalue['cid'];
                 $pagedatacount = 100;
-                $apiurlScheduled = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$pagedatacount&paged=$page&status=1";
+                $apiurlScheduled = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$pagedatacount&paged=$page";
 
                 $curlScheduled = curl_init($apiurlScheduled);
 

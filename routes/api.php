@@ -10,7 +10,8 @@ use App\Http\Controllers\Api\{
     UserController,
     HowToPlayController,
     CompetitionController,
-    MatchesController
+    MatchesController,
+    UserPredictionController
 };
 
 
@@ -49,4 +50,7 @@ Route::middleware('jwt.verify')->group(function() {
     Route::post('/competition-list', [CompetitionController::class, 'competitionList']);
     Route::post('/matches-list', [MatchesController::class, 'matchesList']);
     Route::post('/matches-detail', [MatchesController::class, 'matchesDetail']);
+    Route::post('/question-list-for-over', [MatchesController::class, 'questionListForOver']);
+    Route::post('/save-user-prediction', [UserPredictionController::class, 'saveUserPrediction']);
+    Route::post('/user-prediction', [UserPredictionController::class, 'getUserPrediction']);
 });

@@ -535,7 +535,7 @@ class AuthController extends Controller
 
 
     public function getUserDetail($user_id){
-        $user = User::select('id','full_name','email','phone','country_code')->where('id',$user_id)->first();
+        $user = User::select('id','full_name','email','phone','country_code','avatar')->where('id',$user_id)->first();
 
         $user->id = $user->id ?? "";
         $user->full_name = $user->full_name ?? "";
