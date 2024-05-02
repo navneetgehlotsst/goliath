@@ -10,7 +10,8 @@ use App\Models\{
     CompetitionMatches,
     MatchInnings,
     InningsOver,
-    OverQuestions
+    OverQuestions,
+    Prediction
 };
 use App\Http\Response\ApiResponse;
 
@@ -55,86 +56,89 @@ class MatchesController extends Controller
             'match_id' => 'required',
         ]);
 
-        $matchdata = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/scorecard/?token={$this->token}")['response'];
-        $matchdatalive = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/live/?token={$this->token}")['response'];
+        // Fetch match data and live score data concurrently
+        $matchPromise = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/scorecard/?token={$this->token}");
+        $livePromise = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/live/?token={$this->token}");
 
-        $currentover = $matchdatalive['live_score']['overs'] ?? "0";
+        $matchdata = $matchPromise['response'];
+        $matchdatalive = $livePromise['response'];
+
+        $currentover = $matchdatalive['live_score']['overs'] ?? 0;
 
         // Calculate current over final
-        $currentoverfinal = ($currentover != floor($currentover)) ? ceil($currentover) : $currentover;
+        $current_over = ceil($currentover);
+        $nextover = $current_over + 3;
 
-        $nextover = $currentoverfinal + 3;
+        // Fetch innings data
+        $matchInnings = MatchInnings::where('match_innings.match_id', $input['match_id'])->get();
 
-        $matchInningsData = MatchInnings::where('match_innings.match_id', $input['match_id'])->get();
-
-
+        $matchdetail = [];
         $inningsone = [];
-        $over = [];
-        foreach ($matchInningsData as $matchInningskey => $matchInningsvalue) {
+
+        foreach ($matchInnings as $match_inning) {
+            $innings_status = '';
             $over = [];
-            if($matchdata['latest_inning_number'] = '0'){
-                $inningsstatus = "Ongoing";
-            }elseif($matchInningsvalue->innings == $matchdata['latest_inning_number']){
-                $inningsstatus = "Ongoing";
-            }else{
-                $inningsstatus = "";
-            }
-            $matchInningsOversData = InningsOver::where('match_innings_id', $matchInningsvalue->id)->get();
-            foreach ($matchInningsOversData as $matchInningsOverskey => $matchInningsOversvalue) {
-                $status = "Upcoming"; // Assuming all overs are Upcoming by default
-                if ($matchdata['latest_inning_number'] == "1") {
-                    if ($matchInningsvalue->innings != "1") {
-                        $status = "Completed";
-                    }else{
-                        if($matchInningsOversvalue->overs < $currentoverfinal){
-                            $status = "Completed";
-                        }elseif($matchInningsOversvalue->overs == $currentoverfinal){
-                            $status = "Ongoing";
-                        }elseif($matchInningsOversvalue->overs >= $nextover){
-                            $status = "Available";
-                        }else{
-                            $status = "Upcoming";
+
+            $matchInningsOversData = InningsOver::where('match_innings_id', $match_inning->id)->get();
+
+            foreach ($matchInningsOversData as $matchInningsOversvalue) {
+                $over_status = '';
+                $prediction = Prediction::where('over_id', $matchInningsOversvalue->id)->first();
+
+                if ($match_inning->innings == $matchdata['latest_inning_number']) {
+                    if ($prediction) {
+                        $over_status = "Predicted";
+                    } else {
+                        if ($matchInningsOversvalue->overs < $current_over) {
+                            $over_status = "Completed";
+                        } elseif ($matchInningsOversvalue->overs == $current_over) {
+                            $over_status = "Ongoing";
+                        } elseif ($matchInningsOversvalue->overs >= $nextover) {
+                            $over_status = "Not Available";
+                        } else {
+                            $over_status = "Available";
                         }
                     }
-                } elseif ($matchdata['latest_inning_number'] == "2") {
-                    if ($matchInningsvalue->innings == "2") {
-                        if($matchInningsOversvalue->overs < $currentoverfinal){
-                            $status = "Completed";
-                        }elseif($matchInningsOversvalue->overs == $currentoverfinal){
-                            $status = "Ongoing";
-                        }elseif($matchInningsOversvalue->overs >= $nextover){
-                            $status = "Available";
-                        }else{
-                            $status = "Upcoming";
-                        }
-                    }else{
-                        $status = "Completed";
-                    }
+                    $innings_status = "Ongoing";
                 }
+
+                if ($match_inning->innings < $matchdata['latest_inning_number']) {
+                    $over_status = "Completed";
+                    $innings_status = "Completed";
+                }
+
+                if ($match_inning->innings > $matchdata['latest_inning_number']) {
+                    $over_status = "Upcoming";
+                    $innings_status = "Upcoming";
+                }
+
                 $over[] = [
                     "over_id" => $matchInningsOversvalue->id,
                     "over_number" => $matchInningsOversvalue->overs,
-                    "over_status" => $status
+                    "over_status" => $over_status
                 ];
             }
+
             $inningsone[] = [
-                "inning_name" => $matchInningsvalue->innings . " Inning",
-                "inning_status" => $inningsstatus,
+                "inning_name" => $match_inning->innings . " Inning",
+                "inning_status" => $innings_status,
                 "overs" => $over,
             ];
         }
+
         $matchdetail['matchdetail'] = [
-                "match" => $matchdata['title'],
-                "short_title" => $matchdata['short_title'],
-                "status"  => $matchdata['status_str'],
-                "note"  => $matchdata['status_note'],
-                "datetime"  => $matchdata['date_start'],
-                "teama"  => $matchdata['teama'],
-                "teamb"  => $matchdata['teamb'],
-                "innings" => $inningsone
-            ];
+            "match" => $matchdata['title'],
+            "short_title" => $matchdata['short_title'],
+            "status"  => $matchdata['status_str'],
+            "note"  => $matchdata['status_note'],
+            "datetime"  => $matchdata['date_start'],
+            "teama"  => $matchdata['teama'],
+            "teamb"  => $matchdata['teamb'],
+            "innings" => $inningsone
+        ];
 
         return ApiResponse::successResponse($matchdetail ?? null, $message ?? "Matches Data Not Found");
+
     }
 
     public function questionListForOver(Request $request)

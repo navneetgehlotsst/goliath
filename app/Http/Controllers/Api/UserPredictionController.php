@@ -71,7 +71,8 @@ class UserPredictionController extends Controller
             }
 
 
-            $checkUserpredictedorNot = Prediction::where('user_id', $userId)->where('match_id', $matchid)->where('over_id', $overid)->get();
+            $checkUserpredictedorNot = Prediction::where('user_id', $userId)->where('match_id', $matchid)->where('over_id', $overid)->first();
+            //dd($checkUserpredictedorNot);
 
             if($checkUserpredictedorNot){
                 return ApiResponse::errorResponse("You Have already given answere for this Question");

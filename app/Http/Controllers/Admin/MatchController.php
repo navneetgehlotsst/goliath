@@ -13,6 +13,8 @@ use App\Models\{
 
 };
 
+use Carbon\Carbon;
+
 class MatchController extends Controller
 {
     public function index($cId)
@@ -24,6 +26,12 @@ class MatchController extends Controller
     public function matchInfo($id)
     {
         try {
+
+            Carbon::setTestNow(Carbon::now()->tz('GMT'));
+
+            // Now you can work with GMT time using Carbon
+            echo $gmtTime = Carbon::now();
+
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
 
             // Function to make curl requests
