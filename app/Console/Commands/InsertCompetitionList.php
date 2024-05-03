@@ -30,53 +30,15 @@ class InsertCompetitionList extends Command
     public function handle()
     {
         try {
-            $currentYear = Carbon::now()->year;
+
+            $compdata = Competition::get();
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
             $perPage = 500;
-            $apiurl = "https://rest.entitysport.com/v2/seasons/$currentYear/competitions?token=$token&per_page=$perPage";
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => $apiurl,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-            ));
-
-            $competitionresponse = curl_exec($curl);
-            curl_close($curl);
-
-            $competitionresponsedata = json_decode($competitionresponse, true);
-            $compdata = $competitionresponsedata['response']['items'];
-
-            // Collect competition IDs
-            $competitionIds = array_column($compdata, 'cid');
-
-            // Fetch existing competitions
-            $existingCompetitions = Competition::whereIn('competiton_id', $competitionIds)->get()->keyBy('competiton_id');
 
             foreach ($compdata as $value) {
-                $competitiondata = [
-                    'competiton_id' => $value['cid'],
-                    'title' => $value['title'],
-                    'type' => $value['category'],
-                    'competition_type' => $value['match_format'],
-                    'date_start' => $value['datestart'],
-                    'date_end' => $value['dateend'],
-                    'status' => $value['status'],
-                ];
-
-                if ($existingCompetitions->has($value['cid'])) {
-                    // Update existing competition
-                    $existingCompetitions[$value['cid']]->update($competitiondata);
-                } else {
-                    // Create new competition
-                    Competition::create($competitiondata);
-                }
-                $cId = $value['cid'];
+                $cId = $value->competiton_id;
                 $pagedatacount = 100;
-                $apiurlmatch = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$pagedatacount";
+                $apiurlmatch = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$perPage";
 
                 $curlmatch = curl_init($apiurlmatch);
 

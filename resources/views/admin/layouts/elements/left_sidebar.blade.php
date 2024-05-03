@@ -37,7 +37,7 @@
 			</a>
 		</li>
 
-        <li class="menu-item {{ request()->is('admin/questions') ? 'active' : ''}}">
+        <li class="menu-item {{ request()->is('admin/questions*') ? 'active' : ''}}">
 			<a href="{{route('admin.questions.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-data"></i>
 				<div data-i18n="questions">Question</div>
@@ -66,7 +66,7 @@
 		</li>
 
 
-        <li class="menu-item {{ request()->is('admin/how-to-play') ? 'active' : ''}}">
+        <li class="menu-item {{ request()->is('admin/how-to-play*') ? 'active' : ''}}">
 			<a href="{{route('admin.how-to-play.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-envelope"></i>
 				<div data-i18n="HowToPLay">How to Play</div>

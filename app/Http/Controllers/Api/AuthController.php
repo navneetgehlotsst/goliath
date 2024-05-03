@@ -300,8 +300,8 @@ class AuthController extends Controller
                 $user->last_name = $lastName;
                 $user->full_name = $data['full_name'];
                 $user->slug = Helper::slug('users', $data['full_name']);
-                $user->email = $data['email'] ?? null;
-                $user->phone = $data['phone'] ?? null;
+                $user->email = $data['email'] ?? "";
+                $user->phone = $data['phone'] ?? "";
                 $user->country_code = $countrycode ?? '91';
                 $user->device_type = $data['device_type'] ?? null;
                 $user->device_token = $data['device_token'] ?? null;

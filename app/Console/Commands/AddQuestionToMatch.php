@@ -5,7 +5,8 @@ use App\Models\{
     Question,
     MatchInnings,
     InningsOver,
-    OverQuestions
+    OverQuestions,
+    Competition
 };
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -55,9 +56,35 @@ class AddQuestionToMatch extends Command
             $competitionresponsedata = json_decode($competitionresponse, true);
             $compdata = $competitionresponsedata['response']['items'] ?? [];
 
+            // Collect competition IDs
+            $competitionIds = array_column($compdata, 'cid');
+
+            // Fetch existing competitions
+            $existingCompetitions = Competition::whereIn('competiton_id', $competitionIds)->get()->keyBy('competiton_id');
+
             $questionIds = Question::where('type', 'initial')->pluck('id')->toArray();
 
             foreach ($compdata as $compdatakey => $compdatavalue) {
+
+                $competitiondata = [
+                    'competiton_id' => $compdatavalue['cid'],
+                    'title' => $compdatavalue['title'],
+                    'type' => $compdatavalue['category'],
+                    'competition_type' => $compdatavalue['match_format'],
+                    'date_start' => $compdatavalue['datestart'],
+                    'date_end' => $compdatavalue['dateend'],
+                    'status' => $compdatavalue['status'],
+                ];
+
+                if ($existingCompetitions->has($compdatavalue['cid'])) {
+                    // Update existing competition
+                    $existingCompetitions[$compdatavalue['cid']]->update($competitiondata);
+                } else {
+                    // Create new competition
+                    Competition::create($competitiondata);
+                }
+
+
                 $cId = $compdatavalue['cid'];
                 $pagedatacount = 100;
                 $apiurlScheduled = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$pagedatacount&paged=$page";
