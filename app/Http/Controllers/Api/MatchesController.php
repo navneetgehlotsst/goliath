@@ -44,9 +44,52 @@ class MatchesController extends Controller
             ->orderBy('match_start_date', 'ASC')
             ->orderBy('match_start_time', 'ASC')
             ->paginate(10);
+            $transformedMatches = [];
+
+            foreach ($datamatches as $key => $match) {
+                $transformedMatch = [
+                        "id"=> $match->id,
+                        "competiton_id" => $match->competiton_id,
+                        "match_id" => $match->match_id,
+                        "match" => $match->match,
+                        "short_title" => $match->teama_short_name . " vs " . $match->teamb_short_name,
+                        "status" => $match->status,
+                        "note" => "No additional note available",
+                        "match_start_date" => $match->match_start_date,
+                        "match_start_time" => $match->match_start_time,
+                        "formate" => $match->formate,
+                        "teama" => [
+                            "team_id" => null, // Set team ID if available, otherwise null.
+                            "name" => $match->teama_name,
+                            "short_name" => $match->teama_short_name,
+                            "logo_url" => $match->teama_img,
+                            "thumb_url" => $match->teama_img,
+                            "scores_full" => "", // Set scores if available.
+                            "scores" => "", // Set scores if available.
+                            "overs" => "", // Set overs if available.
+                        ],
+                        "teamb" => [
+                            "team_id" => null, // Set team ID if available, otherwise null.
+                            "name" => $match->teamb_name,
+                            "short_name" => $match->teamb_short_name,
+                            "logo_url" => $match->teamb_img,
+                            "thumb_url" => $match->teamb_img,
+                            "scores_full" => "", // Set scores if available.
+                            "scores" => "", // Set scores if available.
+                            "overs" => "", // Set overs if available.
+                        ],
+                        "innings" => [] // Assuming no detailed innings information is available initially.
+                ];
+
+                $datamatches[$key] = $transformedMatch;
+            }
+            $matchesdata['matchlist'] = $datamatches;
+            // Now $transformedMatches contains the transformed data in the desired format.
+
+
 
         return $datamatches->count()
-            ? ApiResponse::successResponse($datamatches, "Matches Data Found")
+            ? ApiResponse::successResponse($matchesdata, "Matches Data Found")
             : ApiResponse::errorResponse("Matches Data Not Found");
     }
 
