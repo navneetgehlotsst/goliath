@@ -14,7 +14,8 @@ use Illuminate\Filesystem\Filesystem;
 use App\Models\{
     Prediction,
     OverQuestions,
-    InningsOver
+    InningsOver,
+    CompetitionMatches
 
 };
 
@@ -116,26 +117,54 @@ class UserPredictionController extends Controller
                 'over_id' => 'required',
                 'match_id' => 'required',
             ]);
-
+            $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
             $matchdata = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/scorecard/?token={$this->token}")['response'];
-            $datamatches = Prediction::select('predictions.question_id','predictions.over_id','predictions.answere','questions.question','innings_overs.overs')
+            $userprediction = Prediction::select('predictions.question_id','predictions.over_id','predictions.answere','questions.question','innings_overs.overs')
                 ->where('predictions.over_id', $input['over_id'])
                 ->join('questions', 'predictions.question_id', '=', 'questions.id')
                 ->join('innings_overs', 'predictions.over_id', '=', 'innings_overs.id')
                 ->get();
 
-            return ApiResponse::successResponse([
-                "match" => $matchdata['title'],
-                "short_title" => $matchdata['short_title'],
-                "status"  => $matchdata['status_str'],
-                "note"  => $matchdata['status_note'],
-                "datetime"  => $matchdata['date_start'],
-                "teama"  => $matchdata['teama'],
-                "teamb"  => $matchdata['teamb'],
-                "overnumber" => $datamatches->isEmpty() ? '0' : $datamatches->first()->overs,
-                "question" => $datamatches,
-            ], $datamatches->isEmpty() ? "Question Not Found" : "Question Data Found");
+                $transformedMatch['matchdetail'] = [
+                    "id"=> $datamatches->id,
+                    "competiton_id" => $datamatches->competiton_id,
+                    "match_id" => $datamatches->match_id,
+                    "match" => $datamatches->match,
+                    "short_title" => $datamatches->teama_short_name . " vs " . $datamatches->teamb_short_name,
+                    "status" => $datamatches->status,
+                    "note" => $datamatches->note,
+                    "match_start_date" => $datamatches->match_start_date,
+                    "match_start_time" => $datamatches->match_start_time,
+                    "formate" => $datamatches->formate,
+                    "teama" => [
+                        "team_id" => $datamatches->teamaid, // Set team ID if available, otherwise null.
+                        "name" => $datamatches->teama_name,
+                        "short_name" => $datamatches->teama_short_name,
+                        "logo_url" => $datamatches->teama_img,
+                        "thumb_url" => $datamatches->teama_img,
+                        "scores_full" => $datamatches->teamascorefull, // Set scores if available.
+                        "scores" => $datamatches->teamascore, // Set scores if available.
+                        "overs" => $datamatches->teamaover, // Set overs if available.
+                    ],
+                    "teamb" => [
+                        "team_id" => $datamatches->teambid, // Set team ID if available, otherwise null.
+                        "name" => $datamatches->teamb_name,
+                        "short_name" => $datamatches->teamb_short_name,
+                        "logo_url" => $datamatches->teamb_img,
+                        "thumb_url" => $datamatches->teamb_img,
+                        "scores_full" => $datamatches->teambscorefull, // Set scores if available.
+                        "scores" => $datamatches->teambscore, // Set scores if available.
+                        "overs" => $datamatches->teambover, // Set overs if available.
+                    ],
+                    "overnumber" => $userprediction->isEmpty() ? '0' : $userprediction->first()->overs,
+                    "question" => $userprediction,
+                ];
 
+                if($transformedMatch){
+                    return ApiResponse::successResponse($transformedMatch,"Question Found");
+                }else{
+                    return ApiResponse::errorResponse("Question Not Found");
+                }
 
         } catch (Exception $e) {
             DB::rollback();

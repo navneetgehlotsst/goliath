@@ -22,6 +22,15 @@ class CompetitionMatches extends Model
         'formate',
         'match_start_date',
         'match_start_time',
-        'status'
+        'status',
+        'note',
+        'teamaid',
+        'teambid',
+        'teamascorefull',
+        'teambscorefull',
+        'teamascore',
+        'teambscore',
+        'teamaover',
+        'teambover',
     ];
 }
