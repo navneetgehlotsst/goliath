@@ -44,7 +44,7 @@ class AuthController extends Controller
         $commonRules = [
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
-            'type' => 'required|in:login,register',
+            'type' => 'required|in:login,register,update',
         ];
 
         $typeSpecificRules = [
@@ -83,8 +83,34 @@ class AuthController extends Controller
 
             // Begin transaction
             DB::beginTransaction();
+            if ($data['type'] == 'update') {
+                if(isset($data['phone'])){
+                    $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
+                    if ($user) {
+                        return ApiResponse::errorResponse('Phone Number already exit');
+                    }
+                }else{
+                    $user = User::where('email',$data['email'])->where('role','user')->first();
+                    if ($user) {
+                        return ApiResponse::errorResponse('Email already exit');
+                    }
+                }
 
-            if ($data['type'] == 'login') {
+
+                $checkotp = new CheckOtp();
+                $checkotp->country_code = $countrycode ?? null;
+                $checkotp->data = $data['phone'] ?? $data['email'];
+                $checkotp->otp = $otp;
+                $checkotp->otp_expire_time = $otpExpiry;
+                $checkotp->save();
+
+                $dataUser['user'] = [
+                    'email' => $data['email'] ?? "",
+                    'phone' => $data['phone'] ?? "",
+                    'country_code' => '+'.$countrycode ?? "",
+                    'type' => $data['type'],
+                ];
+            }else if ($data['type'] == 'login') {
                 if(isset($data['phone'])){
                     $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
                 }else{
@@ -226,7 +252,7 @@ class AuthController extends Controller
             'full_name' => 'sometimes|string',
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
-            'type' => 'required|in:login,register',
+            'type' => 'required|in:login,register,update',
         ];
 
         $typeSpecificRules = [
@@ -278,48 +304,58 @@ class AuthController extends Controller
         }
         CheckOtp::find($otp->id)->forceDelete();
         try {
-            if($data['type'] == 'login'){
-                DB::beginTransaction();
-                // Otp Delete
-                //CheckOtp::where('id', $otp->id)->forceDelete();
+            if($data['type'] == 'update'){
                 if(isset($data['phone'])){
-                    $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
+                    $message = "Phone Verifed Succesfully";
+                    return ApiResponse::successResponsenoData($message);
                 }else{
-                    $user = User::where('email',$data['email'])->where('role','user')->first();
+                    $message = "Email Verifed Succesfully";
+                    return ApiResponse::successResponsenoData($message);
+                }
+            }else{
+                if($data['type'] == 'login'){
+                    DB::beginTransaction();
+                    // Otp Delete
+                    //CheckOtp::where('id', $otp->id)->forceDelete();
+                    if(isset($data['phone'])){
+                        $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
+                    }else{
+                        $user = User::where('email',$data['email'])->where('role','user')->first();
+                    }
+
+                }else{
+
+                    $fullName = explode(" ", $data['full_name']);
+                    $firstName = $fullName[0] ?? '';
+                    $lastName = $fullName[1] ?? '';
+
+
+                    $user = new User();
+                    $user->first_name = $firstName;
+                    $user->last_name = $lastName;
+                    $user->full_name = $data['full_name'];
+                    $user->slug = Helper::slug('users', $data['full_name']);
+                    $user->email = $data['email'] ?? null;
+                    $user->phone = $data['phone'] ?? null;
+                    $user->country_code = $countrycode ?? '91';
+                    $user->device_type = $data['device_type'] ?? null;
+                    $user->device_token = $data['device_token'] ?? null;
+                    $user->save();
                 }
 
-            }else{
+                // Make User Login
+                $input = isset($data['phone']) ? ['phone' => $data['phone'], 'country_code' => $countrycode] : ['email' => $data['email']];
+                $token = JWTAuth::fromUser($user);
 
-                $fullName = explode(" ", $data['full_name']);
-                $firstName = $fullName[0] ?? '';
-                $lastName = $fullName[1] ?? '';
+                $dataResponse = [
+                        'access_token' => $token,
+                        'token_type' => 'bearer',
+                        'user' => $this->getUserDetail($user->id),
+                    ];
 
-
-                $user = new User();
-                $user->first_name = $firstName;
-                $user->last_name = $lastName;
-                $user->full_name = $data['full_name'];
-                $user->slug = Helper::slug('users', $data['full_name']);
-                $user->email = $data['email'] ?? "";
-                $user->phone = $data['phone'] ?? "";
-                $user->country_code = $countrycode ?? '91';
-                $user->device_type = $data['device_type'] ?? null;
-                $user->device_token = $data['device_token'] ?? null;
-                $user->save();
+                $message = $data['type'] == 'login' ? 'Login successfully!' : 'Account created successfully!';
+                return ApiResponse::successResponse($dataResponse, $message);
             }
-
-             // Make User Login
-             $input = isset($data['phone']) ? ['phone' => $data['phone'], 'country_code' => $countrycode] : ['email' => $data['email']];
-             $token = JWTAuth::fromUser($user);
-
-             $dataResponse = [
-                    'access_token' => $token,
-                    'token_type' => 'bearer',
-                    'user' => $this->getUserDetail($user->id),
-                ];
-
-            $message = $data['type'] == 'login' ? 'Login successfully!' : 'Account created successfully!';
-            return ApiResponse::successResponse($dataResponse, $message);
         } catch (Exception $e) {
             DB::rollback();
             return ApiResponse::errorResponse($e->getMessage());

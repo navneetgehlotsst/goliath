@@ -121,7 +121,7 @@ class UserPredictionController extends Controller
             ]);
             $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
             $matchdata = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/scorecard/?token={$this->token}")['response'];
-            $userprediction = Prediction::select('predictions.question_id','predictions.over_id','predictions.answere','questions.question','innings_overs.overs')
+            $userprediction = Prediction::select('predictions.question_id','predictions.over_id','predictions.answere as your_answer','questions.question','innings_overs.overs')
                 ->where('predictions.over_id', $input['over_id'])
                 ->join('questions', 'predictions.question_id', '=', 'questions.id')
                 ->join('innings_overs', 'predictions.over_id', '=', 'innings_overs.id')
