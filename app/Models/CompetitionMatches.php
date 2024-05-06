@@ -34,4 +34,10 @@ class CompetitionMatches extends Model
         'teambover',
         'live_innings'
     ];
+
+
+    public function matchInnings()
+    {
+        return $this->hasMany(MatchInnings::class, 'match_id', 'match_id');
+    }
 }

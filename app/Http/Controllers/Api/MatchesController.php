@@ -99,22 +99,64 @@ class MatchesController extends Controller
             'match_id' => 'required',
         ]);
 
+        // Fetching match data
         $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
-        // Fetch match data and live score data concurrently
-        $livePromise = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/live/?token={$this->token}");
-        $matchdatalive = $livePromise['response'];
 
-        $currentover = $matchdatalive['live_score']['overs'] ?? 0;
+        if (!$datamatches) {
+            return ApiResponse::errorResponse(null, "Match Data Not Found");
+        }
 
-        // Calculate current over final
+        $live_innings = $datamatches->live_innings;
+
+        // Fetching current innings data
+        $datamatchinnings = MatchInnings::where('match_id', $input['match_id'])
+            ->where('innings', $live_innings)
+            ->first();
+
+        $currentover = $datamatchinnings ? $datamatchinnings->current_overs : 0;
+
+        // Adding 1 to the integer part if necessary
         $current_over = ceil($currentover);
         $nextover = $current_over + 3;
 
-        // Fetch innings data
-        $matchInnings = MatchInnings::where('match_innings.match_id', $input['match_id'])->get();
+        // Fetching all innings data for the match
+        $matchInnings = MatchInnings::where('match_id', $input['match_id'])->get();
 
-        $matchdetail = [];
-        $inningsone = [];
+        $transformedMatch = [
+            "matchdetail" => [
+                "id" => $datamatches->id,
+                "competition_id" => $datamatches->competition_id, // Corrected typo
+                "match_id" => $datamatches->match_id,
+                "match" => $datamatches->match,
+                "short_title" => $datamatches->teama_short_name . " vs " . $datamatches->teamb_short_name,
+                "status" => $datamatches->status,
+                "note" => $datamatches->note,
+                "match_start_date" => $datamatches->match_start_date,
+                "match_start_time" => $datamatches->match_start_time,
+                "format" => $datamatches->format, // Corrected typo
+                "teama" => [
+                    "team_id" => $datamatches->teamaid,
+                    "name" => $datamatches->teama_name,
+                    "short_name" => $datamatches->teama_short_name,
+                    "logo_url" => $datamatches->teama_img,
+                    "thumb_url" => $datamatches->teama_img,
+                    "scores_full" => $datamatches->teamascorefull,
+                    "scores" => $datamatches->teamascore,
+                    "overs" => $datamatches->teamaover,
+                ],
+                "teamb" => [
+                    "team_id" => $datamatches->teambid,
+                    "name" => $datamatches->teamb_name,
+                    "short_name" => $datamatches->teamb_short_name,
+                    "logo_url" => $datamatches->teamb_img,
+                    "thumb_url" => $datamatches->teamb_img,
+                    "scores_full" => $datamatches->teambscorefull,
+                    "scores" => $datamatches->teambscore,
+                    "overs" => $datamatches->teambover,
+                ],
+                "innings" => [], // Initialize innings array
+            ]
+        ];
 
         foreach ($matchInnings as $match_inning) {
             $innings_status = '';
@@ -126,7 +168,7 @@ class MatchesController extends Controller
                 $over_status = '';
                 $prediction = Prediction::where('over_id', $matchInningsOversvalue->id)->first();
 
-                if ($match_inning->innings == $matchdatascorecard['latest_inning_number']) {
+                if ($match_inning->innings == $live_innings) {
                     if ($prediction) {
                         $over_status = "Predicted";
                     } else {
@@ -143,12 +185,12 @@ class MatchesController extends Controller
                     $innings_status = "Ongoing";
                 }
 
-                if ($match_inning->innings < $matchdatascorecard['latest_inning_number']) {
+                if ($match_inning->innings < $live_innings) {
                     $over_status = "Completed";
                     $innings_status = "Completed";
                 }
 
-                if ($match_inning->innings > $matchdatascorecard['latest_inning_number']) {
+                if ($match_inning->innings > $live_innings) {
                     $over_status = "Upcoming";
                     $innings_status = "Upcoming";
                 }
@@ -160,48 +202,15 @@ class MatchesController extends Controller
                 ];
             }
 
-            $inningsone[] = [
+            $transformedMatch['matchdetail']['innings'][] = [
                 "inning_name" => $match_inning->innings . " Inning",
                 "inning_status" => $innings_status,
                 "overs" => $over,
             ];
         }
 
-        $transformedMatch['matchdetail'] = [
-            "id"=> $datamatches->id,
-            "competiton_id" => $datamatches->competiton_id,
-            "match_id" => $datamatches->match_id,
-            "match" => $datamatches->match,
-            "short_title" => $datamatches->teama_short_name . " vs " . $datamatches->teamb_short_name,
-            "status" => $datamatches->status,
-            "note" => $datamatches->note,
-            "match_start_date" => $datamatches->match_start_date,
-            "match_start_time" => $datamatches->match_start_time,
-            "formate" => $datamatches->formate,
-            "teama" => [
-                "team_id" => $datamatches->teamaid, // Set team ID if available, otherwise null.
-                "name" => $datamatches->teama_name,
-                "short_name" => $datamatches->teama_short_name,
-                "logo_url" => $datamatches->teama_img,
-                "thumb_url" => $datamatches->teama_img,
-                "scores_full" => $datamatches->teamascorefull, // Set scores if available.
-                "scores" => $datamatches->teamascore, // Set scores if available.
-                "overs" => $datamatches->teamaover, // Set overs if available.
-            ],
-            "teamb" => [
-                "team_id" => $datamatches->teambid, // Set team ID if available, otherwise null.
-                "name" => $datamatches->teamb_name,
-                "short_name" => $datamatches->teamb_short_name,
-                "logo_url" => $datamatches->teamb_img,
-                "thumb_url" => $datamatches->teamb_img,
-                "scores_full" => $datamatches->teambscorefull, // Set scores if available.
-                "scores" => $datamatches->teambscore, // Set scores if available.
-                "overs" => $datamatches->teambover, // Set overs if available.
-            ],
-            "innings" => $inningsone // Assuming no detailed innings information is available initially.
-        ];
+        return ApiResponse::successResponse($transformedMatch, "Matches Data Found"); // Simplified response message
 
-        return ApiResponse::successResponse($transformedMatch ?? null, $message ?? "Matches Data Not Found");
 
     }
 

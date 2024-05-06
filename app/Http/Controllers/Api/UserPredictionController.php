@@ -15,7 +15,8 @@ use App\Models\{
     Prediction,
     OverQuestions,
     InningsOver,
-    CompetitionMatches
+    CompetitionMatches,
+    MatchInnings,
 
 };
 
@@ -61,9 +62,18 @@ class UserPredictionController extends Controller
 
             // $questionAns = json_decode($questionans, true);
 
-            $matchdatalive = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/live/?token={$this->token}")['response'];
+            $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
 
-            $currentover = $matchdatalive['live_score']['overs'] ?? "0";
+            $live_innings = $datamatches->live_innings;
+
+            $datamatchinnings = MatchInnings::where('match_id', $input['match_id'])->where('innings', $live_innings)->first();
+
+            if ($datamatchinnings->current_overs != intval($datamatchinnings->current_overs)) {
+                // Add 1 to the integer part
+                $currentover = intval($datamatchinnings->current_overs) + 1 ?? 0;
+            }else{
+                $currentover = $datamatchinnings->current_overs ?? 0;
+            }
 
             $checkOver = InningsOver::where('id', $overid)->first();
 
@@ -120,7 +130,6 @@ class UserPredictionController extends Controller
                 'match_id' => 'required',
             ]);
             $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
-            $matchdata = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/scorecard/?token={$this->token}")['response'];
             $userprediction = Prediction::select('predictions.question_id','predictions.over_id','predictions.answere as your_answer','questions.question','innings_overs.overs')
                 ->where('predictions.over_id', $input['over_id'])
                 ->join('questions', 'predictions.question_id', '=', 'questions.id')
