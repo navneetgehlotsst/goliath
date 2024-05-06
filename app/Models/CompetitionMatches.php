@@ -32,5 +32,6 @@ class CompetitionMatches extends Model
         'teambscore',
         'teamaover',
         'teambover',
+        'live_innings'
     ];
 }

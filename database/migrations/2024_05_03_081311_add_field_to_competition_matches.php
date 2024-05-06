@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('teambscore');
             $table->string('teamaover');
             $table->string('teambover');
+            $table->integer('live_innings')->default('0');
         });
     }
 
@@ -39,6 +40,7 @@ return new class extends Migration
             $table->dropColumn('teambscore');
             $table->dropColumn('teamaover');
             $table->dropColumn('teambover');
+            $table->dropColumn('live_innings');
         });
     }
 };

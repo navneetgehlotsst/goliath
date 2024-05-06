@@ -31,7 +31,7 @@ class InsertCompetitionList extends Command
     {
         try {
 
-            $compdata = Competition::get();
+            $compdata = Competition::where('status', 'like', 'live')->get();
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
             $perPage = 500;
 

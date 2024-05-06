@@ -102,9 +102,7 @@ class MatchesController extends Controller
         $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
         // Fetch match data and live score data concurrently
         $livePromise = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/live/?token={$this->token}");
-        $matchPromise = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/scorecard/?token={$this->token}");
         $matchdatalive = $livePromise['response'];
-        $matchdatascorecard = $matchPromise['response'];
 
         $currentover = $matchdatalive['live_score']['overs'] ?? 0;
 
@@ -214,7 +212,6 @@ class MatchesController extends Controller
             'match_id' => 'required',
         ]);
 
-        $matchdata = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/scorecard/?token={$this->token}")['response'];
         $dataquestion = OverQuestions::select('over_questions.id','over_questions.question_id','questions.question','innings_overs.overs')
             ->where('over_questions.innings_over_id', $input['over_id'])
             ->join('questions', 'over_questions.question_id', '=', 'questions.id')
