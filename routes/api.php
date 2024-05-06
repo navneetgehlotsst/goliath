@@ -54,4 +54,5 @@ Route::middleware('jwt.verify')->group(function() {
     Route::post('/save-user-prediction', [UserPredictionController::class, 'saveUserPrediction']);
     Route::post('/user-prediction', [UserPredictionController::class, 'getUserPrediction']);
     Route::post('/get-predictions', [UserPredictionController::class, 'getPredictions']);
+    Route::post('/mypredictions', [UserPredictionController::class, 'listPredictions']);
 });

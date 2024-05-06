@@ -183,4 +183,17 @@ class UserPredictionController extends Controller
         }
 
     }
+
+
+    public function listPredictions(Request $request){
+        try {
+
+
+
+        } catch (Exception $e) {
+            DB::rollback();
+            return ApiResponse::errorResponse($e->getMessage());
+        }
+
+    }
 }
