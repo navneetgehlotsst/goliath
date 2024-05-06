@@ -57,14 +57,16 @@ class UserPredictionController extends Controller
             $userId = auth()->id();
             $matchid = $input['match_id'];
             $overid = $input['over_id'];
-            $questionans = $input['questionans'];
-            $questionAns = json_decode($questionans, true);
+            $questionAns = $input['questionans'];
+
+            // $questionAns = json_decode($questionans, true);
 
             $matchdatalive = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/live/?token={$this->token}")['response'];
 
             $currentover = $matchdatalive['live_score']['overs'] ?? "0";
 
             $checkOver = InningsOver::where('id', $overid)->first();
+
             $userpredictionOver = $checkOver->overs;
 
             if($currentover >= $userpredictionOver){

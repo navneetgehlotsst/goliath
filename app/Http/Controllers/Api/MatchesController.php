@@ -102,8 +102,9 @@ class MatchesController extends Controller
         $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
         // Fetch match data and live score data concurrently
         $livePromise = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/live/?token={$this->token}");
-
+        $matchPromise = $this->makeCurlRequest("https://rest.entitysport.com/v2/matches/{$input['match_id']}/scorecard/?token={$this->token}");
         $matchdatalive = $livePromise['response'];
+        $matchdatascorecard = $matchPromise['response'];
 
         $currentover = $matchdatalive['live_score']['overs'] ?? 0;
 
@@ -127,7 +128,7 @@ class MatchesController extends Controller
                 $over_status = '';
                 $prediction = Prediction::where('over_id', $matchInningsOversvalue->id)->first();
 
-                if ($match_inning->innings == $matchdatalive['live_inning_number']) {
+                if ($match_inning->innings == $matchdatascorecard['latest_inning_number']) {
                     if ($prediction) {
                         $over_status = "Predicted";
                     } else {
@@ -144,12 +145,12 @@ class MatchesController extends Controller
                     $innings_status = "Ongoing";
                 }
 
-                if ($match_inning->innings < $matchdatalive['live_inning_number']) {
+                if ($match_inning->innings < $matchdatascorecard['latest_inning_number']) {
                     $over_status = "Completed";
                     $innings_status = "Completed";
                 }
 
-                if ($match_inning->innings > $matchdatalive['live_inning_number']) {
+                if ($match_inning->innings > $matchdatascorecard['latest_inning_number']) {
                     $over_status = "Upcoming";
                     $innings_status = "Upcoming";
                 }
