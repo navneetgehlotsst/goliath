@@ -17,6 +17,8 @@ use App\Models\{
     InningsOver,
     CompetitionMatches,
     MatchInnings,
+    User,
+    Transaction
 
 };
 
@@ -118,10 +120,7 @@ class UserPredictionController extends Controller
             DB::rollback();
             return ApiResponse::errorResponse($e->getMessage());
         }
-
     }
-
-
 
     public function getUserPrediction(Request $request){
         try {
@@ -246,5 +245,88 @@ class UserPredictionController extends Controller
             return ApiResponse::errorResponse($e->getMessage());
         }
 
+    }
+
+    public function confirmPrediction(Request $request){
+        try {
+
+            $input = $request->all();
+
+            $validator = Validator::make($input, [
+                'match_id' => 'required',
+                'over_id' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return ApiResponse::errorResponse($validator->errors()->first());
+            }
+
+            $user = auth()->user();
+            $userId = $user->id;
+            $userWallet = $user->wallet;
+            $payamount = env('BETING_AMOUNT');
+
+            //check wallet Blance
+
+            if ($userWallet < $payamount) {
+                return ApiResponse::errorResponse("Your Wallet balance is insufficient");
+            }
+
+            $matchid = $input['match_id'];
+            $overid = $input['over_id'];
+
+            $datamatches = CompetitionMatches::where('match_id', $matchid)->first();
+            //check Match
+            if (!$datamatches) {
+                return ApiResponse::errorResponse("Match not found");
+            }
+
+            // check status
+            if ($datamatches->status === "Completed") {
+                return ApiResponse::errorResponse("Match Completed, You can't predict here");
+            }
+
+            $live_innings = $datamatches->live_innings;
+
+            $datamatchinnings = MatchInnings::where('match_id', $matchid)
+                ->where('innings', $live_innings)
+                ->first();
+
+            $currentover = $datamatchinnings ? intval($datamatchinnings->current_overs) + 1 : 0;
+
+            $checkOver = InningsOver::find($overid);
+            //check over
+            if (!$checkOver) {
+                return ApiResponse::errorResponse("Over not found");
+            }
+
+            $userpredictionOver = $checkOver->overs;
+            // check over status
+            if ($currentover >= $userpredictionOver) {
+                return ApiResponse::errorResponse("Prediction time is complete for this over");
+            }
+            // reduce payment from wallet
+            User::where('id', $userId)->decrement('wallet', $payamount);
+
+            $datatran = [
+                'user_id' => $userId,
+                'amount' =>  $payamount,
+                'transaction_id' =>  "mCQF63epGk",
+                'transaction_type' => "pay",
+                'payment_mode' => "debite"
+            ];
+
+            Transaction::create($datatran);
+
+            // cnfrnm pridiction
+            Prediction::where('user_id', $userId)->where('match_id', $matchid)->where('over_id', $overid)->update(['status' => 'confirm']);
+
+            $message = "Predicted Confrm Succesfully";
+            return ApiResponse::successResponsenoData($message);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            return ApiResponse::errorResponse($e->getMessage());
+        }
     }
 }

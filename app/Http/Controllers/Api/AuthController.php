@@ -438,8 +438,30 @@ class AuthController extends Controller
                 return ApiResponse::errorResponse($message);
             }
             else{
+                $addwallet = 0;
+                $pay = 0;
+                $winningamount = 0;
+                $withdrawalamount = 0;
                 $message = 'User found successfully.';
                 $datauser['user'] = $this->getUserDetail($user->id);
+                $userTransiction = Transaction::where('user_id',$user->id)->get();
+                foreach ($userTransiction as $userKey => $userValue) {
+                    if($userValue->transaction_type == 'add-wallet'){
+                        $addwallet += $userValue->amount;
+                    }elseif($userValue->transaction_type == 'pay'){
+                        $pay += $userValue->amount;
+                    }elseif($userValue->transaction_type == 'winning-amount'){
+                        $winningamount += $userValue->amount;
+                    }elseif($userValue->transaction_type == 'withdrawal-amount'){
+                        $withdrawalamount += $userValue->amount;
+                    }
+                }
+                $datauser['wallet_detail'] = [
+                    'total_diposite' => $addwallet,
+                    'total_winning' => $winningamount,
+                    'total_fee_paid' => $pay,
+                    'total_withdrawal' => $withdrawalamount,
+                ];
                 return ApiResponse::successResponse($datauser, $message);
             }
         }catch(Exception $e){
@@ -506,7 +528,7 @@ class AuthController extends Controller
 
 
     public function getUserDetail($user_id){
-        $user = User::select('id','full_name','email','phone','country_code','avatar')->where('id',$user_id)->first();
+        $user = User::select('id','full_name','email','phone','country_code','avatar','wallet')->where('id',$user_id)->first();
 
         $user->id = $user->id ?? "";
         $user->full_name = $user->full_name ?? "";
