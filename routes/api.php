@@ -47,6 +47,7 @@ Route::middleware('jwt.verify')->group(function() {
     Route::post('/update-profile', [AuthController::class, 'updateProfile']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::delete('/delete-account', [AuthController::class, 'deleteAccount']);
+    Route::post('/add-wallet', [AuthController::class, 'addWallet']);
     Route::post('/competition-list', [CompetitionController::class, 'competitionList']);
     Route::post('/matches-list', [MatchesController::class, 'matchesList']);
     Route::post('/matches-detail', [MatchesController::class, 'matchesDetail']);

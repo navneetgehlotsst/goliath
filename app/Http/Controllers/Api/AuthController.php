@@ -12,6 +12,7 @@ use App\Mail\UserRegisterVerifyMail;
 use App\Models\AppUser;
 use App\Models\User;
 use App\Models\CheckOtp;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Filesystem\Filesystem;
 use App\Models\SplashScreen;
@@ -177,72 +178,6 @@ class AuthController extends Controller
         }
 
     }
-
-
-    // public function verifyOtp(Request $request){
-    //     $data = $request->all();
-
-    //     // Validation
-    //     $validator = Validator::make($data, [
-    //         'phone' => 'nullable|numeric',
-    //         'country_code' => 'nullable|numeric',
-    //         'email' => 'nullable|email',
-    //         'otp' => 'required|max:4',
-    //         'type' => 'required|in:login,register',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return ApiResponse::errorResponse($validator->errors()->first());
-    //     }
-
-    //     // Common user retrieval logic
-    //     $userQuery = User::where('otp', $data['otp']);
-
-    //     if (isset($data['phone'])) {
-    //         $userQuery->where('phone', $data['phone']);
-    //     } else {
-    //         $userQuery->where('email', $data['email']);
-    //     }
-
-    //     $appuser = $userQuery->first();
-
-    //     if (!$appuser) {
-    //         return ApiResponse::errorResponse('Invalid detail.');
-    //     }
-
-    //     $currentTimestamp = now()->timestamp;
-
-    //     if ($currentTimestamp > $appuser->otp_expired) {
-    //         return ApiResponse::errorResponse('Otp time has expired.');
-    //     }
-
-    //     try {
-    //         DB::beginTransaction();
-
-    //         // Update user's OTP and OTP expiration
-    //         $user = User::find($appuser->id);
-    //         $user->update(['otp' => '', 'otp_expired' => null]);
-
-    //         // Make User Login
-    //         $input = isset($data['phone']) ? ['phone' => $appuser->phone, 'country_code' => $appuser->country_code] : ['email' => $appuser->email];
-    //         $token = JWTAuth::fromUser($user);
-
-    //         $message = $data['type'] == 'login' ? 'Login successfully!' : 'Account created successfully!';
-    //         $dataResponse = [
-    //             'access_token' => $token,
-    //             'token_type' => 'bearer',
-    //             'user' => $this->getUserDetail($user->id),
-    //         ];
-
-    //         DB::commit();
-
-    //         return ApiResponse::successResponse($dataResponse, $message);
-    //     } catch (Exception $e) {
-    //         DB::rollback();
-    //         return ApiResponse::errorResponse($e->getMessage());
-    //     }
-    // }
-
 
     public function verifyOtp(Request $request){
         $data = $request->all();
@@ -611,5 +546,43 @@ class AuthController extends Controller
         }
 
 
+    }
+
+    public function addWallet(Request $request){
+        $data   =   $request->all();
+        $id = auth()->user()->id;
+
+        $validator = Validator::make($data, [
+            'wallet' => 'required|string',
+        ]);
+
+
+        if($validator->fails()) {
+            $message = $validator->errors()->first();
+            return ApiResponse::errorResponse($message);
+        }
+
+
+        try{
+            $amount = $request->wallet;
+            User::where('id', $id)->increment('wallet', $amount);
+
+            $datatran = [
+                'user_id' => $id,
+                'amount' =>  $amount,
+                'transaction_id' =>  "mCQF63epGk",
+                'transaction_type' => "add-wallet",
+                'payment_mode' => "credit"
+            ];
+
+            Transaction::create($datatran);
+
+            $message = 'Amount Added successfully.';
+            return ApiResponse::successResponsenoData($message);
+
+        }catch(Exception $e){
+            $message = $e->getMessage();
+            return ApiResponse::errorResponse($message);
+        }
     }
 }
