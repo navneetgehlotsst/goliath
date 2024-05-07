@@ -188,7 +188,58 @@ class UserPredictionController extends Controller
     public function listPredictions(Request $request){
         try {
 
+            $userId = auth()->id();
+            $myPrediction = Prediction::select('predictions.user_id', 'predictions.match_id', 'competition_matches.*')
+                            ->where('predictions.user_id', $userId)
+                            ->join('competition_matches', 'predictions.match_id', '=', 'competition_matches.match_id')
+                            ->get();
 
+
+
+            $transformedMatches = [];
+
+            foreach ($myPrediction as $key => $match) {
+                $transformedMatch = [
+                        "id"=> $match->id,
+                        "competiton_id" => $match->competiton_id,
+                        "match_id" => $match->match_id,
+                        "match" => $match->match,
+                        "short_title" => $match->teama_short_name . " vs " . $match->teamb_short_name,
+                        "status" => $match->status,
+                        "note" => $match->note,
+                        "match_start_date" => $match->match_start_date,
+                        "match_start_time" => $match->match_start_time,
+                        "formate" => $match->formate,
+                        "teama" => [
+                            "team_id" => $match->teamaid, // Set team ID if available, otherwise null.
+                            "name" => $match->teama_name,
+                            "short_name" => $match->teama_short_name,
+                            "logo_url" => $match->teama_img,
+                            "thumb_url" => $match->teama_img,
+                            "scores_full" => $match->teamascorefull, // Set scores if available.
+                            "scores" => $match->teamascore, // Set scores if available.
+                            "overs" => $match->teamaover, // Set overs if available.
+                        ],
+                        "teamb" => [
+                            "team_id" => $match->teambid, // Set team ID if available, otherwise null.
+                            "name" => $match->teamb_name,
+                            "short_name" => $match->teamb_short_name,
+                            "logo_url" => $match->teamb_img,
+                            "thumb_url" => $match->teamb_img,
+                            "scores_full" => $match->teambscorefull, // Set scores if available.
+                            "scores" => $match->teambscore, // Set scores if available.
+                            "overs" => $match->teambover, // Set overs if available.
+                        ],
+                ];
+
+                $datamatches[$key] = $transformedMatch;
+            }
+            $matchesdata['matchlist'] = $datamatches;
+
+
+            return $myPrediction->count()
+            ? ApiResponse::successResponse($matchesdata, "Matches Data Found")
+            : ApiResponse::errorResponse("Matches Data Not Found");
 
         } catch (Exception $e) {
             DB::rollback();
