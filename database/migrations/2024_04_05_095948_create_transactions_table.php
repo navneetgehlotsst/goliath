@@ -16,7 +16,8 @@ return new class extends Migration
             $table->integer('user_id')->default('0');
             $table->string('amount')->nullable();
             $table->string('transaction_id')->nullable();
-            $table->enum('transaction_type',['admin-payout','wallet-transiction','winning-amount'])->default('winning-amount');
+            $table->enum('transaction_type',['admin-payout','add-wallet','pay','winning-amount','withdrawal-amount'])->default('winning-amount');
+            $table->enum('payment_mode',['credit','debite'])->default('debite');
             $table->timestamps();
             $table->softDeletes();
         });
