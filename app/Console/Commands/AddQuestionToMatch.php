@@ -111,7 +111,7 @@ class AddQuestionToMatch extends Command
                     $formattedDate = $now->toDateString();
                     if($onlydate == $formattedDate){
                         $format = $matchscheduleddatavalue['format'];
-                        $overlimit = ($format == '7' || $format == '1') ? 50 : (($format == '3' || $format == '6' || $format == '8') ? 20 : 90);
+                        $overlimit = ($format == '7' || $format == '1') ? 50 : (($format == '17') ? 10 : (($format == '3' || $format == '6' || $format == '8') ? 20 : 90));
                         $existingQuestions = MatchInnings::where('match_id', $matchscheduleddatavalue['match_id'])->exists();
 
                         if (!$existingQuestions) {
