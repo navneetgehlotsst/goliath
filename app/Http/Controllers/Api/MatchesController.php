@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Mail,Hash,File,DB,Helper,Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -40,9 +41,10 @@ class MatchesController extends Controller
             'status' => 'required|in:Live,Scheduled,Completed',
         ]);
 
-        $datamatches = CompetitionMatches::where('status', $input['status'])
-            ->orderBy('match_start_date', 'ASC')
-            ->orderBy('match_start_time', 'ASC')
+        $datamatches = CompetitionMatches::where('competition_matches.status', $input['status'])
+            ->join('competitions', 'competition_matches.competiton_id', '=', 'competitions.competiton_id')
+            ->orderBy('competition_matches.match_start_date', 'ASC')
+            ->orderBy('competition_matches.match_start_time', 'ASC')
             ->paginate(10);
             $transformedMatches = [];
 
@@ -50,6 +52,7 @@ class MatchesController extends Controller
                 $transformedMatch = [
                         "id"=> $match->id,
                         "competiton_id" => $match->competiton_id,
+                        "competiton_name" => $match->title,
                         "match_id" => $match->match_id,
                         "match" => $match->match,
                         "short_title" => $match->teama_short_name . " vs " . $match->teamb_short_name,
@@ -98,6 +101,9 @@ class MatchesController extends Controller
         $input = $request->validate([
             'match_id' => 'required',
         ]);
+
+        $user = Auth::user();
+        $userId = $user->id;
 
         // Fetching match data
         $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
@@ -166,7 +172,7 @@ class MatchesController extends Controller
 
             foreach ($matchInningsOversData as $matchInningsOversvalue) {
                 $over_status = '';
-                $prediction = Prediction::where('over_id', $matchInningsOversvalue->id)->first();
+                $prediction = Prediction::where('over_id', $matchInningsOversvalue->id)->where('user_id', $userId)->first();
 
                 if ($match_inning->innings == $live_innings) {
                     if ($prediction) {
