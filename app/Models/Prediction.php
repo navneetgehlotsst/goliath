@@ -16,4 +16,10 @@ class Prediction extends Model
         'over_id',
         'answere'
     ];
+
+
+    public function competitionMatch()
+    {
+        return $this->belongsTo(CompetitionMatches::class, 'match_id', 'match_id');
+    }
 }
