@@ -108,7 +108,7 @@ class UserPredictionController extends Controller
                         'match_id' => $matchId,
                         'over_id' => $overId,
                         'question_id' => $question['question_id'],
-                        'answer' => $question['answer'],
+                        'answer' => $question['answere'],
                     ]);
                 } else {
                     return ApiResponse::errorResponse("Question not found");
@@ -291,20 +291,54 @@ class UserPredictionController extends Controller
     public function predicted_result(Request $request){
         try {
 
-            $input = $request->all();
+            // Extracting necessary input fields from the request
+            $input = $request->only(['match_id', 'over_id']);
 
             // Validate input
-            $validator = Validator::make($input, ['match_id' => 'required','over_id' => 'required']);
+            $validator = Validator::make($input, [
+                'match_id' => 'required',
+                'over_id' => 'required'
+            ]);
             if ($validator->fails()) {
+                // Return error response if validation fails
                 return ApiResponse::errorResponse($validator->errors()->first());
             }
 
+            // Fetch current user
             $user = Auth::user();
             $userId = $user->id;
 
-            $datamatches = Prediction::where('user_id', $userId)->where('match_id', $request->match_id)->where('over_id', $request->over_id)->get();
-            return ApiResponse::successResponse($datamatches, "Matches Data Found"); // Simplified response message
+            // Retrieve predictions for the specified match and over for the current user
+            $userPredictions = Prediction::select('predictions.question_id', 'predictions.over_id', 'predictions.answere as your_answer', 'predictions.result as your_result','questions.question')
+                ->where('predictions.over_id', $input['over_id'])
+                ->where('user_id', $userId)
+                ->where('match_id', $input['match_id'])
+                ->join('questions', 'predictions.question_id', '=', 'questions.id')
+                ->get();
 
+            // Modify your_answer field to be 1 or 0 based on the string value
+            $userPredictions->transform(function ($prediction) {
+                $prediction->your_answer = $prediction->your_answer === "true" ? 1 : 0;
+                return $prediction;
+            });
+
+            // Store user predictions
+            $predictedData['user_prediction'] = $userPredictions;
+
+            // Count correct predictions
+            $countResult = $userPredictions->where('your_result', 'W')->count();
+
+            // Store count of correct predictions
+            $predictedData['correct_counts'] = $countResult;
+
+            // Winning Amount of correct predictions
+            $predictedData['winning_amount'] = "100";
+
+            // Message for result
+            $message = $countResult >= 5 ? "You are a winner" : "You have lost this time";
+
+            // Return success response with prediction data
+            return ApiResponse::successResponse($predictedData, $message);
         } catch (Exception $e) {
             DB::rollback();
             return ApiResponse::errorResponse($e->getMessage());
