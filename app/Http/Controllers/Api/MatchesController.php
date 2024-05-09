@@ -12,7 +12,8 @@ use App\Models\{
     MatchInnings,
     InningsOver,
     OverQuestions,
-    Prediction
+    Prediction,
+    Competition
 };
 use App\Http\Response\ApiResponse;
 
@@ -42,17 +43,20 @@ class MatchesController extends Controller
         ]);
 
         $datamatches = CompetitionMatches::where('competition_matches.status', $input['status'])
-            ->join('competitions', 'competition_matches.competiton_id', '=', 'competitions.competiton_id')
-            ->orderBy('competition_matches.match_start_date', 'ASC')
-            ->orderBy('competition_matches.match_start_time', 'ASC')
-            ->paginate(10);
+                    ->where('teamaid', '!=', '127770')
+                    ->where('teambid', '!=', '127775')
+                    ->orderBy('competition_matches.match_start_date', 'ASC')
+                    ->orderBy('competition_matches.match_start_time', 'ASC')
+                    ->paginate(10);
             $transformedMatches = [];
 
             foreach ($datamatches as $key => $match) {
+                $datamatchescomp = Competition::where('competiton_id', $match->competiton_id)
+                ->first();
                 $transformedMatch = [
                         "id"=> $match->id,
                         "competiton_id" => $match->competiton_id,
-                        "competiton_name" => $match->title,
+                        "competiton_name" => $datamatchescomp->title,
                         "match_id" => $match->match_id,
                         "match" => $match->match,
                         "short_title" => $match->teama_short_name . " vs " . $match->teamb_short_name,
