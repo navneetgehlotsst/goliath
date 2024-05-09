@@ -26,7 +26,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ( $CompetitionData as $CompetitionDatas)
+                                @foreach ( $CompetitionLiveData as $CompetitionDatas)
                                     <tr>
                                         <td><a href="{{ route('admin.match.index', $CompetitionDatas->competiton_id) }}">{{$CompetitionDatas->competiton_id}}</a></td>
                                         <td>{{$CompetitionDatas->title}}</td>

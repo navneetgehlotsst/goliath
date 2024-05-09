@@ -16,54 +16,49 @@
                     <div class="row">
                         <div class="col-md-12">
                             <h4 class="text-center">
-                                {{$matchdata['title']}}
+                                {{$transformedMatch['matchdetail']['match']}}
                             </h4>
                             <h6 class="text-center">
-                                {{$matchdata['short_title']}}
-                            </h6>
-                            <h6 class="text-center">
-                                {{$matchdata['venue']['name']}}, {{$matchdata['venue']['location']}}
+                                {{$transformedMatch['matchdetail']['short_title']}}
                             </h6>
                         </div>
                         {{-- team A Data --}}
                         <div class="col-md-6 text-center">
                             <p>
                                 <span class="fw-bold fs-5">
-                                    {{$matchdata['teama']['name']}}
+                                    {{$transformedMatch['matchdetail']['teama']['name']}}
                                 </span>
                                 <br>
-                                {{$matchdata['teama']['scores_full'] ?? ''}}
+                                {{$transformedMatch['matchdetail']['teama']['scores_full'] ?? ''}}
                             </p>
-                            <img src="{{$matchdata['teama']['logo_url']}}" width="10%" alt="">
+                            <img src="{{$transformedMatch['matchdetail']['teama']['logo_url']}}" width="10%" alt="">
                         </div>
                         {{-- team B Data --}}
                         <div class="col-md-6 text-center">
                             <p>
                                 <span class="fw-bold fs-5">
-                                    {{$matchdata['teamb']['name']}}
+                                    {{$transformedMatch['matchdetail']['teamb']['name']}}
                                 </span>
                                 <br>
-                                {{$matchdata['teamb']['scores_full'] ?? ''}}
+                                {{$transformedMatch['matchdetail']['teamb']['scores_full'] ?? ''}}
                             </p>
-                            <img src="{{$matchdata['teamb']['logo_url']}}" width="10%" alt="">
+                            <img src="{{$transformedMatch['matchdetail']['teamb']['logo_url']}}" width="10%" alt="">
                         </div>
                         {{-- Match result --}}
                         <div class="col-md-12">
                             <h6 class="text-center">
-                                {{$matchdata['status_note']}}
+                                {{$transformedMatch['matchdetail']['note']}}
                             </h6>
                             <div class="text-center">
-                                @if ($matchdata['status_str'] == 'Scheduled')
-                                    <span class="badge bg-label-secondary">{{$matchdata['status_str']}}</span>
-                                @elseif ($matchdata['status_str'] == 'Completed')
-                                    <span class="badge bg-label-success">{{$matchdata['status_str']}}</span>
+                                @if ($transformedMatch['matchdetail']['status'] == 'Scheduled')
+                                    <span class="badge bg-label-secondary">{{$transformedMatch['matchdetail']['status']}}</span>
+                                @elseif ($transformedMatch['matchdetail']['status'] == 'Completed')
+                                    <span class="badge bg-label-success">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @else
-                                    <span class="badge bg-label-success">{{$matchdata['status_str']}}</span>
+                                    <span class="badge bg-label-success">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @endif
                                 <br>
-                                <span>Date & Time :- {{$matchdata['date_start_ist']}}</span>
-                                <br>
-                                <span>{{$matchdata['toss']['text'] ?? ''}}</span>
+                                <span>Date & Time :- {{$transformedMatch['matchdetail']['match_start_date']}} / {{$transformedMatch['matchdetail']['match_start_time']}}</span>
                             </div>
                         </div>
                     </div>
@@ -80,103 +75,52 @@
                         <span class="badge rounded-pill bg-label-danger">Completed Over</span>
                         <span class="badge rounded-pill bg-danger">On Going Over</span>
                         <span class="badge rounded-pill bg-success">Selected Over</span>
-                        <span class="badge rounded-pill bg-label-success">Upcoming Over</span>
-                        <span class="badge rounded-pill bg-secondary">Pridicted Over</span>
                         <span class="badge rounded-pill bg-label-warning">Not Available Over</span>
                     </div>
                   </div>
+                  @foreach ($transformedMatch['matchdetail']['innings'] as $innings)
                   <div class="col-xl-6">
-                    <div class="mb-2 fw-bolder">Innings 1</div>
+                    <div class="mb-2 fw-bolder">{{$innings['inning_name']}}</div>
                     <div class="demo-inline-spacing">
-                        @php
-                            if($currentoverfinal != 0){
 
-                                $nextover = $currentoverfinal + 5;
-                            }else{
-                                $nextover = 0;
-                            }
-                        @endphp
                       <p>
-                        @foreach ($GetMatchdata as $matchdatainningsone)
-                            @if ($matchdatainningsone->innings == '1' )
-                                <a href="{{ route('admin.match.question', ['overid' => $matchdatainningsone->innings_overs_id]) }}"
-                                    class="badge badge-center rounded-pill
-                                        @if($matchdata['latest_inning_number'] == '2')
+                        @foreach ($innings['overs'] as $matchdatainningsone)
+                            <a href="{{ route('admin.match.question', ['overid' => $matchdatainningsone['over_id']]) }}"
+                                class="badge badge-center rounded-pill
+                                    @if($innings['inning_status'] == 'Completed')
+                                        bg-label-danger
+                                    @else
+                                        @if($matchdatainningsone['over_status'] == 'Completed')
                                             bg-label-danger
+                                        @elseif($matchdatainningsone['over_status'] == 'Ongoing')
+                                            bg-danger
+                                        @elseif($matchdatainningsone['over_status'] == 'Available')
+                                            bg-label-success
                                         @else
-                                            @if($matchdatainningsone->overs < $currentoverfinal)
-                                                bg-label-danger
-                                            @elseif($matchdatainningsone->overs == $currentoverfinal)
-                                                bg-danger
-                                            @elseif($matchdatainningsone->overs >= $nextover)
-                                                bg-label-success
-                                            @else
-                                                bg-label-warning
-                                            @endif
+                                            bg-label-warning
                                         @endif
-                                        mb-2
-                                        @if($matchdata['latest_inning_number'] == '2')
+                                    @endif
+                                    mb-2
+                                    @if($innings['inning_status'] == 'Completed')
+                                        matchdisable
+                                    @else
+                                        @if($matchdatainningsone['over_status'] == 'Completed')
                                             matchdisable
+                                        @elseif($matchdatainningsone['over_status'] == 'Ongoing')
+                                            matchdisable
+                                        @elseif($matchdatainningsone['over_status'] == 'Available')
+                                            bg-label-success
                                         @else
-                                            @if($matchdatainningsone->overs < $currentoverfinal)
-                                                matchdisable
-                                            @elseif($matchdatainningsone->overs == $currentoverfinal)
-                                                matchdisable
-                                            @elseif($matchdatainningsone->overs >= $nextover)
-                                                bg-label-success
-                                            @else
-                                                matchdisable
-                                            @endif
-                                        @endif">
-                                    {{$matchdatainningsone->overs}}
-                                </a>
-                            @endif
+                                            matchdisable
+                                        @endif
+                                    @endif">
+                                {{$matchdatainningsone['over_number']}}
+                            </a>
                         @endforeach
                       </p>
                     </div>
                   </div>
-                  <div class="col-xl-6">
-                    <div class="mb-2 fw-bolder">Innings 2</div>
-                    <div class="demo-inline-spacing">
-                      <p>
-                        @foreach ($GetMatchdata as $matchdatainningstwo)
-                            @if ($matchdatainningstwo->innings == '2' )
-                                <a href="{{ route('admin.match.question', ['overid' => $matchdatainningstwo->innings_overs_id]) }}"
-                                    class="badge badge-center rounded-pill
-                                        @if($matchdata['latest_inning_number'] == '1')
-                                            bg-label-danger
-                                        @else
-                                            @if($matchdatainningstwo->overs < $currentoverfinal)
-                                                bg-label-danger
-                                            @elseif($matchdatainningstwo->overs == $currentoverfinal)
-                                                bg-danger
-                                            @elseif($matchdatainningstwo->overs >= $nextover)
-                                                bg-label-success
-                                            @else
-                                                bg-label-warning
-                                            @endif
-                                        @endif
-                                        mb-2
-                                        @if($matchdata['latest_inning_number'] == '1')
-                                            matchdisable
-                                        @else
-                                            @if($matchdatainningstwo->overs < $currentoverfinal)
-                                                matchdisable
-                                            @elseif($matchdatainningstwo->overs == $currentoverfinal)
-                                                matchdisable
-                                            @elseif($matchdatainningstwo->overs >= $nextover)
-                                                bg-label-success
-                                            @else
-                                                matchdisable
-                                            @endif
-                                        @endif">
-                                    {{$matchdatainningstwo->overs}}
-                                </a>
-                            @endif
-                        @endforeach
-                      </p>
-                    </div>
-                  </div>
+                  @endforeach
                 </div>
               </div>
             </div>

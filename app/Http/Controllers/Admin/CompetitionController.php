@@ -13,8 +13,8 @@ class CompetitionController extends Controller
 {
     public function index()
     {
-        $CompetitionData = Competition::get();
+        $CompetitionLiveData = Competition::where('status','live')->get();
 
-        return view('admin.competition.index',compact('CompetitionData'));
+        return view('admin.competition.index',compact('CompetitionLiveData'));
     }
 }

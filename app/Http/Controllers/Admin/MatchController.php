@@ -9,7 +9,8 @@ use App\Models\{
     MatchInnings,
     InningsOver,
     OverQuestions,
-    CompetitionMatches
+    CompetitionMatches,
+    Prediction
 
 };
 
@@ -19,7 +20,9 @@ class MatchController extends Controller
 {
     public function index($cId)
     {
-        $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)->get();
+        $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)
+        ->whereNotIn('status', ["Cancelled", "Completed"])
+        ->get();
         return view('admin.matches.index', compact('CompetitionMatchData'));
     }
 
@@ -27,88 +30,119 @@ class MatchController extends Controller
     {
         try {
 
-            Carbon::setTestNow(Carbon::now()->tz('GMT'));
+             // Fetching match data
+            $datamatches = CompetitionMatches::where('match_id', $id)->join('competitions', 'competition_matches.competiton_id', '=', 'competitions.competiton_id')->first();
 
-            // Now you can work with GMT time using Carbon
-            echo $gmtTime = Carbon::now();
-
-            $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
-
-            // Function to make curl requests
-            function makeCurlRequest($url) {
-                $curl = curl_init();
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => $url,
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'GET',
-                ));
-                $response = curl_exec($curl);
-                curl_close($curl);
-                return json_decode($response, true);
+            if (!$datamatches) {
+                return ApiResponse::errorResponse(null, "Match Data Not Found");
             }
 
-            // Get match data
-            $matchdata = makeCurlRequest("https://rest.entitysport.com/v2/matches/$id/scorecard/?token=$token")['response'];
+            $live_innings = $datamatches->live_innings;
 
-            // Get live match data
-            $matchdatalive = makeCurlRequest("https://rest.entitysport.com/v2/matches/$id/live/?token=$token")['response'];
+            // Fetching current innings data
+            $datamatchinnings = MatchInnings::where('match_id', $id)
+                ->where('innings', $live_innings)
+                ->first();
 
-            $currentover = $matchdatalive['live_score']['overs'] ?? "0";
+            $currentover = $datamatchinnings ? $datamatchinnings->current_overs : 0;
 
-            // Calculate current over final
-            $currentoverfinal = ($currentover != floor($currentover)) ? ceil($currentover) : $currentover;
+            // Adding 1 to the integer part if necessary
+            $current_over = ceil($currentover);
+            $nextover = $current_over + 5;
 
-            $format = $matchdata['format'];
-            // $maxOver = $matchdata['innings'];
-            // dd($maxOver);
+            // Fetching all innings data for the match
+            $matchInnings = MatchInnings::where('match_id', $id)->get();
 
-            // Determine over limit based on match format
-            $overlimit = ($format == '7' || $format == '1') ? 50 : (($format == '3' || $format == '6' || $format == '8') ? 20 : 90);
+            $transformedMatch = [
+                "matchdetail" => [
+                    "id" => $datamatches->id,
+                    "competition_id" => $datamatches->competition_id,
+                    "competition_name" => $datamatches->title,
+                    "match_id" => $datamatches->match_id,
+                    "match" => $datamatches->match,
+                    "short_title" => $datamatches->teama_short_name . " vs " . $datamatches->teamb_short_name,
+                    "status" => $datamatches->status,
+                    "note" => $datamatches->note,
+                    "match_start_date" => $datamatches->match_start_date,
+                    "match_start_time" => $datamatches->match_start_time,
+                    "format" => $datamatches->format, // Corrected typo
+                    "teama" => [
+                        "team_id" => $datamatches->teamaid,
+                        "name" => $datamatches->teama_name,
+                        "short_name" => $datamatches->teama_short_name,
+                        "logo_url" => $datamatches->teama_img,
+                        "thumb_url" => $datamatches->teama_img,
+                        "scores_full" => $datamatches->teamascorefull,
+                        "scores" => $datamatches->teamascore,
+                        "overs" => $datamatches->teamaover,
+                    ],
+                    "teamb" => [
+                        "team_id" => $datamatches->teambid,
+                        "name" => $datamatches->teamb_name,
+                        "short_name" => $datamatches->teamb_short_name,
+                        "logo_url" => $datamatches->teamb_img,
+                        "thumb_url" => $datamatches->teamb_img,
+                        "scores_full" => $datamatches->teambscorefull,
+                        "scores" => $datamatches->teambscore,
+                        "overs" => $datamatches->teambover,
+                    ],
+                    "innings" => [], // Initialize innings array
+                ]
+            ];
 
-            // Check if questions exist for the match
-            $existingQuestions = MatchInnings::where('match_id', $matchdata['match_id'])->exists();
+            foreach ($matchInnings as $match_inning) {
+                $innings_status = '';
+                $over = [];
 
-            if (!$existingQuestions) {
-                // Prepare question IDs
-                $questionIds = Question::where('type', 'initial')->pluck('id')->toArray();
+                $matchInningsOversData = InningsOver::where('match_innings_id', $match_inning->id)->get();
 
-                // Insert match innings
-                $inningsToCreate = [];
-                foreach (range(1, 2) as $i) {
-                    $inningsToCreate[] = [
-                        'match_id' => $matchdata['match_id'],
-                        'innings' => $i,
+                foreach ($matchInningsOversData as $matchInningsOversvalue) {
+                    $over_status = '';
+                    $prediction = Prediction::where('over_id', $matchInningsOversvalue->id)->first();
+
+                    if ($match_inning->innings == $live_innings) {
+                        if ($prediction) {
+                            $over_status = "Predicted";
+                        } else {
+                            if ($matchInningsOversvalue->overs < $current_over) {
+                                $over_status = "Completed";
+                            } elseif ($matchInningsOversvalue->overs == $current_over) {
+                                $over_status = "Ongoing";
+                            } elseif ($matchInningsOversvalue->overs <= $nextover) {
+                                $over_status = "Not Available";
+                            } else {
+                                $over_status = "Available";
+                            }
+                        }
+                        $innings_status = "Ongoing";
+                    }
+
+                    if ($match_inning->innings < $live_innings) {
+                        $over_status = "Completed";
+                        $innings_status = "Completed";
+                    }
+
+                    if ($match_inning->innings > $live_innings) {
+                        $over_status = "Upcoming";
+                        $innings_status = "Upcoming";
+                    }
+
+                    $over[] = [
+                        "over_id" => $matchInningsOversvalue->id,
+                        "over_number" => $matchInningsOversvalue->overs,
+                        "over_status" => $over_status
                     ];
                 }
-                MatchInnings::insert($inningsToCreate);
 
-                // Insert innings overs and associate questions
-                foreach (MatchInnings::where('match_id', $matchdata['match_id'])->get() as $matchInning) {
-                    $inningsOverToCreate = [];
-                    foreach (range(1, $overlimit) as $j) {
-                        $inningOver = InningsOver::create([
-                            'match_innings_id' => $matchInning->id,
-                            'overs' => $j,
-                        ]);
-                        // Associate questions
-                        foreach ($questionIds as $questionId) {
-                            OverQuestions::create([
-                                'innings_over_id' => $inningOver->id,
-                                'question_id' => $questionId,
-                            ]);
-                        }
-                    }
-                }
+                $transformedMatch['matchdetail']['innings'][] = [
+                    "inning_name" => $match_inning->innings . " Inning",
+                    "inning_status" => $innings_status,
+                    "overs" => $over,
+                ];
             }
 
-            $GetMatchdata = MatchInnings::select('match_innings.id as match_innings_id', 'match_innings.match_id', 'match_innings.innings', 'innings_overs.overs', 'innings_overs.id as innings_overs_id')
-                ->where('match_innings.match_id', $matchdata['match_id'])
-                ->join('innings_overs', 'match_innings.id', '=', 'innings_overs.match_innings_id')
-                ->get();
 
-            return view('admin.matches.info', compact('matchdata', 'GetMatchdata', 'currentoverfinal'));
+            return view('admin.matches.info', compact('transformedMatch'));
 
         } catch (\Throwable $th) {
             dd($th);
