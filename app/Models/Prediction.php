@@ -22,4 +22,10 @@ class Prediction extends Model
     {
         return $this->belongsTo(CompetitionMatches::class, 'match_id', 'match_id');
     }
+
+
+    public function inningsOvers()
+    {
+        return $this->belongsTo(InningsOver::class, 'over_id', 'id');
+    }
 }

@@ -12,4 +12,9 @@ class MatchInnings extends Model
     public function overs() {
         return $this->morphMany(InningsOver::class, 'overable');
     }
+
+    public function inningsOvers()
+    {
+        return $this->hasMany(InningsOver::class, 'match_innings_id');
+    }
 }

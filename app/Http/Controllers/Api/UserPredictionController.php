@@ -57,89 +57,66 @@ class UserPredictionController extends Controller
                 return ApiResponse::errorResponse($message);
             }
 
-
             $user = auth()->user();
             $userId = $user->id;
-            $matchid = $input['match_id'];
-            $overid = $input['over_id'];
+            $matchId = $input['match_id'];
+            $overId = $input['over_id'];
             $questionAns = $input['questionans'];
             $userWallet = $user->wallet;
-            // $payamount = env('BETING_AMOUNT');
 
-            // //check wallet Blance
-
-            // if ($userWallet < $payamount) {
-            //     return ApiResponse::errorResponse("Your Wallet balance is insufficient");
-            // }
-
-            $matchid = $input['match_id'];
-            $overid = $input['over_id'];
-
-            $datamatches = CompetitionMatches::where('match_id', $matchid)->first();
-            //check Match
-            if (!$datamatches) {
+            // Check if match exists
+            $match = CompetitionMatches::where('match_id', $matchId)->first();
+            if (!$match) {
                 return ApiResponse::errorResponse("Match not found");
             }
 
-            // check status
-            if ($datamatches->status === "Completed") {
+            // Check match status
+            if ($match->status === "Completed") {
                 return ApiResponse::errorResponse("Match Completed, You can't predict here");
             }
 
-            // $questionAns = json_decode($questionans, true);
+            // Check wallet balance (if needed)
+            // $payAmount = env('BETING_AMOUNT');
+            // if ($userWallet < $payAmount) {
+            //     return ApiResponse::errorResponse("Your Wallet balance is insufficient");
+            // }
 
-            $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
+            // Get innings data
+            $innings = MatchInnings::where('match_id', $matchId)->where('innings', $match->live_innings)->first();
+            $currentOver = $innings ? $innings->current_overs : 0;
 
-            $live_innings = $datamatches->live_innings;
-
-            $datamatchinnings = MatchInnings::where('match_id', $input['match_id'])->where('innings', $live_innings)->first();
-
-            if ($datamatchinnings->current_overs != intval($datamatchinnings->current_overs)) {
-                // Add 1 to the integer part
-                $currentover = intval($datamatchinnings->current_overs) + 1 ?? 0;
-            }else{
-                $currentover = $datamatchinnings->current_overs ?? 0;
+            // Check if prediction time is complete for this over
+            $over = InningsOver::find($overId);
+            if (!$over || $currentOver >= $over->overs) {
+                return ApiResponse::errorResponse("Prediction time is complete for this over");
             }
 
-            $checkOver = InningsOver::where('id', $overid)->first();
-
-            $userpredictionOver = $checkOver->overs;
-
-            if($currentover >= $userpredictionOver){
-                return ApiResponse::errorResponse("Pridition time is Complete For this over");
+            // Check if user has already predicted for this question
+            if (Prediction::where('user_id', $userId)->where('match_id', $matchId)->where('over_id', $overId)->exists()) {
+                return ApiResponse::errorResponse("You have already given an answer for this question");
             }
 
+            // Iterate over question answers
+            foreach ($questionAns as $question) {
+                $existingQuestion = OverQuestions::where('innings_over_id', $overId)
+                                                ->where('question_id', $question['question_id'])
+                                                ->exists();
 
-            $checkUserpredictedorNot = Prediction::where('user_id', $userId)->where('match_id', $matchid)->where('over_id', $overid)->first();
-            //dd($checkUserpredictedorNot);
-
-            if($checkUserpredictedorNot){
-                return ApiResponse::errorResponse("You Have already given answere for this Question");
-            }
-
-            foreach ($questionAns as $questionAnskey => $questionAnsvalue) {
-                $existingOverQuestion = OverQuestions::where('innings_over_id', $overid)->where('question_id', $questionAnsvalue['question_id'])->first();
-
-                if($existingOverQuestion){
-                    $questiondata = [
+                if ($existingQuestion) {
+                    Prediction::create([
                         'user_id' => $userId,
-                        'match_id' => $matchid,
-                        'over_id' => $overid,
-                        'question_id' => $questionAnsvalue['question_id'],
-                        'answere' => $questionAnsvalue['answere'],
-                    ];
-                    // Create new Prediction
-                    Prediction::create($questiondata);
-                }else{
-                    return ApiResponse::errorResponse("Question Not Found");
-                    break;
+                        'match_id' => $matchId,
+                        'over_id' => $overId,
+                        'question_id' => $question['question_id'],
+                        'answer' => $question['answer'],
+                    ]);
+                } else {
+                    return ApiResponse::errorResponse("Question not found");
                 }
             }
 
-            $message = "Predicted Succesfully";
-            return ApiResponse::successResponsenoData($message);
-
-
+            $message = "Predicted successfully";
+            return ApiResponse::successResponseNoData($message);
         } catch (Exception $e) {
             DB::rollback();
             return ApiResponse::errorResponse($e->getMessage());
@@ -148,60 +125,185 @@ class UserPredictionController extends Controller
 
     public function listPredictions(Request $request){
         try {
-
             $userId = auth()->id();
-            $datamatches = Prediction::with('competitionMatch')
-                            ->where('predictions.user_id', $userId)
-                            ->groupBy('predictions.match_id')
-                            ->paginate(10);
 
-                            // my pridiction data fetach//
+            // Fetch predictions with eager loading
+            $datamatches = Prediction::with(['competitionMatch' => function ($query) {
+                    // Additional condition if necessary
+                }])
+                ->where('user_id', $userId)
+                ->groupBy('match_id')
+                ->paginate(10);
 
-                            foreach ($datamatches as $key => $match) {
-                                $transformedMatch = [
-                                    "id"=> $match['competitionMatch']->id,
-                                    "competiton_id" => $match['competitionMatch']->competiton_id,
-                                    "match_id" => $match['competitionMatch']->match_id,
-                                    "match" => $match['competitionMatch']->match,
-                                    "short_title" => $match['competitionMatch']->teama_short_name . " vs " . $match['competitionMatch']->teamb_short_name,
-                                    "status" => $match['competitionMatch']->status,
-                                    "note" => $match['competitionMatch']->note,
-                                    "match_start_date" => $match['competitionMatch']->match_start_date,
-                                    "match_start_time" => $match['competitionMatch']->match_start_time,
-                                    "formate" => $match['competitionMatch']->formate,
-                                    "teama" => [
-                                        "team_id" => $match['competitionMatch']->teamaid, // Set team ID if available, otherwise null.
-                                        "name" => $match['competitionMatch']->teama_name,
-                                        "short_name" => $match['competitionMatch']->teama_short_name,
-                                        "logo_url" => $match['competitionMatch']->teama_img,
-                                        "thumb_url" => $match['competitionMatch']->teama_img,
-                                        "scores_full" => $match['competitionMatch']->teamascorefull, // Set scores if available.
-                                        "scores" => $match['competitionMatch']->teamascore, // Set scores if available.
-                                        "overs" => $match['competitionMatch']->teamaover, // Set overs if available.
-                                    ],
-                                    "teamb" => [
-                                        "team_id" => $match['competitionMatch']->teambid, // Set team ID if available, otherwise null.
-                                        "name" => $match['competitionMatch']->teamb_name,
-                                        "short_name" => $match['competitionMatch']->teamb_short_name,
-                                        "logo_url" => $match['competitionMatch']->teamb_img,
-                                        "thumb_url" => $match['competitionMatch']->teamb_img,
-                                        "scores_full" => $match['competitionMatch']->teambscorefull, // Set scores if available.
-                                        "scores" => $match['competitionMatch']->teambscore, // Set scores if available.
-                                        "overs" => $match['competitionMatch']->teambover, // Set overs if available.
-                                    ],
-                                    "innings" => [] // Assuming no detailed innings information is available initially.
-                            ];
+            // Transform the data
+            $matchesdata['matchlist'] = $datamatches->map(function ($match) {
+                return [
+                    "id" => $match->competitionMatch->id,
+                    "competiton_id" => $match->competitionMatch->competiton_id,
+                    "match_id" => $match->competitionMatch->match_id,
+                    "match" => $match->competitionMatch->match,
+                    "short_title" => $match->competitionMatch->teama_short_name . " vs " . $match->competitionMatch->teamb_short_name,
+                    "status" => $match->competitionMatch->status,
+                    "note" => $match->competitionMatch->note,
+                    "match_start_date" => $match->competitionMatch->match_start_date,
+                    "match_start_time" => $match->competitionMatch->match_start_time,
+                    "formate" => $match->competitionMatch->formate,
+                    "teama" => [
+                        "team_id" => $match->competitionMatch->teamaid,
+                        "name" => $match->competitionMatch->teama_name,
+                        "short_name" => $match->competitionMatch->teama_short_name,
+                        "logo_url" => $match->competitionMatch->teama_img,
+                        "thumb_url" => $match->competitionMatch->teama_img,
+                        "scores_full" => $match->competitionMatch->teamascorefull,
+                        "scores" => $match->competitionMatch->teamascore,
+                        "overs" => $match->competitionMatch->teamaover,
+                    ],
+                    "teamb" => [
+                        "team_id" => $match->competitionMatch->teambid,
+                        "name" => $match->competitionMatch->teamb_name,
+                        "short_name" => $match->competitionMatch->teamb_short_name,
+                        "logo_url" => $match->competitionMatch->teamb_img,
+                        "thumb_url" => $match->competitionMatch->teamb_img,
+                        "scores_full" => $match->competitionMatch->teambscorefull,
+                        "scores" => $match->competitionMatch->teambscore,
+                        "overs" => $match->competitionMatch->teambover,
+                    ],
+                    "innings" => [] // Assuming no detailed innings information is available initially.
+                ];
+            });
 
-                            $datamatches[$key] = $transformedMatch;
-                            }
-                            $matchesdata['matchlist'] = $datamatches;
-                            // Now $transformedMatches contains the transformed data in the desired format.
+            // Now $matchesdata contains the transformed data in the desired format.
+            return $datamatches->count()
+            ? ApiResponse::successResponse($matchesdata, "Matches Data Found")
+            : ApiResponse::errorResponse("Matches Data Not Found");
 
+        } catch (Exception $e) {
+            DB::rollback();
+            return ApiResponse::errorResponse($e->getMessage());
+        }
+    }
 
+    public function predicted_over(Request $request){
+        try {
 
-                        return $datamatches->count()
-                            ? ApiResponse::successResponse($matchesdata, "Matches Data Found")
-                            : ApiResponse::errorResponse("Matches Data Not Found");
+            $input = $request->all();
+
+            // Validate input
+            $validator = Validator::make($input, ['match_id' => 'required']);
+            if ($validator->fails()) {
+                return ApiResponse::errorResponse($validator->errors()->first());
+            }
+
+            $user = Auth::user();
+            $userId = $user->id;
+
+            // Fetch match data, current innings data, and innings data for the match in a single query
+            $matchData = CompetitionMatches::where('match_id', $input['match_id'])
+                ->with(['matchInnings', 'matchInnings.inningsOvers'])
+                ->first();
+
+            if (!$matchData) {
+                return ApiResponse::errorResponse(null, "Match Data Not Found");
+            }
+
+            // Fetch prediction data with eager loading
+            $predictionData = Prediction::with(['competitionMatch'])
+                ->where('user_id', $userId)
+                ->where('match_id', $input['match_id'])
+                ->first();
+
+            if (!$predictionData) {
+                return ApiResponse::errorResponse("Prediction data not found.");
+            }
+
+            // Transform data
+            $transformedMatch = [
+                "matchdetail" => [
+                    "id" => $predictionData->competitionMatch->id,
+                    "competiton_id" => $predictionData->competitionMatch->competiton_id,
+                    "match_id" => $predictionData->competitionMatch->match_id,
+                    "match" => $predictionData->competitionMatch->match,
+                    "short_title" => $predictionData->competitionMatch->teama_short_name . " vs " . $predictionData->competitionMatch->teamb_short_name,
+                    "status" => $predictionData->competitionMatch->status,
+                    "note" => $predictionData->competitionMatch->note,
+                    "match_start_date" => $predictionData->competitionMatch->match_start_date,
+                    "match_start_time" => $predictionData->competitionMatch->match_start_time,
+                    "formate" => $predictionData->competitionMatch->formate,
+                    "teama" => [
+                        "team_id" => $predictionData->competitionMatch->teamaid,
+                        "name" => $predictionData->competitionMatch->teama_name,
+                        "short_name" => $predictionData->competitionMatch->teama_short_name,
+                        "logo_url" => $predictionData->competitionMatch->teama_img,
+                        "thumb_url" => $predictionData->competitionMatch->teama_img,
+                        "scores_full" => $predictionData->competitionMatch->teamascorefull,
+                        "scores" => $predictionData->competitionMatch->teamascore,
+                        "overs" => $predictionData->competitionMatch->teamaover,
+                    ],
+                    "teamb" => [
+                        "team_id" => $predictionData->competitionMatch->teambid,
+                        "name" => $predictionData->competitionMatch->teamb_name,
+                        "short_name" => $predictionData->competitionMatch->teamb_short_name,
+                        "logo_url" => $predictionData->competitionMatch->teamb_img,
+                        "thumb_url" => $predictionData->competitionMatch->teamb_img,
+                        "scores_full" => $predictionData->competitionMatch->teambscorefull,
+                        "scores" => $predictionData->competitionMatch->teambscore,
+                        "overs" => $predictionData->competitionMatch->teambover,
+                    ],
+                    "innings" => [], // Initialize innings array
+                ]
+            ];
+
+            foreach ($matchData->matchInnings as $match_inning) {
+                $innings_status = ($match_inning->innings == $matchData->live_innings) ? "Ongoing" : (($match_inning->innings < $matchData->live_innings) ? "Completed" : "Upcoming");
+                $overs = [];
+
+                foreach ($match_inning->inningsOvers as $matchInningsOversvalue) {
+                    $over_status = Prediction::where('over_id', $matchInningsOversvalue->id)
+                        ->where('user_id', $userId)
+                        ->exists() ? "Predicted" : "Available";
+
+                    // Add over details only if there is a prediction
+                    if ($over_status === "Predicted") {
+                        $overs[] = [
+                            "over_id" => $matchInningsOversvalue->id,
+                            "over_number" => $matchInningsOversvalue->overs,
+                            "over_status" => $over_status
+                        ];
+                    }
+                }
+
+                // Construct the innings array
+                $transformedMatch['matchdetail']['innings'][] = [
+                    "inning_name" => $match_inning->innings . " Inning",
+                    "inning_status" => $innings_status,
+                    "overs" => $overs,
+                ];
+            }
+            return ApiResponse::successResponse($transformedMatch, "Matches Data Found"); // Simplified response message
+
+        } catch (Exception $e) {
+            DB::rollback();
+            return ApiResponse::errorResponse($e->getMessage());
+        }
+
+    }
+
+    public function predicted_result(Request $request){
+        try {
+
+            $input = $request->all();
+
+            // Validate input
+            $validator = Validator::make($input, ['match_id' => 'required','over_id' => 'required']);
+            if ($validator->fails()) {
+                return ApiResponse::errorResponse($validator->errors()->first());
+            }
+
+            $user = Auth::user();
+            $userId = $user->id;
+
+            $datamatches = Prediction::where('user_id', $userId)->where('match_id', $request->match_id)->where('over_id', $request->over_id)->get();
+            return ApiResponse::successResponse($datamatches, "Matches Data Found"); // Simplified response message
 
         } catch (Exception $e) {
             DB::rollback();
