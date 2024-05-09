@@ -13,6 +13,7 @@ use Exception,Auth;
 class NotificationController extends Controller
 {
     public function index(){
+                                 
         try{
             $user = Auth::user();
             $user_notifications = NotificationUser::where('user_id',$user->id)->pluck('notification_id')->toArray();
