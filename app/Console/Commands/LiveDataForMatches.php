@@ -37,9 +37,7 @@ class LiveDataForMatches extends Command
     public function handle()
     {
         try {
-
             $compdata = Competition::where('status', 'like', 'live')->get();
-
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
 
             foreach ($compdata as $value) {
@@ -68,84 +66,83 @@ class LiveDataForMatches extends Command
 
                     $matchresponsedata = json_decode($matchresponse, true);
                     $matchesData = $matchresponsedata['response'];
-                    $matchcommentaries = $matchesData['commentaries'];
-                    $liveinningnumber = $matchesData['live_inning_number'];
-                    $liveinningrun = $matchesData['live_score']['runs'];
-                    $liveinningover = $matchesData['live_score']['overs'];
-                    $liveinningnwicket = $matchesData['live_score']['wickets'];
 
                     // Update live innings in CompetitionMatches table
-                    CompetitionMatches::where('match_id', $matchid)->update(['live_innings' => $liveinningnumber]);
+                    CompetitionMatches::where('match_id', $matchid)->update(['live_innings' => $matchesData['live_inning_number']]);
 
                     // Update match innings in MatchInnings table
                     $matchData = [
-                        'current_score' => $liveinningnumber,
-                        'current_wicket' => $liveinningnwicket,
-                        'current_overs' => $liveinningover
+                        'current_score' => $matchesData['live_score']['runs'],
+                        'current_wicket' => $matchesData['live_score']['wickets'],
+                        'current_overs' => $matchesData['live_score']['overs']
                     ];
-                    MatchInnings::where('match_id', $matchid)->where('innings', $liveinningnumber)->update($matchData);
+                    MatchInnings::where('match_id', $matchid)->where('innings', $matchesData['live_inning_number'])->update($matchData);
 
                     // Prepare ball events for batch insert
                     $ballEvents = [];
-                    foreach ($matchcommentaries as $commentarieskey => $commentariesvalue) {
-
-                        // over by ball data insert
-                        if ($commentariesvalue['event'] == 'ball') {
-                            $eventId = $commentariesvalue['event_id'];
-                            $overBallCheck = Overballes::where('eventid', $eventId)->first();
-                            if (empty($overBallCheck)) {
-                                $ballevent = [
-                                    "eventid" => $commentariesvalue['event_id'],
-                                    "match_id" => $matchid,
-                                    "innings" => $liveinningnumber,
-                                    "over_no" => $commentariesvalue['over'],
-                                    "ball_no" => $commentariesvalue['ball'],
-                                    "score" => $commentariesvalue['score'],
-                                    "noball_dismissal" => ($commentariesvalue['noball_dismissal'] == 1) ? "1" : "0",
-                                    "run" => $commentariesvalue['run'],
-                                    "noball_run" => $commentariesvalue['noball_run'],
-                                    "wide_run" => $commentariesvalue['wide_run'],
-                                    "bye_run" => $commentariesvalue['bye_run'],
-                                    "legbye_run" => $commentariesvalue['legbye_run'],
-                                    "bat_run" => $commentariesvalue['bat_run'],
-                                    "noball" => ($commentariesvalue['noball'] == 1) ? "1" : "0",
-                                    "wideball" => ($commentariesvalue['wideball'] == 1) ? "1" : "0",
-                                    "six" => ($commentariesvalue['six'] == 1) ? "1" : "0",
-                                    "four" => ($commentariesvalue['four'] == 1) ? "1" : "0",
-                                ];
-                                $ballEvents[] = $ballevent;
+                    if (isset($matchesData['commentaries'])) {
+                        foreach ($matchesData['commentaries'] as $commentarieskey => $commentariesvalue) {
+                            // over by ball data insert
+                            if ($commentariesvalue['event'] == 'ball') {
+                                $eventId = $commentariesvalue['event_id'];
+                                $overBallCheck = Overballes::where('eventid', $eventId)->first();
+                                if (empty($overBallCheck)) {
+                                    $ballevent = [
+                                        "eventid" => $commentariesvalue['event_id'],
+                                        "match_id" => $matchid,
+                                        "innings" => $matchesData['live_inning_number'],
+                                        "over_no" => $commentariesvalue['over'],
+                                        "ball_no" => $commentariesvalue['ball'],
+                                        "score" => $commentariesvalue['score'],
+                                        "noball_dismissal" => ($commentariesvalue['noball_dismissal'] == 1) ? "1" : "0",
+                                        "run" => $commentariesvalue['run'],
+                                        "noball_run" => $commentariesvalue['noball_run'],
+                                        "wide_run" => $commentariesvalue['wide_run'],
+                                        "bye_run" => $commentariesvalue['bye_run'],
+                                        "legbye_run" => $commentariesvalue['legbye_run'],
+                                        "bat_run" => $commentariesvalue['bat_run'],
+                                        "noball" => ($commentariesvalue['noball'] == 1) ? "1" : "0",
+                                        "wideball" => ($commentariesvalue['wideball'] == 1) ? "1" : "0",
+                                        "six" => ($commentariesvalue['six'] == 1) ? "1" : "0",
+                                        "four" => ($commentariesvalue['four'] == 1) ? "1" : "0",
+                                    ];
+                                    $ballEvents[] = $ballevent;
+                                }
                             }
                         }
+                        // Batch insert ball events
+                        Overballes::insert($ballEvents);
+                    }
 
-                        // Get Perdition data
-                        $predictiondata = Prediction::select('predictions.id', 'predictions.user_id', 'predictions.match_id', 'predictions.question_id', 'predictions.over_id', 'predictions.answere', 'predictions.status' ,'predictions.result' ,'questions.question_constant','innings_overs.overs')
+                    // Get Prediction data
+                    $predictiondata = Prediction::select('predictions.id', 'predictions.user_id', 'predictions.match_id', 'predictions.question_id', 'predictions.over_id', 'predictions.answere', 'predictions.status', 'predictions.result', 'questions.question_constant', 'innings_overs.overs')
                         ->where('predictions.result', '=', 'ND')
                         ->where('predictions.status', '=', 'pending')
                         ->where('predictions.match_id', '=', $matchid)
                         ->join('questions', 'predictions.question_id', '=', 'questions.id')
                         ->join('innings_overs', 'predictions.over_id', '=', 'innings_overs.id')
                         ->get();
-                        foreach ($predictiondata as $predictionkey => $predictionvalue) {
-                            if($predictionvalue->overs < $liveinningover){
-                                $type = $predictionvalue->question_constant;
-                                $over = $predictionvalue->overs;
-                                $answer = $predictionvalue->answere;
-                                $predictionid = $predictionvalue->id;
-                                $returnresult = Helper::QuestionType($type,$matchid,$liveinningnumber,$over);
 
-                                if($answer == $returnresult){
-                                    $result = "W";
-                                }else{
-                                    $result = "L";
-                                }
+                    foreach ($predictiondata as $predictionkey => $predictionvalue) {
+                        if ($predictionvalue->overs < $matchesData['live_score']['overs']) {
+                            
+                            $type = $predictionvalue->question_constant;
+                            $over = $predictionvalue->overs;
+                            $answer = $predictionvalue->answere;
+                            $predictionid = $predictionvalue->id;
+                            $firstBallScore = Overballes::where('match_id' , $matchid)->where('innings' , $matchesData['live_inning_number'])->where('over_no' , $over)->where('ball_no' , '1')->first();
+                            \Log::info($matchid . ' ' . $matchesData['live_inning_number'] .' '. $over);
+                            \Log::info($firstBallScore);
+                            $returnresult = Helper::QuestionType($type, $matchid, $matchesData['live_inning_number'], $over);
 
-                                Prediction::where('id', $predictionid)->update(['result' => $result]);
+                            if ($answer == $returnresult) {
+                                $result = "W";
+                            } else {
+                                $result = "L";
                             }
+
+                            Prediction::where('id', $predictionid)->update(['result' => $result]);
                         }
-                    }
-                    // Batch insert ball events
-                    if (!empty($ballEvents)) {
-                        Overballes::insert($ballEvents);
                     }
                 }
             }

@@ -213,12 +213,11 @@ class Helper
     public static function CalculateForFirstBallScore($matchid,$liveinningnumber,$over){
         //============== calculate here ========///
         $firstBallScore = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->where('ball_no' , '1')->first();
-        \Log::info($firstBallScore);
-        // if($firstBallScore->run != 0){
-        //     return "true";
-        // }else{
-        //     return "false";
-        // }
+        if($firstBallScore->run != 0){
+            return "true";
+        }else{
+            return "false";
+        }
 
     }
 
