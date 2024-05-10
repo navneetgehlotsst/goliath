@@ -22,7 +22,30 @@
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody>
+                                @foreach ( $users as $user )
+                                    <tr>
+                                        <td>{{$user->full_name}}</td>
+                                        <td>{{$user->email}}</td>
+                                        <td>{{$user->phone}}</td>
+                                        <td>
+                                            @if($user->status == "active")
+                                                <span class="badge bg-label-success me-1">Active</span>
+                                            @else
+                                                <span class="badge bg-label-danger me-1">Inactive</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($user->status == "active")
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="userStatus({{$user->id}},`inactive`)">Inactive</button>
+                                            @else
+                                                <button type="button" class="btn btn-sm btn-success" onclick="userStatus({{$user->id}},`active`)">Active</button>
+                                            @endif
+                                            <a href="{{ route("admin.users.show", $user->id) }}" class="btn btn-sm btn-primary">View Detail</a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -35,50 +58,6 @@
 <script>
 $('#usersTable').DataTable({
     processing: true,
-    ajax: {
-      url: "{{route('admin.users.alluser')}}",
-    },
-    columns: [
-        {
-            data: "full_name",
-            render: (data,type,row) => {
-                let url = '{{ route("admin.users.show", ":userId") }}';
-                url = url.replace(':userId', row.id);
-                return '<a href="'+url+'">'+row.full_name+'</a>';
-            }
-        },
-        {
-            data: "email",
-            render: (data,type,row) => {
-                return '<a href="mailto:'+row.email+'">'+row.email+'</a>';
-            }
-        },
-        {
-            data: "phone",
-        },
-        {
-            data: "status",
-            render: (data,type,row) => {
-                if(row.status == 'active'){
-                    return '<span class="badge bg-label-success me-1">Active</span>'
-                }
-                if(row.status == 'inactive'){
-                    return '<span class="badge bg-label-danger me-1">Inactive</span>';
-                }
-            }
-        },
-        {
-            data: "action",
-            render: (data,type,row) => {
-                if(row.status == 'inactive'){
-                    return '<button type="button" class="btn btn-sm btn-success" onclick="userStatus('+row.id+',`active`)">Active</button>';
-                }
-                if(row.status == 'active'){
-                    return '<button type="button" class="btn btn-sm btn-danger" onclick="userStatus('+row.id+',`inactive`)">Inactive</button>';
-                }
-            }
-        }
-    ],
 });
 
 

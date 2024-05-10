@@ -11,19 +11,20 @@ use Carbon\Carbon;
 use App\Models\Notification;
 use App\Models\NotificationUser;
 
-class AdminUserController extends Controller 
+class AdminUserController extends Controller
 {
     //========================= User Member Funcations ========================//
-    
+
     public function index() {
-        return view('admin.users.index');
+        $users = User::where('role', 'user')->orderBy('id', 'desc')->get();
+        return view('admin.users.index',compact('users'));
     }
-    
+
     public function getallUser(Request $request) {
         $users = User::where('role', 'user')->orderBy('id', 'desc')->get();
         return response()->json(['data' => $users]);
     }
-   
+
     public function userStatus(Request $request) {
         try
         {
@@ -60,6 +61,6 @@ class AdminUserController extends Controller
         }
     }
 
-    
+
 
 }

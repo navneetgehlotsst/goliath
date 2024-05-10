@@ -18,7 +18,8 @@ use App\Models\{
     CompetitionMatches,
     MatchInnings,
     User,
-    Transaction
+    Transaction,
+    Competition
 
 };
 
@@ -128,54 +129,59 @@ class UserPredictionController extends Controller
             $userId = auth()->id();
 
             // Fetch predictions with eager loading
-            $datamatches = Prediction::with(['competitionMatch' => function ($query) {
-                    // Additional condition if necessary
-                }])
+            $datamatches = Prediction::with(['competitionMatch'])
                 ->where('user_id', $userId)
                 ->groupBy('match_id')
                 ->paginate(10);
 
-            // Transform the data
-            $matchesdata['matchlist'] = $datamatches->map(function ($match) {
-                return [
-                    "id" => $match->competitionMatch->id,
-                    "competiton_id" => $match->competitionMatch->competiton_id,
-                    "match_id" => $match->competitionMatch->match_id,
-                    "match" => $match->competitionMatch->match,
-                    "short_title" => $match->competitionMatch->teama_short_name . " vs " . $match->competitionMatch->teamb_short_name,
-                    "status" => $match->competitionMatch->status,
-                    "note" => $match->competitionMatch->note,
-                    "match_start_date" => $match->competitionMatch->match_start_date,
-                    "match_start_time" => $match->competitionMatch->match_start_time,
-                    "formate" => $match->competitionMatch->formate,
-                    "teama" => [
-                        "team_id" => $match->competitionMatch->teamaid,
-                        "name" => $match->competitionMatch->teama_name,
-                        "short_name" => $match->competitionMatch->teama_short_name,
-                        "logo_url" => $match->competitionMatch->teama_img,
-                        "thumb_url" => $match->competitionMatch->teama_img,
-                        "scores_full" => $match->competitionMatch->teamascorefull,
-                        "scores" => $match->competitionMatch->teamascore,
-                        "overs" => $match->competitionMatch->teamaover,
-                    ],
-                    "teamb" => [
-                        "team_id" => $match->competitionMatch->teambid,
-                        "name" => $match->competitionMatch->teamb_name,
-                        "short_name" => $match->competitionMatch->teamb_short_name,
-                        "logo_url" => $match->competitionMatch->teamb_img,
-                        "thumb_url" => $match->competitionMatch->teamb_img,
-                        "scores_full" => $match->competitionMatch->teambscorefull,
-                        "scores" => $match->competitionMatch->teambscore,
-                        "overs" => $match->competitionMatch->teambover,
-                    ],
-                    "innings" => [] // Assuming no detailed innings information is available initially.
-                ];
-            });
 
-            // Now $matchesdata contains the transformed data in the desired format.
+                foreach ($datamatches as $key => $match) {
+                    $datamatchescomp = Competition::where('competiton_id', $match['competitionMatch']->competiton_id)->first();
+                    $transformedMatch = [
+                            "id"=> $match->id,
+                            "competiton_id" => $match['competitionMatch']->competiton_id,
+                            "competiton_name" => $datamatchescomp->title,
+                            "match_id" => $match['competitionMatch']->match_id,
+                            "match" => $match['competitionMatch']->match,
+                            "short_title" => $match['competitionMatch']->teama_short_name . " vs " . $match['competitionMatch']->teamb_short_name,
+                            "status" => $match['competitionMatch']->status,
+                            "note" => $match['competitionMatch']->note,
+                            "match_start_date" => $match['competitionMatch']->match_start_date,
+                            "match_start_time" => $match['competitionMatch']->match_start_time,
+                            "formate" => $match['competitionMatch']->formate,
+                            "teama" => [
+                                "team_id" => $match['competitionMatch']->teamaid, // Set team ID if available, otherwise null.
+                                "name" => $match['competitionMatch']->teama_name,
+                                "short_name" => $match['competitionMatch']->teama_short_name,
+                                "logo_url" => $match['competitionMatch']->teama_img,
+                                "thumb_url" => $match['competitionMatch']->teama_img,
+                                "scores_full" => $match['competitionMatch']->teamascorefull, // Set scores if available.
+                                "scores" => $match['competitionMatch']->teamascore, // Set scores if available.
+                                "overs" => $match['competitionMatch']->teamaover, // Set overs if available.
+                            ],
+                            "teamb" => [
+                                "team_id" => $match['competitionMatch']->teambid, // Set team ID if available, otherwise null.
+                                "name" => $match['competitionMatch']->teamb_name,
+                                "short_name" => $match['competitionMatch']->teamb_short_name,
+                                "logo_url" => $match['competitionMatch']->teamb_img,
+                                "thumb_url" => $match['competitionMatch']->teamb_img,
+                                "scores_full" => $match['competitionMatch']->teambscorefull, // Set scores if available.
+                                "scores" => $match['competitionMatch']->teambscore, // Set scores if available.
+                                "overs" => $match['competitionMatch']->teambover, // Set overs if available.
+                            ],
+                            "innings" => [] // Assuming no detailed innings information is available initially.
+                    ];
+
+                    $datamatches[$key] = $transformedMatch;
+                }
+                $matchesdata['matchlist'] = $datamatches;
+                // Now $transformedMatches contains the transformed data in the desired format.
+
+
+
             return $datamatches->count()
-            ? ApiResponse::successResponse($matchesdata, "Matches Data Found")
-            : ApiResponse::errorResponse("Matches Data Not Found");
+                ? ApiResponse::successResponse($matchesdata, "Matches Data Found")
+                : ApiResponse::errorResponse("Matches Data Not Found");
 
         } catch (Exception $e) {
             DB::rollback();
