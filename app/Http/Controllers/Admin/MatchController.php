@@ -142,7 +142,6 @@ class MatchController extends Controller
                 ];
             }
 
-            dd($transformedMatch);
             return view('admin.matches.info', compact('transformedMatch'));
 
         } catch (\Throwable $th) {

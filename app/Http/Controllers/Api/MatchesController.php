@@ -166,6 +166,7 @@ class MatchesController extends Controller
                     "scores" => $datamatches->teambscore,
                     "overs" => $datamatches->teambover,
                 ],
+                "pridiction_amount" => env('BETING_AMOUNT'),
                 "innings" => [], // Initialize innings array
             ]
         ];
