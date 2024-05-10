@@ -11,7 +11,8 @@ use App\Models\{
     Overballes,
     Prediction,
     Notification,
-    NotificationUser
+    NotificationUser,
+    Competition
 };
 
 
@@ -334,6 +335,13 @@ class Helper
     public static function CalculateForOutForDuck($matchid,$liveinningnumber,$over){
         //============== calculate here
         return true;
+    }
+
+
+
+    public static function CompetionDetail($compotitionid){
+        $datamatchescomp = Competition::where('competiton_id', $compotitionid)->first();
+        return $datamatchescomp;
     }
 
 }

@@ -58,6 +58,7 @@ class MatchesController extends Controller
                         "competiton_id" => $match->competiton_id,
                         "competiton_name" => $datamatchescomp->title,
                         "match_id" => $match->match_id,
+                        "match_no" => $match->subtitle,
                         "match" => $match->match,
                         "short_title" => $match->teama_short_name . " vs " . $match->teamb_short_name,
                         "status" => $match->status,
@@ -138,6 +139,7 @@ class MatchesController extends Controller
                 "competition_id" => $datamatches->competition_id, // Corrected typo
                 "match_id" => $datamatches->match_id,
                 "match" => $datamatches->match,
+                "match_no" => $datamatches->subtitle,
                 "short_title" => $datamatches->teama_short_name . " vs " . $datamatches->teamb_short_name,
                 "status" => $datamatches->status,
                 "note" => $datamatches->note,

@@ -67,6 +67,7 @@ class InsertCompetitionList extends Command
                         'competiton_id' => $cId,
                         'match_id' => $matchvalue['match_id'],
                         'match' => $matchvalue['title'],
+                        'subtitle' => $matchvalue['subtitle'],
                         'note' => $matchvalue['status_note'],
                         'teamaid' => $matchvalue['teama']['team_id'],
                         'teama_name' => $matchvalue['teama']['name'],

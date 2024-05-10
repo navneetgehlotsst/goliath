@@ -12,6 +12,7 @@ class CompetitionMatches extends Model
     protected $fillable = [
         'competiton_id',
         'match_id',
+        'subtitle',
         'match',
         'teama_name',
         'teama_short_name',

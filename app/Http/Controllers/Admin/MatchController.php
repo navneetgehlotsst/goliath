@@ -56,7 +56,7 @@ class MatchController extends Controller
             $transformedMatch = [
                 "matchdetail" => [
                     "id" => $datamatches->id,
-                    "competition_id" => $datamatches->competition_id,
+                    "competition_id" => $datamatches->competiton_id,
                     "competition_name" => $datamatches->title,
                     "match_id" => $datamatches->match_id,
                     "match" => $datamatches->match,
@@ -89,6 +89,7 @@ class MatchController extends Controller
                     "innings" => [], // Initialize innings array
                 ]
             ];
+
 
             foreach ($matchInnings as $match_inning) {
                 $innings_status = '';
@@ -141,7 +142,7 @@ class MatchController extends Controller
                 ];
             }
 
-
+            dd($transformedMatch);
             return view('admin.matches.info', compact('transformedMatch'));
 
         } catch (\Throwable $th) {

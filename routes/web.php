@@ -51,10 +51,10 @@ Route::name('admin.')->prefix('admin')->group(function () {
 
         Route::prefix('users')->name('users.')->group(function () {
             Route::get('', [AdminUserController::class, 'index'])->name('index');
-            Route::get('alluser', [AdminUserController::class, 'getallUser'])->name('alluser');
             Route::post('status', [AdminUserController::class, 'userStatus'])->name('status');
             Route::delete('delete/{user}', [AdminUserController::class, 'destroy'])->name('destroy');
             Route::get('{user}', [AdminUserController::class, 'show'])->name('show');
+            Route::get('match-prediction/{user}/{matchId}', [AdminUserController::class, 'matchPrediction'])->name('match.prediction');
         });
 
         Route::prefix('contacts')->name('contacts.')->group(function () {

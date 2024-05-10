@@ -5,11 +5,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use Mail,Hash,File,Auth,DB,Helper,Exception,Session,Redirect,Validator;
 use Carbon\Carbon;
-use App\Models\Notification;
-use App\Models\NotificationUser;
+
+use App\Models\{
+    User,
+    Notification,
+    NotificationUser,
+    Prediction
+
+};
 
 class AdminUserController extends Controller
 {
@@ -18,11 +23,6 @@ class AdminUserController extends Controller
     public function index() {
         $users = User::where('role', 'user')->orderBy('id', 'desc')->get();
         return view('admin.users.index',compact('users'));
-    }
-
-    public function getallUser(Request $request) {
-        $users = User::where('role', 'user')->orderBy('id', 'desc')->get();
-        return response()->json(['data' => $users]);
     }
 
     public function userStatus(Request $request) {
@@ -50,8 +50,13 @@ class AdminUserController extends Controller
         try
         {
             $user = User::find($id);
+            // Fetch predictions with eager loading
+            $datamatches = Prediction::with(['competitionMatch'])
+                ->where('user_id', $id)
+                ->groupBy('match_id')
+                ->paginate(10);
             if($user){
-                return view('admin.users.show', compact('user'));
+                return view('admin.users.show', compact('user','datamatches'));
             }else{
                 return redirect()->route('admin.users.index')->withError('User not found!');
             }
@@ -59,6 +64,13 @@ class AdminUserController extends Controller
         }catch(Exception $e){
             return back()->withError($e->getMessage());
         }
+    }
+
+
+
+    public function matchPrediction($userid,$matchid){
+        echo $userid;
+        echo $matchid;
     }
 
 
