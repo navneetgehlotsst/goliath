@@ -133,10 +133,15 @@ class MatchesController extends Controller
         // Fetching all innings data for the match
         $matchInnings = MatchInnings::where('match_id', $input['match_id'])->get();
 
+        $datamatchescomp = Competition::where('competiton_id', $datamatches->competiton_id)
+                ->first();
+        // dd($datamatchescomp);
+
         $transformedMatch = [
             "matchdetail" => [
                 "id" => $datamatches->id,
-                "competition_id" => $datamatches->competition_id, // Corrected typo
+                "competition_id" => $datamatches->competiton_id, // Corrected typo
+                "competiton_name" => $datamatchescomp->title,
                 "match_id" => $datamatches->match_id,
                 "match" => $datamatches->match,
                 "match_no" => $datamatches->subtitle,
@@ -145,7 +150,7 @@ class MatchesController extends Controller
                 "note" => $datamatches->note,
                 "match_start_date" => $datamatches->match_start_date,
                 "match_start_time" => $datamatches->match_start_time,
-                "format" => $datamatches->format, // Corrected typo
+                "formate" => $datamatches->formate, // Corrected typo
                 "teama" => [
                     "team_id" => $datamatches->teamaid,
                     "name" => $datamatches->teama_name,

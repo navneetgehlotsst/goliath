@@ -103,13 +103,19 @@ class UserPredictionController extends Controller
                                                 ->where('question_id', $question['question_id'])
                                                 ->exists();
 
+                if($question['answere'] == 1){
+                    $answer = "true";
+                }else{
+                    $answer = "false";
+                }
+
                 if ($existingQuestion) {
                     Prediction::create([
                         'user_id' => $userId,
                         'match_id' => $matchId,
                         'over_id' => $overId,
                         'question_id' => $question['question_id'],
-                        'answer' => $question['answere'],
+                        'answere' => $answer,
                     ]);
                 } else {
                     return ApiResponse::errorResponse("Question not found");
@@ -325,6 +331,14 @@ class UserPredictionController extends Controller
                 ->join('questions', 'predictions.question_id', '=', 'questions.id')
                 ->get();
 
+                if($userPredictions[0]->your_result == "ND"){
+                    $predictedData['result_message'] = "Result Not Declared";
+                    $predictedData['is_result'] = false;
+                 }else{
+                    $predictedData['result_message'] = "Result Declared";
+                    $predictedData['is_result'] = true;
+                 }
+
             // Modify your_answer field to be 1 or 0 based on the string value
             $userPredictions->transform(function ($prediction) {
                 $prediction->your_answer = $prediction->your_answer === "true" ? 1 : 0;
@@ -344,7 +358,7 @@ class UserPredictionController extends Controller
             $predictedData['winning_amount'] = "100";
 
             // Message for result
-            $message = $countResult >= 5 ? "You are a winner" : "You have lost this time";
+            $predictedData['message'] = $message = $countResult >= 5 ? "You are a winner" : "You have lost this time";
 
             // Return success response with prediction data
             return ApiResponse::successResponse($predictedData, $message);
