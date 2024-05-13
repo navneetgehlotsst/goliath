@@ -14,18 +14,18 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive text-nowrap">
-                    <table class="table table-bordered" id="TransactionsTable">
-                        <thead>
-                            <tr>
-                                <th>User Detail</th>
-                                <th>Transiction id</th>
-                                <th>Amount</th>
-                                <th>Transiction Type</th>
-                                {{--  <th>Action</th>  --}}
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+                        <table class="table table-bordered" id="TransactionsTable">
+                            <thead>
+                                <tr>
+                                    <th>User Detail</th>
+                                    <th>Transiction id</th>
+                                    <th>Amount</th>
+                                    <th>Transiction Type</th>
+                                    {{--  <th>Action</th>  --}}
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>

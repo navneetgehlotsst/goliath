@@ -42,12 +42,14 @@ class AuthController extends Controller
     public function sendOtp(Request $request){
         $data = $request->all();
 
+        // Define common validation rules
         $commonRules = [
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
             'type' => 'required|in:login,register,update',
         ];
 
+        // Define rules specific to each type
         $typeSpecificRules = [
             'full_name' => 'string|nullable',
             'email' => 'nullable|email',
@@ -55,15 +57,22 @@ class AuthController extends Controller
             'country_code' => 'numeric',
         ];
 
-        if ($data['type'] == 'register') {
-            $typeSpecificRules['full_name'] .= '|required';
-            $typeSpecificRules['email'] .= '|unique:users';
-            $typeSpecificRules['phone'] .= '|unique:users';
-            $typeSpecificRules['country_code'] .= '|sometimes';
-        }
-
+        // Merge common and type-specific rules
         $validator = Validator::make($data, array_merge($commonRules, $typeSpecificRules));
 
+        // Check if 'type' is set
+        if (!isset($data['type'])) {
+            return ApiResponse::errorResponse($validator->errors()->first());
+        } else {
+            // If 'type' is 'register', update rules accordingly
+            if ($data['type'] == 'register') {
+                $typeSpecificRules['full_name'] .= '|required';
+                $typeSpecificRules['email'] .= '|unique:users';
+                $typeSpecificRules['country_code'] .= '|sometimes';
+            }
+        }
+
+        // Check if validation fails
         if ($validator->fails()) {
             return ApiResponse::errorResponse($validator->errors()->first());
         }
@@ -72,32 +81,30 @@ class AuthController extends Controller
             // Generate OTP
             $otp = '1234';
             $otpExpiry = now()->addMinutes(120);
-            if(isset($data['country_code'])){
-                if (strstr($data['country_code'],"+")) {
-                    $countrycode = trim($data['country_code'],"+");
-                } else {
-                    $countrycode = $data['country_code'];
-                }
-            }else{
-                $countrycode = "";
-            }
+
+            // Extract country code from data or set to empty string if not provided
+            $countrycode = isset($data['country_code']) ? trim($data['country_code'], "+") : "";
 
             // Begin transaction
             DB::beginTransaction();
+
+            // Handle 'update' type
             if ($data['type'] == 'update') {
-                if(isset($data['phone'])){
-                    $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
+                if (isset($data['phone'])) {
+                    // Check if phone number already exists
+                    $user = User::where('phone', $data['phone'])->where('country_code', $countrycode)->where('role', 'user')->first();
                     if ($user) {
-                        return ApiResponse::errorResponse('Phone Number already exit');
+                        return ApiResponse::errorResponse('Phone Number already exists');
                     }
-                }else{
-                    $user = User::where('email',$data['email'])->where('role','user')->first();
+                } else {
+                    // Check if email already exists
+                    $user = User::where('email', $data['email'])->where('role', 'user')->first();
                     if ($user) {
-                        return ApiResponse::errorResponse('Email already exit');
+                        return ApiResponse::errorResponse('Email already exists');
                     }
                 }
 
-
+                // Save OTP information for update
                 $checkotp = new CheckOtp();
                 $checkotp->country_code = $countrycode ?? null;
                 $checkotp->data = $data['phone'] ?? $data['email'];
@@ -105,17 +112,21 @@ class AuthController extends Controller
                 $checkotp->otp_expire_time = $otpExpiry;
                 $checkotp->save();
 
+                // Prepare data for response
                 $dataUser['user'] = [
                     'email' => $data['email'] ?? "",
                     'phone' => $data['phone'] ?? "",
-                    'country_code' => '+'.$countrycode ?? "",
+                    'country_code' => '+' . $countrycode ?? "",
                     'type' => $data['type'],
                 ];
-            }else if ($data['type'] == 'login') {
-                if(isset($data['phone'])){
-                    $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
-                }else{
-                    $user = User::where('email',$data['email'])->where('role','user')->first();
+            } else if ($data['type'] == 'login') {
+                // Handle 'login' type
+                if (isset($data['phone'])) {
+                    // Check if user exists
+                    $user = User::where('phone', $data['phone'])->where('country_code', $countrycode)->where('role', 'user')->first();
+                } else {
+                    // Check if user exists
+                    $user = User::where('email', $data['email'])->where('role', 'user')->first();
                 }
 
                 if (!$user) {
@@ -126,6 +137,7 @@ class AuthController extends Controller
                     return ApiResponse::errorResponse('Your account is not activated yet.');
                 }
 
+                // Update user device information and save OTP
                 $user->update([
                     'device_type' => $data['device_type'],
                     'device_token' => $data['device_token'],
@@ -133,6 +145,7 @@ class AuthController extends Controller
                     'otp_expired' => $otpExpiry,
                 ]);
 
+                // Save OTP information for login
                 $checkotp = new CheckOtp();
                 $checkotp->country_code = $countrycode ?? null;
                 $checkotp->data = $data['phone'] ?? $data['email'];
@@ -140,27 +153,37 @@ class AuthController extends Controller
                 $checkotp->otp_expire_time = $otpExpiry;
                 $checkotp->save();
 
+                // Prepare data for response
                 $dataUser['user'] = [
                     'email' => $data['email'] ?? "",
                     'phone' => $data['phone'] ?? "",
-                    'country_code' => '+'.$countrycode ?? "",
+                    'country_code' => '+' . $countrycode ?? "",
                     'device_type' => $data['device_type'],
                     'device_token' => $data['device_token'],
                     'type' => $data['type'],
                 ];
             } else {
+                // Handle other types (not 'register' or 'login')
+                // Check if phone number already exists
+                $checkuserPhone = User::where('phone', $data['phone'])->where('country_code', $countrycode)->first();
+                if ($checkuserPhone) {
+                    return ApiResponse::errorResponse('Phone Number already exists');
+                }
 
+                // Save OTP information for other types
                 $checkotp = new CheckOtp();
                 $checkotp->country_code = $countrycode ?? null;
                 $checkotp->data = $data['phone'] ?? $data['email'];
                 $checkotp->otp = $otp;
                 $checkotp->otp_expire_time = $otpExpiry;
                 $checkotp->save();
+
+                // Prepare data for response
                 $dataUser = [
                     'full_name' => $data['full_name'] ?? "",
                     'email' => $data['email'] ?? "",
                     'phone' => $data['phone'] ?? "",
-                    'country_code' => '+'.$countrycode ?? "",
+                    'country_code' => '+' . $countrycode ?? "",
                     'device_type' => $data['device_type'],
                     'device_token' => $data['device_token'],
                     'type' => $data['type'],
@@ -170,51 +193,37 @@ class AuthController extends Controller
             // Commit transaction
             DB::commit();
 
+            // Generate success message based on login or registration
             $message = isset($data['phone']) ? 'OTP is sent to your phone. Please verify it to complete your registration.' : 'OTP is sent to your email. Please verify it to complete your registration.';
-            return ApiResponse::successResponse($dataUser,$message);
+            return ApiResponse::successResponse($dataUser, $message);
         } catch (Exception $e) {
+            // Rollback transaction on exception
             DB::rollback();
             return ApiResponse::errorResponse($e->getMessage());
         }
-
     }
 
     public function verifyOtp(Request $request){
         $data = $request->all();
 
         // Validation
-        $commonRules = [
+        $rules = [
             'full_name' => 'sometimes|string',
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
             'type' => 'required|in:login,register,update',
         ];
 
-        $typeSpecificRules = [
-            'full_name' => 'string|nullable',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|numeric|digits_between:4,12',
-            'country_code' => 'numeric',
-        ];
-
-        if ($data['type'] == 'register') {
-            $typeSpecificRules['full_name'] .= '|required';
-            $typeSpecificRules['email'] .= '|unique:users';
-            $typeSpecificRules['phone'] .= '|unique:users';
-            $typeSpecificRules['country_code'] .= '|sometimes';
-        }
-
-        $validator = Validator::make($data, array_merge($commonRules, $typeSpecificRules));
+        $validator = Validator::make($data, $rules);
 
         if ($validator->fails()) {
             return ApiResponse::errorResponse($validator->errors()->first());
         }
-        if(isset($data['country_code'])){
-            if (strstr($data['country_code'],"+")) {
-                $countrycode = trim($data['country_code'],"+");
-            } else {
-                $countrycode = $data['country_code'];
-            }
+
+        // Extract country code
+        $countrycode = $data['country_code'] ?? '91';
+        if (isset($data['country_code']) && strstr($countrycode, "+")) {
+            $countrycode = trim($countrycode, "+");
         }
 
         // Common user retrieval logic
@@ -228,42 +237,29 @@ class AuthController extends Controller
 
         $otp = $userQuery->first();
 
-        if (!$otp) {
-            return ApiResponse::errorResponse('Invalid Otp.');
+        if (!$otp || now()->timestamp > $otp->otp_expire_time) {
+            return ApiResponse::errorResponse('Invalid or expired OTP.');
         }
 
-        $currentTimestamp = now()->timestamp;
-
-        if ($currentTimestamp > $otp->otp_expire_time) {
-            return ApiResponse::errorResponse('Otp time has expired.');
-        }
         CheckOtp::find($otp->id)->forceDelete();
+
         try {
-            if($data['type'] == 'update'){
-                if(isset($data['phone'])){
-                    $message = "Phone Verifed Succesfully";
-                    return ApiResponse::successResponsenoData($message);
-                }else{
-                    $message = "Email Verifed Succesfully";
-                    return ApiResponse::successResponsenoData($message);
-                }
-            }else{
-                if($data['type'] == 'login'){
-                    DB::beginTransaction();
-                    // Otp Delete
-                    //CheckOtp::where('id', $otp->id)->forceDelete();
-                    if(isset($data['phone'])){
-                        $user = User::where('phone',$data['phone'])->where('country_code',$countrycode)->where('role','user')->first();
-                    }else{
-                        $user = User::where('email',$data['email'])->where('role','user')->first();
-                    }
-
-                }else{
-
+            if ($data['type'] == 'update') {
+                $message = isset($data['phone']) ? "Phone Verified Successfully" : "Email Verified Successfully";
+                return ApiResponse::successResponseNoData($message);
+            } else {
+                if ($data['type'] == 'login') {
+                    $user = User::where('role', 'user')
+                        ->where(function ($query) use ($data, $countrycode) {
+                            $query->where('phone', $data['phone'] ?? '')
+                                ->where('country_code', $countrycode);
+                        })
+                        ->orWhere('email', $data['email'] ?? '')
+                        ->first();
+                } else {
                     $fullName = explode(" ", $data['full_name']);
                     $firstName = $fullName[0] ?? '';
                     $lastName = $fullName[1] ?? '';
-
 
                     $user = new User();
                     $user->first_name = $firstName;
@@ -272,7 +268,7 @@ class AuthController extends Controller
                     $user->slug = Helper::slug('users', $data['full_name']);
                     $user->email = $data['email'] ?? null;
                     $user->phone = $data['phone'] ?? null;
-                    $user->country_code = $countrycode ?? '91';
+                    $user->country_code = $countrycode;
                     $user->device_type = $data['device_type'] ?? null;
                     $user->device_token = $data['device_token'] ?? null;
                     $user->save();
@@ -283,10 +279,10 @@ class AuthController extends Controller
                 $token = JWTAuth::fromUser($user);
 
                 $dataResponse = [
-                        'access_token' => $token,
-                        'token_type' => 'bearer',
-                        'user' => $this->getUserDetail($user->id),
-                    ];
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'user' => $this->getUserDetail($user->id),
+                ];
 
                 $message = $data['type'] == 'login' ? 'Login successfully!' : 'Account created successfully!';
                 return ApiResponse::successResponse($dataResponse, $message);
