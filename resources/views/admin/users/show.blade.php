@@ -47,43 +47,61 @@
         </div>
 
         {{-- User data --}}
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Total Wallet Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">100</p>
+                <h5 class="card-title">Wallet Amount</h5>
+                <p class="card-text mb-4 text-center fw-bold">{{$user->wallet}}</p>
               </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Total Deposit Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">300</p>
+                <h5 class="card-title">Deposit Amount</h5>
+                <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['add-wallet']}}</p>
               </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Total Fee Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">300</p>
+                <h5 class="card-title">Fee Amount</h5>
+                <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['pay']}}</p>
               </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Total Winning Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">300</p>
+                <h5 class="card-title">Winning Amount</h5>
+                <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['winning-amount']}}</p>
               </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Total Withdraw Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">300</p>
+                <h5 class="card-title">Withdraw Amount</h5>
+                <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['withdrawal-amount']}}</p>
+              </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+            <div class="card user-amount-card">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Leader board position by amount</h5>
+                <p class="card-text mb-4 text-center fw-bold">1</p>
+              </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+            <div class="card user-amount-card">
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title">Leader board position by Winning</h5>
+                <p class="card-text mb-4 text-center fw-bold">1</p>
               </div>
             </div>
         </div>
@@ -115,6 +133,7 @@
                                             </thead>
                                             <tbody>
                                                     @foreach ($datamatches as $key => $match)
+
                                                     @php
                                                         $returncompetion = Helper::CompetionDetail($match['competitionMatch']->competiton_id);
                                                     @endphp
@@ -139,7 +158,7 @@
                             <div class="card">
                                 <div class="card-body">
                                     <div class="table-responsive text-nowrap">
-                                        <table class="table table-bordered" id="TransactionsTable">
+                                        <table class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th>Transiction id</th>
@@ -148,13 +167,19 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach ($transactions as $key => $transaction)
-                                                    <tr>
-                                                        <td>{{$transactions->transaction_id}}</td>
-                                                        <td>{{$transactions->amount}}</td>
-                                                        <td>{{$transactions->transaction_type}}</td>
-                                                    </tr>
-                                                @endforeach
+                                                @if ($transactionscount != 0)
+                                                    @foreach ($transactions as $key => $transaction)
+                                                        <tr>
+                                                            <td>{{$transaction->transaction_id}}</td>
+                                                            <td>{{$transaction->amount}}</td>
+                                                            <td>{{$transaction->transaction_type}}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                @else
+                                                        <tr>
+                                                            <td>No Data Found</td>
+                                                        </tr>
+                                                @endif
                                             </tbody>
                                         </table>
                                     </div>
@@ -171,10 +196,6 @@
 @section('script')
 <script>
     $('#PredictionTable').DataTable({
-        processing: true,
-    });
-
-    $('#TransactionsTable').DataTable({
         processing: true,
     });
 </script>

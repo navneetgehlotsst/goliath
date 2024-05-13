@@ -36,6 +36,7 @@ class CompetitionMatches extends Model
         'live_innings'
     ];
 
+    // In the CompetitionMatches model
 
     public function matchInnings()
     {

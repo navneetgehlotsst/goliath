@@ -28,4 +28,12 @@ class Prediction extends Model
     {
         return $this->belongsTo(InningsOver::class, 'over_id', 'id');
     }
+
+
+    // In the Prediction model
+
+    public function overs()
+    {
+        return $this->hasMany(Overballes::class, 'prediction_id', 'id');
+    }
 }

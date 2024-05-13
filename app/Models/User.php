@@ -84,4 +84,18 @@ class User extends Authenticatable implements JWTSubject
         'status'
     ];
 
+
+    // Define the transactions relationship
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'id', 'user_id');
+    }
+
+
+    // Define the predictions relationship
+    public function predictions()
+    {
+        return $this->hasMany(Prediction::class);
+    }
+
 }

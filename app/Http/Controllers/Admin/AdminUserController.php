@@ -52,18 +52,47 @@ class AdminUserController extends Controller
         try
         {
             $user = User::find($id);
-            dd($user);
-            // Fetch predictions with eager loading
+            if(!$user) {
+                return redirect()->route('admin.users.index')->withError('User not found!');
+            }
+
             $datamatches = Prediction::with(['competitionMatch'])
                 ->where('user_id', $id)
                 ->groupBy('match_id')
                 ->paginate(10);
-            $transactions = Transaction::select('transactions.id','transactions.user_id','transactions.amount','transactions.transaction_id','transactions.transaction_type')->where('transactions.user_id',$id)->orderBy('id','desc')->get();
-            if($user){
-                return view('admin.users.show', compact('user','datamatches','transactions','getuserwallet'));
-            }else{
-                return redirect()->route('admin.users.index')->withError('User not found!');
+
+            $transactions = Transaction::select('id', 'user_id', 'amount', 'transaction_id', 'transaction_type')
+                ->where('user_id', $id)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            $transactionscount = $transactions->count();
+
+            $transactionTypes = [
+                'add-wallet' => 0,
+                'pay' => 0,
+                'winning-amount' => 0,
+                'withdrawal-amount' => 0
+            ];
+
+            foreach ($transactions as $transaction) {
+                switch ($transaction->transaction_type) {
+                    case 'add-wallet':
+                        $transactionTypes['add-wallet'] += $transaction->amount;
+                        break;
+                    case 'pay':
+                        $transactionTypes['pay'] += $transaction->amount;
+                        break;
+                    case 'winning-amount':
+                        $transactionTypes['winning-amount'] += $transaction->amount;
+                        break;
+                    case 'withdrawal-amount':
+                        $transactionTypes['withdrawal-amount'] += $transaction->amount;
+                        break;
+                }
             }
+
+            return view('admin.users.show', compact('user', 'datamatches', 'transactions', 'transactionTypes', 'transactionscount'));
 
         }catch(Exception $e){
             return back()->withError($e->getMessage());
