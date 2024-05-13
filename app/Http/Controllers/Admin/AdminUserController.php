@@ -52,6 +52,7 @@ class AdminUserController extends Controller
         try
         {
             $user = User::find($id);
+            dd($user);
             // Fetch predictions with eager loading
             $datamatches = Prediction::with(['competitionMatch'])
                 ->where('user_id', $id)
@@ -59,7 +60,7 @@ class AdminUserController extends Controller
                 ->paginate(10);
             $transactions = Transaction::select('transactions.id','transactions.user_id','transactions.amount','transactions.transaction_id','transactions.transaction_type')->where('transactions.user_id',$id)->orderBy('id','desc')->get();
             if($user){
-                return view('admin.users.show', compact('user','datamatches','transactions'));
+                return view('admin.users.show', compact('user','datamatches','transactions','getuserwallet'));
             }else{
                 return redirect()->route('admin.users.index')->withError('User not found!');
             }
