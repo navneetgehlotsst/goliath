@@ -58,12 +58,12 @@
 			</a>
 		</li>
 
-		<li class="menu-item {{ request()->is('admin/contacts') ? 'active' : ''}}">
+		{{-- <li class="menu-item {{ request()->is('admin/contacts') ? 'active' : ''}}">
 			<a href="{{route('admin.contacts.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-envelope"></i>
 				<div data-i18n="Contacts">Contacts</div>
 			</a>
-		</li>
+		</li> --}}
 
 
         <li class="menu-item {{ request()->is('admin/how-to-play*') ? 'active' : ''}}">
