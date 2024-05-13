@@ -54,6 +54,7 @@ class InsertCompetitionList extends Command
 
                 $matchresponsedata = json_decode($matchresponse, true);
                 $matchesData = $matchresponsedata['response']['items'];
+                \Log::info($matchesData);
                 // Collect Matches IDs
                 $matchesIds = array_column($matchesData, 'match_id');
 

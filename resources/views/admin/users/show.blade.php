@@ -42,6 +42,36 @@
                 </div>
             </div>
         </div>
+
+        {{-- User data --}}
+        <div class="col-sm-6 col-lg-2 mb-4 mt-4">
+            <div class="card card-border-shadow-primary h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                  <h5 class="ms-1 mb-0">Current Balance 2500</h5>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2 mb-4 mt-4">
+            <div class="card card-border-shadow-primary h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                  <h5 class="ms-1 mb-0">Total Winning Amount 3000</h5>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-2 mb-4 mt-4">
+            <div class="card card-border-shadow-primary h-100">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                  <h5 class="">Total Winning Amount <br> <span class="text-center ml-3 mt-2" style="margin-left: 34%;"> 3000 </span> </h5>
+                </div>
+              </div>
+            </div>
+        </div>
+
         <div class="col-md-12 mt-4">
             <div class="nav-align-top mb-4">
                 <ul class="nav nav-tabs" role="tablist">
