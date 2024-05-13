@@ -246,9 +246,13 @@ class MatchesController extends Controller
             ->get();
         $datamatches = CompetitionMatches::where('match_id', $input['match_id'])->first();
 
+        $datamatchescomp = Competition::where('competiton_id', $datamatches->competiton_id)
+                ->first();
+
         $transformedMatch['matchdetail'] = [
             "id"=> $datamatches->id,
             "competiton_id" => $datamatches->competiton_id,
+            "competiton_name" => $datamatchescomp->title,
             "match_id" => $datamatches->match_id,
             "match" => $datamatches->match,
             "short_title" => $datamatches->teama_short_name . " vs " . $datamatches->teamb_short_name,

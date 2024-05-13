@@ -230,11 +230,15 @@ class UserPredictionController extends Controller
                 return ApiResponse::errorResponse("Prediction data not found.");
             }
 
+            $datamatchescomp = Competition::where('competiton_id', $predictionData->competitionMatch->competiton_id)
+                ->first();
+
             // Transform data
             $transformedMatch = [
                 "matchdetail" => [
                     "id" => $predictionData->competitionMatch->id,
                     "competiton_id" => $predictionData->competitionMatch->competiton_id,
+                    "competiton_name" => $datamatchescomp->title,
                     "match_id" => $predictionData->competitionMatch->match_id,
                     "match" => $predictionData->competitionMatch->match,
                     "match_no" => $predictionData->competitionMatch->subtitle,
