@@ -21,10 +21,10 @@ class JWTMiddleware
         try {
             $user = JWTAuth::parseToken()->authenticate();
             if (!$user) {
-                return response()->json(['message' => 'user not found'], 404);
+                return response()->json(['error'=> 'false','message' => 'You are not authorized to access this resource.'], 401);
             }
         } catch (JWTException $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['error'=> 'false','message' => 'You are not authorized to access this resource.'], 401);
         }
         return $next($request);
     }
