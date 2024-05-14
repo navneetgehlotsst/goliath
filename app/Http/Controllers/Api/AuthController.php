@@ -278,13 +278,6 @@ class AuthController extends Controller
                 return ApiResponse::successResponseNoData($message);
             } else {
                 if ($data['type'] == 'login') {
-                    // $user = User::where('role', 'user')
-                    //     ->where(function ($query) use ($data, $countrycode) {
-                    //         $query->where('phone', $data['phone'] ?? '')
-                    //             ->where('country_code', $countrycode);
-                    //     })
-                    //     ->orWhere('email', $data['email'] ?? '')
-                    //     ->first();
                     if(isset($data['phone'])){
                         $user = User::where('role', 'user')->where('phone', $data['phone'] ?? '')->where('country_code', $countrycode)->first();
                     }else{
