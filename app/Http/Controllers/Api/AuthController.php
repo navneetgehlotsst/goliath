@@ -167,9 +167,16 @@ class AuthController extends Controller
             } else {
                 // Handle other types (not 'register' or 'login')
                 // Check if phone number already exists
-                $checkuserPhone = User::where('phone', $data['phone'])->where('country_code', $countrycode)->first();
-                if ($checkuserPhone) {
-                    return ApiResponse::errorResponse('Phone Number already exists');
+                if (isset($data['phone'])) {
+                    $checkuserPhone = User::where('phone', $data['phone'])->where('country_code', $countrycode)->first();
+                    if ($checkuserPhone) {
+                        return ApiResponse::errorResponse('Phone Number already exists');
+                    }
+                }else{
+                    $checkuserPhone = User::where('email', $data['email'])->first();
+                    if ($checkuserPhone) {
+                        return ApiResponse::errorResponse('Email already exists');
+                    }
                 }
 
                 // Save OTP information for other types
