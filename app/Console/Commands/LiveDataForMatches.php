@@ -125,16 +125,16 @@ class LiveDataForMatches extends Command
 
                     foreach ($predictiondata as $predictionkey => $predictionvalue) {
                         if ($predictionvalue->overs < $matchesData['live_score']['overs']) {
-                            
+
                             $type = $predictionvalue->question_constant;
                             $over = $predictionvalue->overs;
                             $answer = $predictionvalue->answere;
                             $predictionid = $predictionvalue->id;
                             $firstBallScore = Overballes::where('match_id' , $matchid)->where('innings' , $matchesData['live_inning_number'])->where('over_no' , $over)->where('ball_no' , '1')->first();
-                            \Log::info($matchid . ' ' . $matchesData['live_inning_number'] .' '. $over);
-                            \Log::info($firstBallScore);
-                            $returnresult = Helper::QuestionType($type, $matchid, $matchesData['live_inning_number'], $over);
 
+                            //$returnresult = Helper::QuestionType($type, $matchid, $matchesData['live_inning_number'], $over);
+                            $evenrun = Overballes::where('match_id' , $matchid)->where('innings' , $matchesData['live_inning_number'])->where('over_no' , $over)->sum('run');
+                            \Log::info($evenrun);
                             if ($answer == $returnresult) {
                                 $result = "W";
                             } else {
