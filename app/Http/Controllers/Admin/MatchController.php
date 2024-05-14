@@ -31,8 +31,7 @@ class MatchController extends Controller
         try {
 
              // Fetching match data
-            $datamatches = CompetitionMatches::where('match_id', $id)->join('competitions', 'competition_matches.competiton_id', '=', 'competitions.competiton_id')->first();
-
+            $datamatches = CompetitionMatches::where('match_id', $id)->first();
             if (!$datamatches) {
                 return ApiResponse::errorResponse(null, "Match Data Not Found");
             }

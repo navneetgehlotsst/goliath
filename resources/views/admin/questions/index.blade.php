@@ -19,11 +19,7 @@
                             <tr>
                                 <th>S.no.</th>
                                 <th>Question</th>
-                                <th>Question Type</th>
                                 <th>Type</th>
-                                <th>Conditions</th>
-                                <th>Quantity</th>
-                                {{--  <th>Action</th>  --}}
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -56,24 +52,8 @@ $('#QuestionsTable').DataTable({
             data: "question",
         },
         {
-            data: "question_type",
-        },
-        {
             data: "type",
         },
-        {
-            data: "conditions",
-        },
-
-        {
-            data: "quantity",
-        },
-        //{
-          //  data: "action",
-            //render: (data,type,row) => {
-              //      return '<button type="button" class="btn btn-sm btn-danger" onclick="deletes('+row.id+')">Delete</button>';
-            //}
-        //}
 
     ],
 });

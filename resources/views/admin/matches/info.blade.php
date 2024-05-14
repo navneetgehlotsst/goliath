@@ -26,7 +26,11 @@
                         <div class="col-md-6 text-center">
                             <p>
                                 <span class="fw-bold fs-5">
-                                    {{$transformedMatch['matchdetail']['teama']['name']}}
+                                    @if($transformedMatch['matchdetail']['teama']['name'] == "TBA")
+                                        TBA (To be announced)
+                                    @else
+                                        {{$transformedMatch['matchdetail']['teama']['name']}}
+                                    @endif
                                 </span>
                                 <br>
                                 {{$transformedMatch['matchdetail']['teama']['scores_full'] ?? ''}}
@@ -37,7 +41,11 @@
                         <div class="col-md-6 text-center">
                             <p>
                                 <span class="fw-bold fs-5">
-                                    {{$transformedMatch['matchdetail']['teamb']['name']}}
+                                    @if($transformedMatch['matchdetail']['teamb']['name'] == "TBA")
+                                        TBA (To be announced)
+                                    @else
+                                        {{$transformedMatch['matchdetail']['teama']['name']}}
+                                    @endif
                                 </span>
                                 <br>
                                 {{$transformedMatch['matchdetail']['teamb']['scores_full'] ?? ''}}
