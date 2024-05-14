@@ -29,24 +29,23 @@
 				<div data-i18n="User">Users</div>
 			</a>
 		</li>
-
         <li class="menu-item {{ request()->is('admin/transactions') ? 'active' : ''}}">
 			<a href="{{route('admin.transaction.index')}}" class="menu-link">
-				<i class="menu-icon tf-icons bx bx-envelope"></i>
+				<i class="menu-icon tf-icons bx bx-list-ul"></i>
 				<div data-i18n="transactions">Transaction</div>
 			</a>
 		</li>
 
         <li class="menu-item {{ request()->is('admin/questions*') ? 'active' : ''}}">
 			<a href="{{route('admin.questions.index')}}" class="menu-link">
-				<i class="menu-icon tf-icons bx bx-data"></i>
+				<i class="menu-icon tf-icons bx bx-list-ul"></i>
 				<div data-i18n="questions">Question</div>
 			</a>
 		</li>
 
         <li class="menu-item {{ request()->is('admin/competition*') ? 'active' : ''}}">
 			<a href="{{route('admin.competition.index')}}" class="menu-link">
-				<i class="menu-icon tf-icons bx bx-user-circle"></i>
+				<i class="menu-icon tf-icons bx bx-list-ul"></i>
 				<div data-i18n="competition">Competition</div>
 			</a>
 		</li>
@@ -68,7 +67,7 @@
 
         <li class="menu-item {{ request()->is('admin/how-to-play*') ? 'active' : ''}}">
 			<a href="{{route('admin.how-to-play.index')}}" class="menu-link">
-				<i class="menu-icon tf-icons bx bx-envelope"></i>
+				<i class="menu-icon tf-icons bx bx-list-ul"></i>
 				<div data-i18n="HowToPLay">How to Play</div>
 			</a>
 		</li>
@@ -80,8 +79,8 @@
 		<li class="menu-item {{ request()->is('admin/page*') ? 'active open' : ''}}">
 			<a href="javascript:void(0);" class="menu-link menu-toggle">
 				<i class="menu-icon tf-icons bx bx-book-content"></i>
-				<div data-i18n="Pages">Pages</div>
-				<div class="badge bg-danger rounded-pill ms-auto">{{count($pages)}}</div>
+				<div data-i18n="Pages">CMS</div>
+				{{-- <div class="badge bg-danger rounded-pill ms-auto">{{count($pages)}}</div> --}}
 			</a>
 			<ul class="menu-sub">
 				@foreach($pages as $page)
