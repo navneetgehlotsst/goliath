@@ -57,9 +57,6 @@ class AuthController extends Controller
             'country_code' => 'numeric',
         ];
 
-        // Merge common and type-specific rules
-        $validator = Validator::make($data, array_merge($commonRules, $typeSpecificRules));
-
         // Check if 'type' is set
         if (!isset($data['type'])) {
             return ApiResponse::errorResponse($validator->errors()->first());
@@ -71,6 +68,11 @@ class AuthController extends Controller
                 $typeSpecificRules['country_code'] .= '|sometimes';
             }
         }
+
+        // Merge common and type-specific rules
+        $validator = Validator::make($data, array_merge($commonRules, $typeSpecificRules));
+
+
 
         // Check if validation fails
         if ($validator->fails()) {
@@ -206,15 +208,35 @@ class AuthController extends Controller
     public function verifyOtp(Request $request){
         $data = $request->all();
 
-        // Validation
-        $rules = [
-            'full_name' => 'sometimes|string',
+        // Define common validation rules
+        $commonRules = [
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
             'type' => 'required|in:login,register,update',
         ];
 
-        $validator = Validator::make($data, $rules);
+        // Define rules specific to each type
+        $typeSpecificRules = [
+            'full_name' => 'string|nullable',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|numeric|digits_between:4,12',
+            'country_code' => 'numeric',
+        ];
+
+        // Check if 'type' is set
+        if (!isset($data['type'])) {
+            return ApiResponse::errorResponse($validator->errors()->first());
+        } else {
+            // If 'type' is 'register', update rules accordingly
+            if ($data['type'] == 'register') {
+                $typeSpecificRules['full_name'] .= '|required';
+                $typeSpecificRules['email'] .= '|unique:users';
+                $typeSpecificRules['country_code'] .= '|sometimes';
+            }
+        }
+
+        // Merge common and type-specific rules
+        $validator = Validator::make($data, array_merge($commonRules, $typeSpecificRules));
 
         if ($validator->fails()) {
             return ApiResponse::errorResponse($validator->errors()->first());
