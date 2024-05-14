@@ -1,19 +1,4 @@
 @extends('admin.layouts.app') @section('content')
-<style>
-    .thumb-image {
-        height: 50px;
-        width: 50px;
-        border: 1px solid lightgray;
-        padding: 1px;
-    }
-    .header-title {
-        text-transform: capitalize;
-        font-size: ;
-    }
-    .user-amount-card{
-        width: 100%;
-    }
-</style>
 
 
 
@@ -47,61 +32,59 @@
         </div>
 
         {{-- User data --}}
-        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Wallet Amount</h5>
+                <h5 class="card-title text-center">Wallet Amount</h5>
                 <p class="card-text mb-4 text-center fw-bold">{{$user->wallet}}</p>
               </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Deposit Amount</h5>
+                <h5 class="card-title text-center">Deposit Amount</h5>
                 <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['add-wallet']}}</p>
               </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Fee Amount</h5>
+                <h5 class="card-title text-center">Fee Amount</h5>
                 <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['pay']}}</p>
               </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Winning Amount</h5>
+                <h5 class="card-title text-center">Winning Amount</h5>
                 <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['winning-amount']}}</p>
               </div>
             </div>
         </div>
-        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Withdraw Amount</h5>
+                <h5 class="card-title text-center">Withdraw Amount</h5>
                 <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['withdrawal-amount']}}</p>
               </div>
             </div>
         </div>
-
-        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Leader board position by amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">1</p>
+                <h5 class="card-title text-center">Leader board position by amount</h5>
+                <p class="card-text mb-4 text-center fw-bold">0</p>
               </div>
             </div>
         </div>
-
-        <div class="col-md-3 mb-3 d-flex align-items-stretch mt-4">
+        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
             <div class="card user-amount-card">
               <div class="card-body d-flex flex-column">
-                <h5 class="card-title">Leader board position by Winning</h5>
-                <p class="card-text mb-4 text-center fw-bold">1</p>
+                <h5 class="card-title text-center">Leader board position by Winning</h5>
+                <p class="card-text mb-4 text-center fw-bold">0</p>
               </div>
             </div>
         </div>
@@ -140,7 +123,7 @@
                                                     <tr>
                                                         <td>{{$match['competitionMatch']->match}}</td>
                                                         <td>{{$match['competitionMatch']->match_start_date}}/{{$match['competitionMatch']->match_start_time}}</td>
-                                                        <td><img src="{{$match['competitionMatch']->teama_img}}" width="10%" alt=""> V/S <img src="{{$match['competitionMatch']->teamb_img}}" width="10%" alt=""></td>
+                                                        <td><img class="teamlogo" src="{{$match['competitionMatch']->teama_img}}" alt=""> V/S <img class="teamlogo" src="{{$match['competitionMatch']->teamb_img}}" alt=""></td>
                                                         <td>
                                                             <a href="{{ route("admin.users.match.prediction", ['user' => $user->id, 'matchId' => $match['competitionMatch']->match_id]) }}" class="btn btn-sm btn-primary">Match Detail</a>
                                                         </td>

@@ -35,7 +35,7 @@
                                 <br>
                                 {{$transformedMatch['matchdetail']['teama']['scores_full'] ?? ''}}
                             </p>
-                            <img src="{{$transformedMatch['matchdetail']['teama']['logo_url']}}" width="10%" alt="">
+                            <img src="{{$transformedMatch['matchdetail']['teama']['logo_url']}}" class="teamlogo" alt="">
                         </div>
                         {{-- team B Data --}}
                         <div class="col-md-6 text-center">
@@ -50,7 +50,7 @@
                                 <br>
                                 {{$transformedMatch['matchdetail']['teamb']['scores_full'] ?? ''}}
                             </p>
-                            <img src="{{$transformedMatch['matchdetail']['teamb']['logo_url']}}" width="10%" alt="">
+                            <img src="{{$transformedMatch['matchdetail']['teamb']['logo_url']}}" class="teamlogo" alt="">
                         </div>
                         {{-- Match result --}}
                         <div class="col-md-12">
