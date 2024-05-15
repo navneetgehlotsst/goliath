@@ -32,21 +32,21 @@
         <li class="menu-item {{ request()->is('admin/transactions') ? 'active' : ''}}">
 			<a href="{{route('admin.transaction.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-list-ul"></i>
-				<div data-i18n="transactions">Transaction</div>
+				<div data-i18n="transactions">Transactions</div>
 			</a>
 		</li>
 
         <li class="menu-item {{ request()->is('admin/questions*') ? 'active' : ''}}">
 			<a href="{{route('admin.questions.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-list-ul"></i>
-				<div data-i18n="questions">Question</div>
+				<div data-i18n="questions">Questions</div>
 			</a>
 		</li>
 
         <li class="menu-item {{ request()->is('admin/competition*') ? 'active' : ''}}">
 			<a href="{{route('admin.competition.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-list-ul"></i>
-				<div data-i18n="competition">Competition</div>
+				<div data-i18n="competition">Competitions</div>
 			</a>
 		</li>
 

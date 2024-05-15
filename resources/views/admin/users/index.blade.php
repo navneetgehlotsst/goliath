@@ -26,8 +26,8 @@
                                 @foreach ( $users as $user )
                                     <tr>
                                         <td>{{$user->full_name}}</td>
-                                        <td>{{$user->email}}</td>
-                                        <td>{{$user->phone}}</td>
+                                        <td>{{$user->email ?? '-'}}</td>
+                                        <td>{{$user->phone ?? '-'}}</td>
                                         <td>
                                             @if($user->status == "active")
                                                 <span class="badge bg-label-success me-1">Active</span>
@@ -92,14 +92,14 @@ function userStatus(userid,status){
                         }else{
                             setFlesh('success','User Inactivate Successfully');
                         }
-                        $('#usersTable').DataTable().ajax.reload();
+                        location.reload();
                     }else{
                         setFlesh('error','There is some problem to change status!Please contact to your server adminstrator');
                     }
                 }
             });
         }else{
-            $('#usersTable').DataTable().ajax.reload();
+            location.reload();
         }
     })
 }

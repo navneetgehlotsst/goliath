@@ -22,7 +22,7 @@
                                     <tr>
                                         <th>Question</th>
                                         <th>User Answer</th>
-                                        <th>Reault</th>
+                                        <th>Result</th>
                                     </tr>
                                 </thead>
                                 <tbody>

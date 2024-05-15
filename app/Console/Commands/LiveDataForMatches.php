@@ -38,14 +38,15 @@ class LiveDataForMatches extends Command
     {
         try {
             $compdata = Competition::where('status', 'like', 'live')->get();
+            
+            
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
 
             foreach ($compdata as $value) {
                 $cId = $value->competiton_id;
-
                 // Fetch live matches outside the loop
-                $matchesData = CompetitionMatches::where('status', 'like', 'live')->get();
-
+                $matchesData = CompetitionMatches::whereIn('status', ['live', 'Completed'])->get();
+                \Log::info($matchesData);
                 foreach ($matchesData as $key => $matche) {
                     $matchid = $matche->match_id;
                     $apimatchlive = "https://rest.entitysport.com/v2/matches/$matchid/live?token=$token";
@@ -66,6 +67,7 @@ class LiveDataForMatches extends Command
 
                     $matchresponsedata = json_decode($matchresponse, true);
                     $matchesData = $matchresponsedata['response'];
+
 
                     // Update live innings in CompetitionMatches table
                     CompetitionMatches::where('match_id', $matchid)->update(['live_innings' => $matchesData['live_inning_number']]);
@@ -127,14 +129,13 @@ class LiveDataForMatches extends Command
                         if ($predictionvalue->overs < $matchesData['live_score']['overs']) {
 
                             $type = $predictionvalue->question_constant;
-                            $over = $predictionvalue->overs;
+                            $over = $predictionvalue->overs - 1;
                             $answer = $predictionvalue->answere;
                             $predictionid = $predictionvalue->id;
                             $firstBallScore = Overballes::where('match_id' , $matchid)->where('innings' , $matchesData['live_inning_number'])->where('over_no' , $over)->where('ball_no' , '1')->first();
 
-                            //$returnresult = Helper::QuestionType($type, $matchid, $matchesData['live_inning_number'], $over);
-                            $evenrun = Overballes::where('match_id' , $matchid)->where('innings' , $matchesData['live_inning_number'])->where('over_no' , $over)->sum('run');
-                            \Log::info($evenrun);
+                            $returnresult = Helper::QuestionType($type, $matchid, $matchesData['live_inning_number'], $over);
+                            \Log::info($returnresult);
                             if ($answer == $returnresult) {
                                 $result = "W";
                             } else {

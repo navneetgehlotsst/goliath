@@ -40,3 +40,26 @@ a.menu-link {
     pointer-events: none;
     cursor: default;
 }
+
+.table-bordered tbody td {
+    text-transform: capitalize;
+}
+
+.thumb-image {
+    height: 50px;
+    width: 50px;
+    border: 1px solid lightgray;
+    padding: 1px;
+}
+.header-title {
+    text-transform: capitalize;
+    font-size: ;
+}
+.user-amount-card{
+    width: 100%;
+}
+
+img.teamlogo {
+    width: 30px;
+    height: auto;
+}

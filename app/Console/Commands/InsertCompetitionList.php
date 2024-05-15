@@ -31,12 +31,14 @@ class InsertCompetitionList extends Command
     {
         try {
 
-            $compdata = Competition::where('status', 'like', 'live')->where('status', 'like', 'live')->get();
+            $compdata = Competition::where('status', 'like', 'live')->get();
+            
             $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
             $perPage = 500;
 
             foreach ($compdata as $value) {
                 $cId = $value->competiton_id;
+              
                 $pagedatacount = 100;
                 $apiurlmatch = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$perPage";
 
@@ -56,10 +58,10 @@ class InsertCompetitionList extends Command
                 $matchesData = $matchresponsedata['response']['items'];
                 // Collect Matches IDs
                 $matchesIds = array_column($matchesData, 'match_id');
+                
 
                 // Fetch existing matches
                 $existingMatches = CompetitionMatches::whereIn('match_id', $matchesIds)->get()->keyBy('match_id');
-
                 foreach ($matchesData as $matchvalue) {
                     $dateTime = $matchvalue['date_start'];
                     $datearray = explode(" ", $dateTime);

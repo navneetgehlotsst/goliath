@@ -256,7 +256,7 @@ class Helper
     public static function CalculateForOneWicketInOver($matchid,$liveinningnumber,$over){
         //============== calculate here
         $wicketinover = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->where('score' , 'w')->count();
-        if($wicketinover != 0){
+        if($wicketinover > 1){
             return "true";
         }else{
             return "false";
@@ -287,7 +287,7 @@ class Helper
         //========== calculation here======//
         $sevenrun = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->sum('run');
 
-        if ($sevenrun < 7) {
+        if ($sevenrun > 7) {
             return "true";
         } else {
             return "false";
