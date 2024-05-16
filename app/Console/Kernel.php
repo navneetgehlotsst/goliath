@@ -14,8 +14,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('app:add-question-to-match')->daily();
-        $schedule->command('app:insert-competition-list')->everyFiveSeconds();
-        $schedule->command('app:live-data-for-matches')->everyFiveSeconds();
+        // $schedule->command('app:insert-competition-list')->everyMinute();
+        $schedule->command('app:live-data-for-matches')->everyThreeMinutes();
     }
 
     /**
