@@ -5,14 +5,22 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Mail, DB, Hash, Validator, Session, File,Exception;
+use App\Models\{
+    Question,
+    MatchInnings,
+    InningsOver,
+    OverQuestions,
+    CompetitionMatches,
+    Prediction,
+    User
+};
 
 class AdminAuthController extends Controller
 {
-    
+
     public function index()
     {
         try{
@@ -33,7 +41,7 @@ class AdminAuthController extends Controller
         }
     }
 
-    
+
 
     public function login()
     {
@@ -131,12 +139,12 @@ class AdminAuthController extends Controller
         catch(Exception $e){
             return back()->with("error",$e->getMessage());
         }
-    
+
     }
 
     public function showResetPasswordForm($token)
     {
-        try{    
+        try{
             $user = DB::table("password_resets")->where("token", $token)->first();
             $email = $user->email;
             return view("admin.auth.reset-password", ["token" => $token,"email" => $email,]);
@@ -199,7 +207,7 @@ class AdminAuthController extends Controller
         }
     }
 
-    
+
 
     public function logout()
     {
@@ -238,11 +246,11 @@ class AdminAuthController extends Controller
                 "email" => "required|email|unique:users,email," . $user->id,
                 "avatar" => "sometimes|image|mimes:jpeg,jpg,png|max:5000"
             ]);
-            
+
             if($validator->fails()) {
                 return redirect()->back()->withInput($request->all())->withErrors($validator->errors());
             }
-            
+
             if($request->file("avatar")) {
                 $file = $request->file("avatar");
                 $filename = time() . $file->getClientOriginalName();
@@ -269,7 +277,9 @@ class AdminAuthController extends Controller
 
     public function adminDashboard()
     {
-        return view("admin.dashboard.index");
+        $usercount = User::where('status', 'active')->count();
+        $predictionMonthCount = Prediction::count();
+        return view("admin.dashboard.index" , compact('usercount','predictionMonthCount'));
     }
 
 
