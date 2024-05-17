@@ -32,63 +32,103 @@
         </div>
 
         {{-- User data --}}
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
-            <div class="card user-amount-card">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-center">Wallet Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">{{$user->wallet}}</p>
-              </div>
+        <div class="col-sm-6 col-lg-2 mt-4 mb-4">
+            <div class="card card-border-shadow-primary h-100">
+                <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                    <div class="avatar me-2">
+                        <span class="avatar-initial rounded bg-label-primary"><i class='bx bx-coin-stack'></i></span>
+                    </div>
+                    <h4 class="ms-1 mb-0">{{$transactionTypes['add-wallet']}}</h4>
+                </div>
+                <p class="mb-1">Deposit Amount</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
-            <div class="card user-amount-card">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-center">Deposit Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['add-wallet']}}</p>
-              </div>
+        <div class="col-sm-6 col-lg-2 mt-4 mb-4">
+            <div class="card card-border-shadow-primary h-100">
+                <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                    <div class="avatar me-2">
+                    <span class="avatar-initial rounded bg-label-primary"><i class='bx bx-coin-stack'></i></span>
+                    </div>
+                    <h4 class="ms-1 mb-0">{{$transactionTypes['pay']}}</h4>
+                </div>
+                <p class="mb-1">Fee Amount</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
-            <div class="card user-amount-card">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-center">Fee Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['pay']}}</p>
-              </div>
+        <div class="col-sm-6 col-lg-2 mt-4 mb-4">
+            <div class="card card-border-shadow-primary h-100">
+                <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                    <div class="avatar me-2">
+                    <span class="avatar-initial rounded bg-label-primary"><i class='bx bx-coin-stack'></i></span>
+                    </div>
+                    <h4 class="ms-1 mb-0">{{$transactionTypes['winning-amount']}}</h4>
+                </div>
+                <p class="mb-1">Winning Amount</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
-            <div class="card user-amount-card">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-center">Winning Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['winning-amount']}}</p>
-              </div>
+        <div class="col-sm-6 col-lg-2 mt-4 mb-4">
+            <div class="card card-border-shadow-primary h-100">
+                <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                    <div class="avatar me-2">
+                    <span class="avatar-initial rounded bg-label-primary"><i class='bx bx-coin-stack'></i></span>
+                    </div>
+                    <h4 class="ms-1 mb-0">{{$transactionTypes['withdrawal-amount']}}</h4>
+                </div>
+                <p class="mb-1">Withdraw Amount</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
-            <div class="card user-amount-card">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-center">Withdraw Amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">{{$transactionTypes['withdrawal-amount']}}</p>
-              </div>
+        <div class="col-sm-6 col-lg-2 mt-4 mb-4">
+            <div class="card card-border-shadow-primary h-100">
+                <div class="card-body">
+                <div class="d-flex align-items-center mb-2 pb-1">
+                    <div class="avatar me-2">
+                    <span class="avatar-initial rounded bg-label-primary"><i class='bx bx-coin-stack'></i></span>
+                    </div>
+                    <h4 class="ms-1 mb-0">{{$user->wallet}}</h4>
+                </div>
+                <p class="mb-1">Wallet Amount</p>
+                </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
-            <div class="card user-amount-card">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-center">Leader board position by amount</h5>
-                <p class="card-text mb-4 text-center fw-bold">0</p>
-              </div>
+        <div class="col-lg-2 mb-4 mt-4">
+            <div class="card h-100">
+                <div class="card-header d-flex align-items-center mb-2 pb-1">
+                    <div class="avatar me-2">
+                        <span class="avatar-initial rounded bg-label-primary"><i class='bx bx-coin-stack'></i></span>
+                    </div>
+                    <h6 class="ms-1 mb-0">Leaderboard</h6>
+                </div>
+                <div class="card-body row g-4">
+                    <div class="col-md-6 pe-md-4 card-separator">
+                        <div class="card-title d-flex align-items-start justify-content-between">
+                            <h6 class="mb-0">Winning Position</h6>
+                        </div>
+                        <div class="d-flex justify-content-between" style="position: relative;">
+                            <div class="mt-auto">
+                                <p class="mb-2">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 ps-md-4">
+                        <div class="card-title d-flex align-items-start justify-content-between">
+                            <h6 class="mb-0">Amount Position</h6>
+                        </div>
+                        <div class="d-flex justify-content-between" style="position: relative;">
+                            <div class="mt-auto">
+                                <p class="mb-2">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-2 mb-3 d-flex align-items-stretch mt-4">
-            <div class="card user-amount-card">
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-center">Leader board position by Winning</h5>
-                <p class="card-text mb-4 text-center fw-bold">0</p>
-              </div>
-            </div>
-        </div>
-
         <div class="col-md-12 mt-4">
             <div class="nav-align-top mb-4">
                 <ul class="nav nav-tabs" role="tablist">

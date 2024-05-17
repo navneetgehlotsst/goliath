@@ -11,10 +11,27 @@ use App\Models\{
 
 class CompetitionController extends Controller
 {
-    public function index()
+    public function live()
     {
         $CompetitionLiveData = Competition::where('status','live')->get();
+        $titel = "Live";
 
-        return view('admin.competition.index',compact('CompetitionLiveData'));
+        return view('admin.competition.index',compact('CompetitionLiveData','titel'));
+    }
+
+
+    public function completed()
+    {
+        $CompetitionLiveData = Competition::where('status','result')->get();
+        $titel = "Completed";
+        return view('admin.competition.index',compact('CompetitionLiveData','titel'));
+    }
+
+
+    public function upcoming()
+    {
+        $CompetitionLiveData = Competition::where('status','upcoming')->get();
+        $titel = "Upconing";
+        return view('admin.competition.index',compact('CompetitionLiveData','titel'));
     }
 }

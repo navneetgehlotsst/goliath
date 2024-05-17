@@ -53,7 +53,6 @@ a.menu-link {
 }
 .header-title {
     text-transform: capitalize;
-    font-size: ;
 }
 .user-amount-card{
     width: 100%;
@@ -62,4 +61,9 @@ a.menu-link {
 img.teamlogo {
     width: 30px;
     height: auto;
+}
+
+
+.bg-menu-theme .menu-item.active > .menu-link:not(.menu-toggle) {
+    background-color: #3777b0 !important;
 }

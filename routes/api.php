@@ -57,5 +57,5 @@ Route::middleware('jwt.verify')->group(function() {
     Route::post('/mypredictions', [UserPredictionController::class, 'listPredictions']);
     Route::post('/predicted-overs', [UserPredictionController::class, 'predicted_over']);
     Route::post('/predicted-result', [UserPredictionController::class, 'predicted_result']);
-    Route::post('/test', [UserPredictionController::class, 'croncheck']);
+
 });

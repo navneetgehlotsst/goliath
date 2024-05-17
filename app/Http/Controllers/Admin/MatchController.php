@@ -20,9 +20,7 @@ class MatchController extends Controller
 {
     public function index($cId)
     {
-        $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)
-        ->whereNotIn('status', ["Cancelled", "Completed"])
-        ->get();
+        $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)->get();
         return view('admin.matches.index', compact('CompetitionMatchData'));
     }
 

@@ -30,6 +30,8 @@ use App\Http\Controllers\Admin\{
 
 Route::get('/', [HomeController::class, 'index'])->name('/');
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/test', [HomeController::class, 'croncheck']);
+Route::get('/testtwo', [HomeController::class, 'cronchecktwo']);
 
 Route::name('admin.')->prefix('admin')->group(function () {
     Route::get('/', [AdminAuthController::class, 'index']);
@@ -40,6 +42,7 @@ Route::name('admin.')->prefix('admin')->group(function () {
     Route::post('forget-password', [AdminAuthController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
     Route::get('reset-password/{token}', [AdminAuthController::class, 'showResetPasswordForm'])->name('reset.password.get');
     Route::post('reset-password', [AdminAuthController::class, 'submitResetPasswordForm'])->name('reset.password.post');
+
 
     Route::middleware(['admin'])->group(function () {
         Route::get('dashboard', [AdminAuthController::class, 'adminDashboard'])->name('dashboard');
@@ -92,7 +95,9 @@ Route::name('admin.')->prefix('admin')->group(function () {
         });
 
         Route::prefix('competition')->name('competition.')->group(function () {
-            Route::get('index', [CompetitionController::class, 'index'])->name('index');
+            Route::get('live', [CompetitionController::class, 'live'])->name('live');
+            Route::get('completed', [CompetitionController::class, 'completed'])->name('completed');
+            Route::get('upcoming', [CompetitionController::class, 'upcoming'])->name('upcoming');
         });
 
         Route::prefix('match')->name('match.')->group(function () {

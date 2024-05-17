@@ -219,6 +219,7 @@ class AuthController extends Controller
         $commonRules = [
             'device_type' => 'sometimes',
             'device_token' => 'sometimes',
+            'otp' => 'required',
             'type' => 'required|in:login,register,update',
         ];
 

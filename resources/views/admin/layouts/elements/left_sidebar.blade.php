@@ -43,11 +43,28 @@
 			</a>
 		</li>
 
-        <li class="menu-item {{ request()->is('admin/competition*') ? 'active' : ''}}">
-			<a href="{{route('admin.competition.index')}}" class="menu-link">
-				<i class="menu-icon tf-icons bx bx-list-ul"></i>
-				<div data-i18n="competition">Competitions</div>
+        <li class="menu-item {{ request()->is('admin/competition*') ? 'active open' : ''}}">
+			<a href="javascript:void(0);" class="menu-link menu-toggle">
+				<i class="menu-icon tf-icons bx bx-book-content"></i>
+				<div data-i18n="Pages">Competitions</div>
 			</a>
+			<ul class="menu-sub">
+                <li class="menu-item {{ request()->is('admin/competition/live') ? 'active' : ''}}">
+                    <a href="{{route('admin.competition.live')}}" class="menu-link">
+                        <div data-i18n="Live">Live</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/competition/completed') ? 'active' : ''}}">
+                    <a href="{{route('admin.competition.completed')}}" class="menu-link">
+                        <div data-i18n="Completed">Completed</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/competition/upcoming') ? 'active' : ''}}">
+                    <a href="{{route('admin.competition.upcoming')}}" class="menu-link">
+                        <div data-i18n="Upcoming">Upcoming</div>
+                    </a>
+                </li>
+			</ul>
 		</li>
 
 		<li class="menu-item {{ request()->is('admin/notifications/index') ? 'active' : ''}}">
