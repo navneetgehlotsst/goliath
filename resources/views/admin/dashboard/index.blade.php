@@ -62,7 +62,7 @@
         <div class="col-md-3 col-lg-3 order-2 mb-4">
             <div class="card h-100">
               <div class="card-header d-flex align-items-center justify-content-between">
-                <h5 class="card-title m-0 me-2">Predicted Matches</h5>
+                <h5 class="card-title m-0 me-2">Recently Completed Predictions</h5>
               </div>
               <div class="card-body">
                 <ul class="list-group">
