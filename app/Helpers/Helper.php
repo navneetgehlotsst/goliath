@@ -29,7 +29,6 @@ class Helper
         return $pages;
     }
 
-
     public static function slug($table, $name)
     {
         $slug = str_replace(' ', '-', $name);
@@ -80,21 +79,17 @@ class Helper
         return $notifications;
     }
 
-
     public static function cleanImage($string)
     {
         $string = str_replace(' ', '-', $string);
         return preg_replace('/[^A-Za-z0-9.\-]/', '', $string);
     }
 
-
     public static function userDetail($user_id)
     {
         $user_detail = User::find($user_id);
         return $user_detail;
     }
-
-
 
     public static function urlValidation(){
         $regex = '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/';
@@ -109,7 +104,6 @@ class Helper
 
         return $matchbystatus;
     }
-
 
     public static function getCompetitionsStatus(){
         //$matchbystatus = array('live','fixture');
@@ -213,8 +207,8 @@ class Helper
 
     public static function CalculateForFirstBallScore($matchid,$liveinningnumber,$over){
         //============== calculate here ========///
-        $firstBallScore = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->where('ball_no' , '1')->first();
-        if($firstBallScore->run != 0){
+        $firstBallScore = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->where('ball_no' , '1')->value('run');
+        if($firstBallScore != 0){
             return "true";
         }else{
             return "false";

@@ -37,8 +37,8 @@ class LiveDataForMatches extends Command
     public function handle()
     {
         try {
-            $apicount = DB::table('api_count')->where('name', 'match_live')->first();
-            if ($apicount < 30000) {
+            //$apicount = DB::table('api_count')->where('name', 'match_live')->value('count');
+            //if ($apicount < 30000) {
                 // API Token
                 $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
 
@@ -51,7 +51,6 @@ class LiveDataForMatches extends Command
                             ->where(DB::raw('TIMESTAMP(CONCAT(match_start_date, " ", match_start_time))'), '<=', $currentUtcTime);
                     })->get();
 
-
                 // If there are live and Completed matches
                 if (!empty($matchesData)) {
                     foreach ($matchesData as $key => $match) {
@@ -60,7 +59,7 @@ class LiveDataForMatches extends Command
                         // API URL for live match data
                         $apimatchlive = "https://rest.entitysport.com/v2/matches/$matchid/live?token=$token";
 
-                        $data = DB::table('api_count')->where('name', 'match_live')->increment("count");
+                        //$data = DB::table('api_count')->where('name', 'match_live')->increment("count");
                         // Curl Request
                         $curl = curl_init();
                         curl_setopt_array($curl, array(
@@ -126,7 +125,7 @@ class LiveDataForMatches extends Command
                                                     "eventid" => $commentariesvalue['event_id'],
                                                     "match_id" => $matchid,
                                                     "innings" => $matchesData['live_inning_number'],
-                                                    "over_no" => $commentariesvalue['over'],
+                                                    "over_no" => ($commentariesvalue['over']+1),
                                                     "ball_no" => $commentariesvalue['ball'],
                                                     "score" => $commentariesvalue['score'],
                                                     "noball_dismissal" => ($commentariesvalue['noball_dismissal'] == 1) ? "1" : "0",
@@ -180,20 +179,20 @@ class LiveDataForMatches extends Command
                                     }
                                 }
                             } else {
-                                \Log::error("Api Not Respomding");
+                                \Log::error("LiveDataForMatches: Match Not Found! MATCH ID: ".$matchid);
                             }
                         } else {
                             // Log error if API not working
-                            \Log::error("Api Not Working");
+                            \Log::error("LiveDataForMatches: Api Not Working");
                             break;
                         }
                     }
                 }
                 // Log success message after updating scores
-                \Log::error("score updated");
-            } else {
-                \Log::info("api count limt end Match live api");
-            }
+                //\Log::error("LiveDataForMatches: score updated");
+            // } else {
+            //     \Log::info("LiveDataForMatches: api count limt end Match live api");
+            // }
         } catch (\Throwable $th) {
             \Log::error($th->getMessage() . " " . $th->getFile() . " " . $th->getLine());
         }

@@ -36,9 +36,10 @@ class AddQuestionToMatch extends Command
      */
     public function handle()
     {
+        \Log::error("AddQuestionToMatch:");
         try {
-            $apicount = DB::table('api_count')->where('name', 'match_live')->first();
-            if ($apicount < 30000) {
+            // $apicount = DB::table('api_count')->where('name', 'match_live')->value('count');
+            // if ($apicount < 30000) {
                 // Get current year
                 $currentYear = Carbon::now()->year;
 
@@ -48,10 +49,10 @@ class AddQuestionToMatch extends Command
                 $perPage = 500;
 
                 // Construct API URL
-                $apiurl = "https://rest.entitysport.com/sandbox/cricket/seasons/$currentYear/competitions?token=$token&per_page=$perPage";
+                $apiurl = "https://rest.entitysport.com/v2/seasons/$currentYear/competitions?token=$token&per_page=$perPage";
 
-                $data = DB::table('api_count')->where('name', 'compitetion')->increment("count");
-
+                //$data = DB::table('api_count')->where('name', 'compitetion')->increment("count");
+                
                 // Initialize cURL session
                 $curl = curl_init();
 
@@ -76,154 +77,168 @@ class AddQuestionToMatch extends Command
                 if ($competitionresponsedata['status'] == 'ok') {
                     // Collect competition IDs
                     $competitionIds = array_column($compdata, 'cid');
-
+                    
+                    // Fetch existing competitions
+                    //$existingCompetitions = Competition::whereIn('competiton_id', $competitionIds)->get()->keyBy('competiton_id');
+                    
                     // Fetch question IDs
                     $questionIds = Question::where('type', 'initial')->pluck('id')->toArray();
 
                     foreach ($compdata as $compdatavalue) {
-                        // Prepare competition data
-                        $competitiondata = [
-                            'competiton_id' => $compdatavalue['cid'],
-                            'title' => $compdatavalue['title'],
-                            'type' => $compdatavalue['category'],
-                            'competition_type' => $compdatavalue['match_format'],
-                            'date_start' => $compdatavalue['datestart'],
-                            'date_end' => $compdatavalue['dateend'],
-                            'status' => $compdatavalue['status'],
-                        ];
+                        if($compdatavalue['status'] != "result"){
+                            // Prepare competition data
+                            $competitiondata = [
+                                'title' => $compdatavalue['title'],
+                                'type' => $compdatavalue['category'],
+                                'competition_type' => $compdatavalue['match_format'],
+                                'date_start' => $compdatavalue['datestart'],
+                                'date_end' => $compdatavalue['dateend'],
+                                'status' => $compdatavalue['status'],
+                            ];
 
-                        // Check if competition already exists
-                        if ($existingCompetitions->has($compdatavalue['cid'])) {
-                            // Update existing competition
-                            $existingCompetitions[$compdatavalue['cid']]->update($competitiondata);
-                        } else {
-                            // Create new competition
-                            Competition::create($competitiondata);
-                        }
+                            Competition::updateOrCreate(['competiton_id' => $compdatavalue['cid']],$competitiondata);
+                            
+                            /* //\Log::info("C_ID".$compdatavalue['cid']);
+                            // Check if competition already exists
+                            if ($existingCompetitions->has($compdatavalue['cid'])) {
+                                // Update existing competition
+                                $existingCompetitions[$compdatavalue['cid']]->update($competitiondata);
 
-                        //========================== Now get competitions matches ==================//
-                        $cId = $compdatavalue['cid'];
+                                //\Log::info("Find");
+                            } else {
+                                // Create new competition
+                                Competition::create($competitiondata);
 
-                        // Fetch existing matches
-                        $existingMatches = CompetitionMatches::whereIn('competiton_id', $cId)->count();
-                        if ($existingMatches == '0') {
-                            $pagedatacount = 100;
-                            $apiurlScheduled = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$pagedatacount&paged=$page";
-                            $data = DB::table('api_count')->where('name', 'compition_matches')->increment("count");
-                            // Initialize cURL session for matches
-                            $curlScheduled = curl_init($apiurlScheduled);
+                                //\Log::info("New");
+                            }*/ 
 
-                            // Set cURL options for matches
-                            curl_setopt_array($curlScheduled, [
-                                CURLOPT_RETURNTRANSFER => true,
-                                CURLOPT_FOLLOWLOCATION => true,
-                                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                                CURLOPT_CUSTOMREQUEST => 'GET',
-                            ]);
+                            //========================== Now get competitions matches ==================//
+                            $cId = $compdatavalue['cid'];
 
-                            // Execute cURL session for matches
-                            $matchScheduledresponse = curl_exec($curlScheduled);
-                            curl_close($curlScheduled);
+                            // Fetch existing matches
+                            //$existingMatches = CompetitionMatches::whereIn('competiton_id', $cId)->count('id');
+                            $existingMatches = CompetitionMatches::where('competiton_id', $cId)->get();
+                            //\Log::info("existingMatches:".count($existingMatches));
+                            if (count($existingMatches) == '0') {
+                                $pagedatacount = 100;
+                                $apiurlScheduled = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$pagedatacount&paged=$page";
+                                
+                                //increment in api count
+                                //DB::table('api_count')->where('name', 'compition_matches')->increment("count");
+                                
+                                // Initialize cURL session for matches
+                                $curlScheduled = curl_init($apiurlScheduled);
 
-                            // Decode match API response
-                            $matchscheduledresponsedata = json_decode($matchScheduledresponse, true);
-                            $matchscheduleddata = $matchscheduledresponsedata['response']['items'] ?? [];
+                                // Set cURL options for matches
+                                curl_setopt_array($curlScheduled, [
+                                    CURLOPT_RETURNTRANSFER => true,
+                                    CURLOPT_FOLLOWLOCATION => true,
+                                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                                    CURLOPT_CUSTOMREQUEST => 'GET',
+                                ]);
 
-                            // Check if match API call was successful
-                            if ($matchscheduledresponsedata['status'] == 'ok') {
-                                foreach ($matchscheduleddata as $matchvalue) {
-                                    // Check if match already exists
-                                    if (!$existingMatches->has($matchvalue['match_id'])) {
+                                // Execute cURL session for matches
+                                $matchScheduledresponse = curl_exec($curlScheduled);
+                                curl_close($curlScheduled);
 
-                                        // Prepare match data
-                                        $dateTime = $matchvalue['date_start'];
-                                        $datearray = explode(" ", $dateTime);
-                                        $matchesdata = [
-                                            'competiton_id' => $cId,
-                                            'match_id' => $matchvalue['match_id'],
-                                            'match' => $matchvalue['title'],
-                                            'subtitle' => $matchvalue['subtitle'],
-                                            'note' => $matchvalue['status_note'],
-                                            'teamaid' => $matchvalue['teama']['team_id'],
-                                            'teama_name' => $matchvalue['teama']['name'],
-                                            'teama_short_name' => $matchvalue['teama']['short_name'],
-                                            'teama_img' => $matchvalue['teama']['logo_url'],
-                                            'teamascorefull' => $matchvalue['teama']['scores_full'] ?? '0',
-                                            'teamascore' => $matchvalue['teama']['scores'] ?? '0',
-                                            'teamaover' => $matchvalue['teama']['overs'] ?? '0',
-                                            'teambid' => $matchvalue['teamb']['team_id'],
-                                            'teamb_name' => $matchvalue['teamb']['name'],
-                                            'teamb_short_name' => $matchvalue['teamb']['short_name'],
-                                            'teamb_img' => $matchvalue['teamb']['logo_url'],
-                                            'teambscorefull' => $matchvalue['teamb']['scores_full'] ?? '0',
-                                            'teambscore' => $matchvalue['teamb']['scores'] ?? '0',
-                                            'teambover' => $matchvalue['teamb']['overs'] ?? '0',
-                                            'formate' => $matchvalue['format_str'],
-                                            'match_start_date' => $datearray['0'],
-                                            'match_start_time' => $datearray['1'],
-                                            'status' => $matchvalue['status_str'],
-                                        ];
+                                // Decode match API response
+                                $matchscheduledresponsedata = json_decode($matchScheduledresponse, true);
+                                $matchscheduleddata = $matchscheduledresponsedata['response']['items'] ?? [];
 
-                                        // Create new match
-                                        CompetitionMatches::create($matchesdata);
+                                // Check if match API call was successful
+                                if ($matchscheduledresponsedata['status'] == 'ok') {
+                                    foreach ($matchscheduleddata as $matchvalue) {
+                                        // Check if match already exists
+                                        if (!$existingMatches->has($matchvalue['match_id'])) {
 
-                                        // Determine over limit based on match format
-                                        $format = $matchvalue['format'];
-                                        $overlimit = ($format == '7' || $format == '1') ? 50 : (($format == '17') ? 10 : (($format == '3' || $format == '6' || $format == '8') ? 20 : 90));
-
-
-
-                                        // Create innings and overs
-                                        $inningsToCreate = [];
-                                        foreach (range(1, 2) as $i) {
-                                            $inningsToCreate[] = [
+                                            // Prepare match data
+                                            $dateTime = $matchvalue['date_start'];
+                                            $datearray = explode(" ", $dateTime);
+                                            $matchesdata = [
+                                                'competiton_id' => $cId,
                                                 'match_id' => $matchvalue['match_id'],
-                                                'innings' => $i,
+                                                'match' => $matchvalue['title'],
+                                                'subtitle' => $matchvalue['subtitle'],
+                                                'note' => $matchvalue['status_note'],
+                                                'teamaid' => $matchvalue['teama']['team_id'],
+                                                'teama_name' => $matchvalue['teama']['name'],
+                                                'teama_short_name' => $matchvalue['teama']['short_name'],
+                                                'teama_img' => $matchvalue['teama']['logo_url'],
+                                                'teamascorefull' => $matchvalue['teama']['scores_full'] ?? '0',
+                                                'teamascore' => $matchvalue['teama']['scores'] ?? '0',
+                                                'teamaover' => $matchvalue['teama']['overs'] ?? '0',
+                                                'teambid' => $matchvalue['teamb']['team_id'],
+                                                'teamb_name' => $matchvalue['teamb']['name'],
+                                                'teamb_short_name' => $matchvalue['teamb']['short_name'],
+                                                'teamb_img' => $matchvalue['teamb']['logo_url'],
+                                                'teambscorefull' => $matchvalue['teamb']['scores_full'] ?? '0',
+                                                'teambscore' => $matchvalue['teamb']['scores'] ?? '0',
+                                                'teambover' => $matchvalue['teamb']['overs'] ?? '0',
+                                                'formate' => $matchvalue['format_str'],
+                                                'match_start_date' => $datearray['0'],
+                                                'match_start_time' => $datearray['1'],
+                                                'status' => $matchvalue['status_str'],
                                             ];
-                                        }
-                                        MatchInnings::insert($inningsToCreate);
 
-                                        // Create overs and questions
-                                        foreach (MatchInnings::where('match_id', $matchvalue['match_id'])->get() as $matchInning) {
-                                            $inningsOverToCreate = [];
-                                            foreach (range(1, $overlimit) as $j) {
-                                                $inningOver = InningsOver::create([
-                                                    'match_innings_id' => $matchInning->id,
-                                                    'overs' => $j,
-                                                ]);
+                                            // Create new match
+                                            CompetitionMatches::create($matchesdata);
 
-                                                foreach ($questionIds as $questionId) {
-                                                    OverQuestions::create([
-                                                        'innings_over_id' => $inningOver->id,
-                                                        'question_id' => $questionId,
+                                            // Determine over limit based on match format
+                                            $format = $matchvalue['format'];
+                                            $overlimit = ($format == '7' || $format == '1') ? 50 : (($format == '17') ? 10 : (($format == '3' || $format == '6' || $format == '8') ? 20 : 90));
+
+                                            // Create innings and overs
+                                            $inningsToCreate = [];
+                                            foreach (range(1, 2) as $i) {
+                                                $inningsToCreate[] = [
+                                                    'match_id' => $matchvalue['match_id'],
+                                                    'innings' => $i,
+                                                ];
+                                            }
+                                            MatchInnings::insert($inningsToCreate);
+
+                                            // Create overs and questions
+                                            foreach (MatchInnings::where('match_id', $matchvalue['match_id'])->get() as $matchInning) {
+                                                $inningsOverToCreate = [];
+                                                foreach (range(1, $overlimit) as $j) {
+                                                    $inningOver = InningsOver::create([
+                                                        'match_innings_id' => $matchInning->id,
+                                                        'overs' => $j,
                                                     ]);
+
+                                                    foreach ($questionIds as $questionId) {
+                                                        OverQuestions::create([
+                                                            'innings_over_id' => $inningOver->id,
+                                                            'question_id' => $questionId,
+                                                        ]);
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+                                } else {
+                                    // Log error if match API call fails
+                                    //echo "API for matches not working for competition ID:" .$cId;
+                                    \Log::error("AddQuestionToMatch: API for matches not working for competition ID:" . $cId);
                                 }
                             } else {
-                                // Log error if match API call fails
-                                //echo "API for matches not working for competition ID:" .$cId;
-                                \Log::error("API for matches not working for competition ID:" . $cId);
+                                \Log::error("AddQuestionToMatch: Matches Exit");
                             }
-                        } else {
-                            \Log::error("Matches Exit");
                         }
                     }
                     // Log success message
-                    \Log::info("All competitions and matches processed successfully.");
+                    \Log::info("AddQuestionToMatch: All competitions and matches processed successfully.");
                 } else {
                     // Log error if competition API call fails
-                    \Log::error("API for competitions not working");
+                    \Log::error("AddQuestionToMatch: API for competitions not working");
                 }
-            } else {
-                \Log::info("api count limt end compitetion Matches");
-            }
+            // } else {
+            //     \Log::info("AddQuestionToMatch: api count limt end compitetion Matches");
+            // }
         } catch (\Throwable $th) {
             // Log any exceptions
             // Log::info($th);
-            dd($th);
+            \Log::error($th->getMessage() . " " . $th->getFile() . " " . $th->getLine());
         }
     }
 }

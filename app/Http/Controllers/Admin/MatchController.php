@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\{
     Question,
+    Overballes,
     MatchInnings,
     InningsOver,
     OverQuestions,
     CompetitionMatches,
     Prediction
 };
+use Helper;
 
 use Carbon\Carbon;
 
@@ -25,6 +27,40 @@ class MatchController extends Controller
 
     public function matchInfo($id)
     {
+        /* $predictiondata = Prediction::select('predictions.id', 'predictions.user_id', 'predictions.match_id', 'predictions.question_id', 'predictions.over_id', 'predictions.answere', 'predictions.status', 'predictions.result', 'questions.question_constant', 'innings_overs.overs')
+        ->where('predictions.result', '=', 'ND')
+        ->where('predictions.status', '=', 'pending')
+        ->where('predictions.match_id', '=', 76305)
+        ->join('questions', 'predictions.question_id', '=', 'questions.id')
+        ->join('innings_overs', 'predictions.over_id', '=', 'innings_overs.id')
+        ->get();
+        if ($predictiondata) {
+            foreach ($predictiondata as $predictionkey => $predictionvalue) {
+                $type = $predictionvalue->question_constant;
+                $over = $predictionvalue->overs;
+                $answer = $predictionvalue->answere;
+                $predictionid = $predictionvalue->id;
+
+                // Call Helper function to get prediction result
+                $returnresult = Helper::QuestionType($type, 76305, 2, $over);
+                if ($answer == $returnresult) {
+                    $result = "W";
+                } else {
+                    $result = "L";
+                }
+                echo $result."<br />";
+            }
+        }
+        die;
+        dd($predictiondata);
+        $evenrun = Overballes::where('match_id' , 76305)->where('innings' , 2)->where('over_no' , 4)->sum('run');
+        if ($evenrun % 2 == 0) {
+            $aaa =  "true";
+        } else {
+            $aaa = "false";
+        }
+        dd($aaa);*/ 
+
         try {
 
              // Fetching match data
