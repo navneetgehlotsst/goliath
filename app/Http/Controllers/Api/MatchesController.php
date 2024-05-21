@@ -213,6 +213,11 @@ class MatchesController extends Controller
                     $innings_status = "Upcoming";
                 }
 
+                if(!empty($datamatches->max_over) && ($datamatches->max_over < $matchInningsOversvalue->overs)){
+                    $over_status = "unavailable";
+                    //$innings_status = "unavailable";
+                }
+
                 $over[] = [
                     "over_id" => $matchInningsOversvalue->id,
                     "over_number" => $matchInningsOversvalue->overs,

@@ -186,6 +186,7 @@ class AuthController extends Controller
                 $checkotp->otp = $otp;
                 $checkotp->otp_expire_time = $otpExpiry;
                 $checkotp->save();
+                \Log::info(json_encode($checkotp));
 
                 // Prepare data for response
                 $dataUser = [
@@ -258,7 +259,6 @@ class AuthController extends Controller
 
         // Common user retrieval logic
         $userQuery = CheckOtp::where('otp', $data['otp']);
-
         if (isset($data['phone'])) {
             $userQuery->where('data', $data['phone'])->where('country_code', $countrycode);
         } else {
@@ -321,6 +321,7 @@ class AuthController extends Controller
         }
     }
 
+    //Not in use
     public function register(Request $request)
     {
         $data = $request->all();

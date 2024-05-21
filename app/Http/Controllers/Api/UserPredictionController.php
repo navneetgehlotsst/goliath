@@ -44,6 +44,7 @@ class UserPredictionController extends Controller
         curl_close($curl);
         return json_decode($response, true);
     }
+
     //User Pridition Function
     public function saveUserPrediction(Request $request){
         try {
@@ -329,21 +330,27 @@ class UserPredictionController extends Controller
             $userId = $user->id;
 
             // Retrieve predictions for the specified match and over for the current user
-            $userPredictions = Prediction::select('predictions.question_id', 'predictions.over_id', 'predictions.answere as your_answer', 'predictions.result as your_result','questions.question')
+            $userPredictions = Prediction::select('predictions.question_id', 'predictions.over_id', 'predictions.answere as your_answer', 'predictions.result as your_result','questions.question', 'competition_matches.status as match_status')
                 ->where('predictions.over_id', $input['over_id'])
-                ->where('user_id', $userId)
-                ->where('match_id', $input['match_id'])
+                ->where('predictions.user_id', $userId)
+                ->where('predictions.match_id', $input['match_id'])
                 ->join('questions', 'predictions.question_id', '=', 'questions.id')
+                ->join('competition_matches', 'predictions.match_id', '=', 'competition_matches.match_id')
                 ->get();
 
-                if($userPredictions[0]->your_result == "ND"){
-                    $predictedData['result_message'] = "Result Not Declared";
-                    $predictedData['is_result'] = false;
-                 }else{
-                    $predictedData['result_message'] = "Result Declared";
-                    $predictedData['is_result'] = true;
-                 }
+            if($userPredictions[0]->your_result == "ND"){
+                $predictedData['result_message'] = "Result Not Declared.";
+                $predictedData['is_result'] = false;
+            }else{
+                $predictedData['result_message'] = "Result Declared.";
+                $predictedData['is_result'] = true;
+            }
 
+            if($userPredictions[0]->match_status == "Completed"){
+                $predictedData['is_cancelled'] = true;
+                $predictedData['result_message'] = "Result Not Declared! Due to over incomplete.";
+            }
+            
             // Modify your_answer field to be 1 or 0 based on the string value
             $userPredictions->transform(function ($prediction) {
                 $prediction->your_answer = $prediction->your_answer === "true" ? 1 : 0;
@@ -648,4 +655,5 @@ class UserPredictionController extends Controller
             \Log::error($th->getMessage() . " " . $th->getFile() . " " . $th->getLine());
         }
     }
+
 }

@@ -162,7 +162,6 @@ class LiveDataForMatches extends Command
                                     ->join('innings_overs', 'predictions.over_id', '=', 'innings_overs.id')
                                     ->get();
                                 if ($predictiondata) {
-                                    \Log::info(json_encode($predictiondata));
                                     foreach ($predictiondata as $predictionkey => $predictionvalue) {
                                         if ($predictionvalue->overs < $matchesData['live_score']['overs']) {
                                             $type = $predictionvalue->question_constant;
