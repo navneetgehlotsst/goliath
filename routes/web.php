@@ -13,7 +13,8 @@ use App\Http\Controllers\Admin\{
     QuestionsController,
     HowToPlayController,
     CompetitionController,
-    MatchController
+    MatchController,
+    PredictedController
 };
 
 /*
@@ -105,6 +106,11 @@ Route::name('admin.')->prefix('admin')->group(function () {
             Route::get('info/{key}', [MatchController::class, 'matchInfo'])->name('info');
             Route::get('question/{overid}', [MatchController::class, 'matchQuestion'])->name('question');
             Route::post('change-question', [MatchController::class, 'changeQuestion'])->name('chnagequestion');
+        });
+
+        Route::prefix('predict')->name('predict.')->group(function () {
+            Route::get('info/{key}', [PredictedController::class, 'pridictedInfo'])->name('info');
+            Route::get('user/{overid}/{matchid}', [PredictedController::class, 'pridictedUser'])->name('user');
         });
     });
 });

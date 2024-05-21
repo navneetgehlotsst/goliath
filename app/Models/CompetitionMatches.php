@@ -42,4 +42,10 @@ class CompetitionMatches extends Model
     {
         return $this->hasMany(MatchInnings::class, 'match_id', 'match_id');
     }
+
+    // Define the relationship to Prediction
+    public function predictions()
+    {
+        return $this->hasMany(Prediction::class, 'match_id', 'match_id');
+    }
 }

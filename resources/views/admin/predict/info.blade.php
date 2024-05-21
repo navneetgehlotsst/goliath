@@ -63,7 +63,7 @@
                                 @elseif ($transformedMatch['matchdetail']['status'] == 'Completed')
                                     <span class="badge bg-label-success">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @else
-                                    <span class="badge bg-label-danger">{{$transformedMatch['matchdetail']['status']}}</span>
+                                    <span class="badge bg-label-success">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @endif
                                 <br>
                                 <span>Date & Time :- {{$transformedMatch['matchdetail']['match_start_date']}} / {{$transformedMatch['matchdetail']['match_start_time']}}</span>
@@ -78,14 +78,7 @@
               <div class="card-body">
                 <div class="row gy-3">
                   <div class="col-md-12">
-                    <h6>Match Innings</h6>
-                    <div class="demo-inline-spacing">
-                        <span class="badge rounded-pill bg-label-danger">Completed Over</span>
-                        <span class="badge rounded-pill bg-danger">On Going Over</span>
-                        <span class="badge rounded-pill bg-label-success">Available Over</span>
-                        <span class="badge rounded-pill bg-label-warning">Not Available Over</span>
-                        <span class="badge rounded-pill bg-success">Predicted Over</span>
-                    </div>
+                    <h6>Match Prediction</h6>
                   </div>
                   @foreach ($transformedMatch['matchdetail']['innings'] as $innings)
                   <div class="col-xl-6">
@@ -93,43 +86,15 @@
                     <div class="demo-inline-spacing">
 
                       <p>
-                        @foreach ($innings['overs'] as $matchdatainningsone)
-                            <a href="{{ route('admin.match.question', ['overid' => $matchdatainningsone['over_id']]) }}"
-                                class="badge badge-center rounded-pill
-                                    @if($innings['inning_status'] == 'Completed')
-                                        bg-label-danger
-                                    @else
-                                        @if($matchdatainningsone['over_status'] == 'Completed')
-                                            bg-label-danger
-                                        @elseif($matchdatainningsone['over_status'] == 'Ongoing')
-                                            bg-danger
-                                        @elseif($matchdatainningsone['over_status'] == 'Available')
-                                            bg-label-success
-                                        @elseif($matchdatainningsone['over_status'] == 'Predicted')
-                                            bg-success
-                                        @else
-                                            bg-label-warning
-                                        @endif
-                                    @endif
-                                    mb-2
-                                    @if($innings['inning_status'] == 'Completed')
-                                        matchdisable
-                                    @else
-                                        @if($matchdatainningsone['over_status'] == 'Completed')
-                                            matchdisable
-                                        @elseif($matchdatainningsone['over_status'] == 'Ongoing')
-                                            matchdisable
-                                        @elseif($matchdatainningsone['over_status'] == 'Available')
-                                            bg-label-success
-                                        @elseif($matchdatainningsone['over_status'] == 'Predicted')
-                                            matchdisable
-                                        @else
-                                            matchdisable
-                                        @endif
-                                    @endif">
-                                {{$matchdatainningsone['over_number']}}
-                            </a>
-                        @endforeach
+                        @if (!empty($innings['overs']))
+                            @foreach ($innings['overs'] as $matchdatainningsone)
+                                <a href="{{ route('admin.predict.user', ['overid' => $matchdatainningsone['over_id'],'matchid' => $transformedMatch['matchdetail']['match_id']]) }}" class="badge badge-center rounded-pill bg-success">
+                                    {{$matchdatainningsone['over_number']}}
+                                </a>
+                            @endforeach
+                        @else
+                            <span>No Pridiction In this Innings</span>
+                        @endif
                       </p>
                     </div>
                   </div>

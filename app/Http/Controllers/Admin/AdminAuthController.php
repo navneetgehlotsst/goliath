@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 use Mail, DB, Hash, Validator, Session, File,Exception;
 use App\Models\{
     Question,
@@ -223,64 +224,94 @@ class AdminAuthController extends Controller
 
     public function adminProfile()
     {
-        try{
+        try {
             $user = Auth::user();
-            return view("admin.auth.profile", compact("user"));
+            return view("admin.auth.profile", ['user' => $user]);
+        } catch (\Throwable $e) {
+            return back()->with('error', 'An unexpected error occurred. Please try again.');
+        }
 
-        }
-        catch(Exception $e){
-            return back()->with("error",$e->getMessage());
-        }
     }
 
     public function updateAdminProfile(Request $request)
     {
-        try
-        {
+        try {
             $user = Auth::user();
             $data = $request->all();
-            $validator = Validator::make($data,[
+
+            $validator = Validator::make($data, [
                 "first_name" => "required",
                 "last_name" => "required",
-                "phone" => "required|min:9|unique:users,phone," .$user->id,
+                "phone" => "required|min:9|unique:users,phone," . $user->id,
                 "email" => "required|email|unique:users,email," . $user->id,
                 "avatar" => "sometimes|image|mimes:jpeg,jpg,png|max:5000"
             ]);
 
-            if($validator->fails()) {
-                return redirect()->back()->withInput($request->all())->withErrors($validator->errors());
+            if ($validator->fails()) {
+                return redirect()->back()->withInput($request->all())->withErrors($validator);
             }
 
-            if($request->file("avatar")) {
-                $file = $request->file("avatar");
-                $filename = time() . $file->getClientOriginalName();
-                $folder = "uploads/user/";
-                $path = public_path($folder);
-                if (!File::exists($path)) {
-                    File::makeDirectory($path, $mode = 0777, true, true);
-                }
-                $file->move($path, $filename);
-                $user->avatar = $folder . $filename;
+            DB::beginTransaction();
+
+            if ($request->hasFile('avatar')) {
+                $user->avatar = $this->handleAvatarUpload($request->file('avatar'));
             }
-            $user->first_name = $request->first_name;
-            $user->last_name = $request->last_name;
-            $user->full_name = $request->first_name . " " . $request->last_name;
-            $user->phone = $request->phone;
-            $user->email = $request->email;
-            $user->save();
-            return redirect()->back()->with("success", "Profile update successfully!");
-        }
-        catch (Exception $e) {
-            return redirect()->back()->with("error", $e->getMessage());
+
+            $user->update([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'full_name' => $request->first_name . " " . $request->last_name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Profile updated successfully!');
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
     public function adminDashboard()
     {
-        $usercount = User::where('status', 'active')->count();
-        $predictionMonthCount = Prediction::count();
-        return view("admin.dashboard.index" , compact('usercount','predictionMonthCount'));
+        // User count Query
+        $userCount = Cache::remember('active_user_count', now()->addMinutes(10), function() {
+            return User::where('status', 'active')->count();
+        });
+
+        // Total Prediction Count
+        $predictionMonthCount = Cache::remember('total_prediction_count', now()->addMinutes(10), function() {
+            return Prediction::count();
+        });
+
+        // Get Top 5 latest predicted matches
+        $latestPredictions = Cache::remember('latest_predictions', now()->addMinutes(10), function() {
+            return Prediction::with('competitionMatch')
+                ->groupBy('predictions.match_id')
+                ->where('status','complete')
+                ->orderBy('updated_at', 'desc')
+                ->take(5)
+                ->get();
+
+        });
+        return view("admin.dashboard.index" , compact('userCount','predictionMonthCount','latestPredictions'));
     }
 
+    private function handleAvatarUpload($file)
+    {
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $folder = 'uploads/user/';
+        $path = public_path($folder);
+
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0777, true, true);
+        }
+
+        $file->move($path, $filename);
+
+        return $folder . $filename;
+    }
 
 }

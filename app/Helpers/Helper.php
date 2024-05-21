@@ -338,4 +338,16 @@ class Helper
         return $datamatchescomp;
     }
 
+    // Get Predicted Overs
+    public static function predictedOvers($matchId){
+        $dataPrediction = Prediction::where('match_id', $matchId)->groupBy('over_id')->with('inningsOvers')->get();
+        return $dataPrediction;
+    }
+
+    // Get Predicted Overs Count
+    public static function predictedOverCount($matchId){
+        $dataPrediction = Prediction::where('match_id', $matchId)->count();
+        return $dataPrediction;
+    }
+
 }

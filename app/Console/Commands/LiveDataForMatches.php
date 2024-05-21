@@ -79,6 +79,8 @@ class LiveDataForMatches extends Command
                         $matchresponsedata = json_decode($matchresponse, true);
                         $matchesData = $matchresponsedata['response'];
 
+                        //\Log::info($matchresponse);
+
                         // If API response is successful
                         if ($matchresponsedata['status'] == 'ok') {
                             if ($matchresponsedata['response'] != "Data unavailable") {
@@ -89,7 +91,8 @@ class LiveDataForMatches extends Command
                                         'teamascore' => $matchesData['live_score']['wickets'],
                                         'teamaover' => $matchesData['live_score']['overs'],
                                         'live_innings' => $matchesData['live_inning_number'],
-                                        'status' => $matchesData['status_str']
+                                        'status' => $matchesData['status_str'],
+                                        'max_over' => ($matchesData['live_inning']['max_over'] ?? 0)
                                     ];
                                 } else {
                                     $competitionmatchDatainsert = [
@@ -97,7 +100,8 @@ class LiveDataForMatches extends Command
                                         'teambscore' => $matchesData['live_score']['wickets'],
                                         'teambover' => $matchesData['live_score']['overs'],
                                         'live_innings' => $matchesData['live_inning_number'],
-                                        'status' => $matchesData['status_str']
+                                        'status' => $matchesData['status_str'],
+                                        'max_over' => ($matchesData['live_inning']['max_over'] ?? 0)
                                     ];
                                 }
 
@@ -158,6 +162,7 @@ class LiveDataForMatches extends Command
                                     ->join('innings_overs', 'predictions.over_id', '=', 'innings_overs.id')
                                     ->get();
                                 if ($predictiondata) {
+                                    \Log::info(json_encode($predictiondata));
                                     foreach ($predictiondata as $predictionkey => $predictionvalue) {
                                         if ($predictionvalue->overs < $matchesData['live_score']['overs']) {
                                             $type = $predictionvalue->question_constant;
@@ -174,11 +179,46 @@ class LiveDataForMatches extends Command
                                             }
 
                                             // Update prediction result
-                                            Prediction::where('id', $predictionid)->update(['result' => $result]);
+                                            Prediction::where('id', $predictionid)->update(['result' => $result , 'status' => 'complete']);
                                         }
                                     }
                                 }
                             } else {
+                                $apiMatchInfo = "https://rest.entitysport.com/v2/matches/$matchid/info?token=$token";
+
+                                // Curl Request
+                                $curl = curl_init();
+                                curl_setopt_array($curl, array(
+                                    CURLOPT_URL => $apiMatchInfo,
+                                    CURLOPT_RETURNTRANSFER => true,
+                                    CURLOPT_ENCODING => '',
+                                    CURLOPT_MAXREDIRS => 10,
+                                    CURLOPT_TIMEOUT => 0,
+                                    CURLOPT_FOLLOWLOCATION => true,
+                                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                                    CURLOPT_CUSTOMREQUEST => 'GET',
+                                ));
+                                $matchResponse = curl_exec($curl);
+                                curl_close($curl);
+
+                                // Decode API response
+                                $matchResponseData = json_decode($matchResponse, true);
+                                $matchesData = $matchResponseData['response'];
+
+                                // If API response is successful
+                                if ($matchResponseData['status'] == 'ok') {
+                                    if ($matchResponseData['response'] != "Data unavailable") {
+                                        // Update live Data in CompetitionMatches table
+                                        $competitionmatchDatainsert = [
+                                            'note' => $matchesData['status_note'],
+                                            'live_innings' => $matchesData['latest_inning_number'],
+                                            'status' => $matchesData['status_str']
+                                        ];
+                                        // Update CompetitionMatches table
+                                        CompetitionMatches::where('match_id', $matchid)->update($competitionmatchDatainsert);
+                                    }
+                                }
+        
                                 \Log::error("LiveDataForMatches: Match Not Found! MATCH ID: ".$matchid);
                             }
                         } else {

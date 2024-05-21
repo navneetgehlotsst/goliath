@@ -63,7 +63,11 @@ img.teamlogo {
     height: auto;
 }
 
-
 .bg-menu-theme .menu-item.active > .menu-link:not(.menu-toggle) {
     background-color: #3777b0 !important;
+}
+
+.predicted_match_logo{
+    width: 75px;
+    height: auto;
 }

@@ -14,7 +14,7 @@
                 <div class="avatar me-2">
                   <span class="avatar-initial rounded bg-label-primary"><i class='bx bxs-user'></i></span>
                 </div>
-                <h4 class="ms-1 mb-0">{{$usercount}}</h4>
+                <h4 class="ms-1 mb-0">{{$userCount}}</h4>
               </div>
               <p class="mb-1">Total Users</p>
             </div>
@@ -59,6 +59,26 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3 col-lg-3 order-2 mb-4">
+            <div class="card h-100">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="card-title m-0 me-2">Predicted Matches</h5>
+              </div>
+              <div class="card-body">
+                <ul class="list-group">
+                    @foreach ($latestPredictions as $latestPrediction)
+                    <a href="{{ route('admin.predict.info', $latestPrediction['competitionMatch']->match_id ) }}">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <img src="{{$latestPrediction['competitionMatch']->teama_img}}" alt="" class="predicted_match_logo">
+                                V/S
+                            <img src="{{$latestPrediction['competitionMatch']->teamb_img}}" alt="" class="predicted_match_logo">
+                        </li>
+                    </a>
+                    @endforeach
+                </ul>
+              </div>
+            </div>
+          </div>
       </div>
 </div>
 <!-- / Content -->

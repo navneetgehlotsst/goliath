@@ -79,11 +79,15 @@
                     <div class="demo-inline-spacing">
 
                       <p>
-                        @foreach ($innings['overs'] as $matchdatainningsone)
-                            <a href="{{ route('admin.users.prediction.result', ['user' => $userid,'matchId' => $transformedMatch['matchdetail']['match_id'],'overid' => $matchdatainningsone['over_id']]) }}" class="badge badge-center rounded-pill bg-label-success mb-2">
-                                {{$matchdatainningsone['over_number']}}
-                            </a>
-                        @endforeach
+                        @if (!empty($innings['overs']))
+                            @foreach ($innings['overs'] as $matchdatainningsone)
+                                <a href="{{ route('admin.users.prediction.result', ['user' => $userid,'matchId' => $transformedMatch['matchdetail']['match_id'],'overid' => $matchdatainningsone['over_id']]) }}" class="badge badge-center rounded-pill bg-success mb-2">
+                                    {{$matchdatainningsone['over_number']}}
+                                </a>
+                            @endforeach
+                        @else
+                            <span>No Pridiction In this Innings</span>
+                        @endif
                       </p>
                     </div>
                   </div>
