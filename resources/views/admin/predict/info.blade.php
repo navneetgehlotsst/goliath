@@ -73,7 +73,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12">
+        <div class="col-md-12">
             <div class="card mb-4">
               <div class="card-body">
                 <div class="row gy-3">
@@ -104,67 +104,95 @@
             </div>
         </div>
         <div class="col-md-12">
-            <div id="userprediction" class="table-responsive text-nowrap d-none">
-                <table id="getpredictUser" class="table">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Prediction Score</th>
-                            <th>Prediction Result</th>
-                        </tr>
-                    </thead>
-                    <tbody class="table-border-bottom-0">
-                    </tbody>
-                </table>
-            </div>
+            <div id="userprediction" class="card mb-4 d-none">
+                <div class="card-body">
+                  <div class="row gy-3">
+                    <div class="col-md-12">
+                      <h5>Prediction Result</h5>
+                    </div>
+                    <div class="table-responsive text-nowrap">
+                        <table id="getpredictUser" class="table table-bordered" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Prediction Correct Answer</th>
+                                    <th>Prediction Wrong Answer</th>
+                                    <th>Total Predict Questions</th>
+                                    <th>Prediction Result</th>
+                                </tr>
+                            </thead>
+                            <tbody class="table-border-bottom-0">
+                            </tbody>
+                        </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
         </div>
     </div>
 </div>
-
-
-
-
 @endsection
 @section('script')
 
 <script>
-    $(document).ready(function(){
-        $('.getPredictionData').click(function(){
-            var preicturl = '{{ route('admin.predict.user') }}';
-            var overid = $(this).data("overid");
-            var matchid = $(this).data("matchid");
+    $(document).ready(function () {
+        // Cache the table and user prediction container
+        const $tableElement = $("#getpredictUser");
+        const $userPrediction = $("#userprediction");
+
+        // Initialize DataTable
+        const table = $tableElement.DataTable({
+            processing: true,
+            ordering: false,
+            searching: true,
+            paging: true,
+        });
+
+        // Event delegation for click events
+        $(document).on("click", ".getPredictionData", function () {
+            const preicturl = "{{ route('admin.predict.user') }}";
+            const overid = $(this).data("overid");
+            const matchid = $(this).data("matchid");
 
             $.ajax({
                 url: preicturl,
-                method: 'POST',
+                method: "POST",
                 data: {
-                    _token: '{{ csrf_token() }}', // Include CSRF token
+                    _token: "{{ csrf_token() }}",
                     overid: overid,
-                    matchid: matchid
+                    matchid: matchid,
                 },
-                success: function(response) {
-                    var tbody = $('#getpredictUser tbody');
-                    tbody.empty(); // Clear the table
-                    $.each(response.data, function(index, pridectuser){
+                success: function (response) {
+                    // Clear existing data
+                    table.clear();
 
-                        $('#userprediction').removeClass('d-none');
-                        var status;
-                        if (pridectuser.win_count == 8) {
-                            status = '<p>Goliath</p>';
+                    // Generate new rows
+                    const rows = response.data.map((pridectuser) => {
+                        const worong = 8 - pridectuser.win_count;
+                        const totalquestion = 8;
+                        let status;
+                        if (pridectuser.win_count === 8) {
+                            status = "<p>Goliath Winner</p>";
                         } else if (pridectuser.win_count >= 5 && pridectuser.win_count < 8) {
-                            status = '<p>Winner</p>';
+                            status = "<p>Winner</p>";
                         } else {
-                            status = '<p>Loser</p>';
+                            status = "<p>Loser</p>";
                         }
-
-                        var row = '<tr>' +
-                            '<td>' + pridectuser.full_name + '</td>' +
-                            '<td>' + pridectuser.win_count + '/8</td>' +
-                            '<td>' + status + '</td>' +
-                            '</tr>';
-                        tbody.append(row);
+                        return [pridectuser.full_name, pridectuser.win_count, worong, totalquestion, status];
                     });
-                }
+
+                    // Add rows to the table
+                    table.rows.add(rows);
+
+                    // Draw the table with new data
+                    table.draw();
+
+                    // Show user prediction section if hidden
+                    $userPrediction.removeClass("d-none");
+                },
+                error: function (xhr, status, error) {
+                    console.error("AJAX Error:", status, error);
+                },
             });
         });
     });

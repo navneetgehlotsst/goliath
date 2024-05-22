@@ -120,22 +120,21 @@ class PredictedController extends Controller
     public function pridictedUser(Request $request)
     {
         try {
-            $overid = $request->overid;
-            $matchid = $request->matchid;
-            $userPredictionResult = Prediction::select('users.full_name', DB::raw('COUNT(case when predictions.result = "W" then 1 else null end) as win_count'))
-                                    ->join('users', 'predictions.user_id', '=', 'users.id')
-                                    ->where([
-                                        ['predictions.match_id', '=', $matchid],
-                                        ['predictions.over_id', '=', $overid],
-                                        ['predictions.status', '=', 'complete']
-                                    ])
-                                    ->groupBy('predictions.user_id', 'users.full_name')
-                                    ->get();
-            if($userPredictionResult){
-                return response()->json(['status' => true, 'data' => $userPredictionResult]);
-            }else{
-                return response()->json(['status' => false, 'data' => 'Data not Found']);
-            }
+                $overid = $request->overid;
+                $matchid = $request->matchid;
+
+                $userPredictionResult = Prediction::select('users.full_name', DB::raw('COUNT(CASE WHEN predictions.result = "W" THEN 1 ELSE NULL END) AS win_count'))
+                    ->join('users', 'predictions.user_id', '=', 'users.id')
+                    ->where('predictions.match_id', $matchid)
+                    ->where('predictions.over_id', $overid)
+                    ->where('predictions.status', 'complete')
+                    ->groupBy('predictions.user_id', 'users.full_name')
+                    ->get();
+
+                return response()->json([
+                    'status' => $userPredictionResult->isNotEmpty(),
+                    'data' => $userPredictionResult->isNotEmpty() ? $userPredictionResult : 'Data not found',
+                ]);
         } catch (\Throwable $th) {
             dd($th);
             return response()->json(['status' => false, 'data' => $th->message]);
