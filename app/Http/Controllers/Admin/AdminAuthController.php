@@ -296,7 +296,7 @@ class AdminAuthController extends Controller
                 ->get();
         });
 
-        // monthly prediction
+        // monthly Prediction Graph Data
         $monthpredicted = [];
         $currentDate = now();
 
