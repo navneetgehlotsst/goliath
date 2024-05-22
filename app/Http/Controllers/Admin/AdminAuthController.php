@@ -297,9 +297,64 @@ class AdminAuthController extends Controller
         });
 
         // monthly prediction
+        $monthpredicted = [];
+        $currentDate = now();
+
+        for ($i = 0; $i < 12; $i++) {
+            $monthYear = $currentDate->copy()->subMonths($i)->format('Y-m');
 
 
-        return view("admin.dashboard.index" , compact('userCount','predictionMonthCount','latestPredictions'));
+            $monthlypredicteduser = Prediction::select(
+                'user_id',
+                'over_id',
+                DB::raw('MONTHNAME(created_at) AS Month'),
+                DB::raw('SUM(IF(result = "W", 1, 0)) AS win_count')
+            )
+            ->whereYear('created_at', Carbon::parse($monthYear)->year)
+            ->whereMonth('created_at', Carbon::parse($monthYear)->month)
+            ->groupBy('user_id', 'over_id')
+            ->get();
+
+
+
+            $total_golith_winner = 0;
+            $total_winner = 0;
+            $total_loser = 0;
+
+            foreach ($monthlypredicteduser as $predictedvalue) {
+                if($predictedvalue->win_count == 8) {
+                    $total_golith_winner ++;
+                } elseif ($predictedvalue->win_count < 8 && $predictedvalue->win_count >= 5) {
+                    $total_winner++;
+                } else {
+                    $total_loser++;
+                }
+            }
+
+            $monthpredicted[$i]['month'] = $monthYear;
+            $monthpredicted[$i]['total_golith_winner'] = $total_golith_winner;
+            $monthpredicted[$i]['total_winner'] = $total_winner;
+            $monthpredicted[$i]['total_loser'] = $total_loser;
+
+        }
+        $month = [];
+        $golith_winner = [];
+        $winner = [];
+        $loser = [];
+        foreach ($monthpredicted as $key => $value) {
+            $month[$key] = $value['month'];
+            $golith_winner[$key] = $value['total_golith_winner'];
+            $winner[$key] = $value['total_winner'];
+            $loser[$key] = $value['total_loser'];
+        }
+        // Convert PHP arrays to JavaScript arrays
+        $monthjson = json_encode($month);
+        $golithwinnerjson = json_encode($golith_winner);
+        $winnerjson = json_encode($winner);
+        $loserjson = json_encode($loser);
+
+
+        return view("admin.dashboard.index" , compact('userCount','predictionMonthCount','latestPredictions','monthjson','golithwinnerjson','winnerjson','loserjson'));
     }
 
     private function handleAvatarUpload($file)

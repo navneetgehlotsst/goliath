@@ -123,7 +123,7 @@ class PredictedController extends Controller
                 $overid = $request->overid;
                 $matchid = $request->matchid;
 
-                $userPredictionResult = Prediction::select('users.full_name', DB::raw('COUNT(CASE WHEN predictions.result = "W" THEN 1 ELSE NULL END) AS win_count'))
+                $userPredictionResult = Prediction::select('users.full_name','users.id', DB::raw('COUNT(CASE WHEN predictions.result = "W" THEN 1 ELSE NULL END) AS win_count'))
                     ->join('users', 'predictions.user_id', '=', 'users.id')
                     ->where('predictions.match_id', $matchid)
                     ->where('predictions.over_id', $overid)

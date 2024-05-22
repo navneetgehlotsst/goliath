@@ -102,64 +102,69 @@
 
 @section('script')
 <script>
-   var options = {
-            series: [
-                {
-                    name: "Goliath Winners",
-                    data: [44, 55, 57, 56, 61, 58, 63, 60, 66],
-                },
-                {
-                    name: "Other Category Winners",
-                    data: [76, 85, 101, 98, 87, 105, 91, 114, 94],
-                },
-                {
-                    name: "Losers",
-                    data: [35, 41, 36, 26, 45, 48, 52, 53, 41],
-                },
-            ],
-            chart: {
-                type: "bar",
-                height: 500,
-                toolbar: {
-                    show: false
-                }
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: "55%",
-                    endingShape: "rounded",
-                },
-            },
-            dataLabels: {
-                enabled: false,
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ["transparent"],
-            },
-            xaxis: {
-                categories: ["Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
-            },
-            yaxis: {
-                title: {
-                    text: "Users",
-                },
-            },
-            fill: {
-                opacity: 1,
-            },
-            tooltip: {
-                y: {
-                    formatter: function (val) {
-                        return val;
-                    },
-                },
-            },
-        };
+    var golithwinnerjson = <?php echo $golithwinnerjson ?>;
+    var winnerjson = <?php echo $winnerjson ?>;
+    var loserjson = <?php echo $loserjson ?>;
+    var monthjson = <?php echo $monthjson ?>;
 
-        var chart = new ApexCharts(document.querySelector("#monthlyprediction"), options);
-        chart.render();
+    var options = {
+        series: [
+            {
+                name: "Goliath Winners",
+                data: golithwinnerjson,
+            },
+            {
+                name: "Other Category Winners",
+                data: winnerjson,
+            },
+            {
+                name: "Losers",
+                data: loserjson,
+            },
+        ],
+        chart: {
+            type: "bar",
+            height: 500,
+            toolbar: {
+                show: false
+            }
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: "55%",
+                endingShape: "rounded",
+            },
+        },
+        dataLabels: {
+            enabled: false,
+        },
+        stroke: {
+            show: true,
+            width: 2,
+            colors: ["transparent"],
+        },
+        xaxis: {
+            categories: monthjson,
+        },
+        yaxis: {
+            title: {
+                text: "Users",
+            },
+        },
+        fill: {
+            opacity: 1,
+        },
+        tooltip: {
+            y: {
+                formatter: function (val) {
+                    return val;
+                },
+            },
+        },
+    };
+
+    var chart = new ApexCharts(document.querySelector("#monthlyprediction"), options);
+    chart.render();
 </script>
 @endsection
