@@ -337,10 +337,18 @@ class AdminAuthController extends Controller
             $monthpredicted[$i]['total_loser'] = $total_loser;
 
         }
+        // Sort the $monthpredicted array by month in ascending order
+        usort($monthpredicted, function($a, $b) {
+            return strcmp($a['month'], $b['month']);
+        });
+
+        // Initialize arrays to store sorted data
         $month = [];
         $golith_winner = [];
         $winner = [];
         $loser = [];
+
+        // Populate sorted data into respective arrays
         foreach ($monthpredicted as $key => $value) {
             $month[$key] = $value['month'];
             $golith_winner[$key] = $value['total_golith_winner'];
