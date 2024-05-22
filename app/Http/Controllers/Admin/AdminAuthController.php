@@ -283,7 +283,7 @@ class AdminAuthController extends Controller
 
         // Total Prediction Count
         $predictionMonthCount = Cache::remember('total_prediction_count', now()->addMinutes(10), function() {
-            return Prediction::count();
+            return Prediction::groupBy('predictions.over_id')->count();
         });
 
         // Get Top 5 latest predicted matches
@@ -294,8 +294,11 @@ class AdminAuthController extends Controller
                 ->orderBy('updated_at', 'desc')
                 ->take(5)
                 ->get();
-
         });
+
+        // monthly prediction
+
+
         return view("admin.dashboard.index" , compact('userCount','predictionMonthCount','latestPredictions'));
     }
 

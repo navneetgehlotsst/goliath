@@ -120,6 +120,9 @@
             chart: {
                 type: "bar",
                 height: 500,
+                toolbar: {
+                    show: false
+                }
             },
             plotOptions: {
                 bar: {

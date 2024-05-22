@@ -88,7 +88,7 @@
                       <p>
                         @if (!empty($innings['overs']))
                             @foreach ($innings['overs'] as $matchdatainningsone)
-                            <a href="javascript:void(0)" data-overid="{{ $matchdatainningsone['over_id'] }}" data-matchid="{{ $transformedMatch['matchdetail']['match_id'] }}" class="badge badge-center rounded-pill bg-success getPredictionData">
+                            <a href="javascript:void(0)" data-inningname ="{{ $innings['inning_name'] }}" data-overnumber ="{{ $matchdatainningsone['over_number'] }}" data-overid="{{ $matchdatainningsone['over_id'] }}" data-matchid="{{ $transformedMatch['matchdetail']['match_id'] }}" class="badge badge-center rounded-pill bg-success getPredictionData">
                                 {{ $matchdatainningsone['over_number'] }}
                             </a>
                             @endforeach
@@ -108,7 +108,7 @@
                 <div class="card-body">
                   <div class="row gy-3">
                     <div class="col-md-12">
-                      <h5>Prediction Result</h5>
+                      <h5 id="predictedText">Prediction Result</h5>
                     </div>
                     <div class="table-responsive text-nowrap">
                         <table id="getpredictUser" class="table table-bordered" style="width: 100%;">
@@ -143,9 +143,10 @@
         // Initialize DataTable
         const table = $tableElement.DataTable({
             processing: true,
-            ordering: false,
+            ordering: true,
             searching: true,
             paging: true,
+            columnDefs: [{ searchable: false, targets: 3 }]
         });
 
         // Event delegation for click events
@@ -153,6 +154,8 @@
             const preicturl = "{{ route('admin.predict.user') }}";
             const overid = $(this).data("overid");
             const matchid = $(this).data("matchid");
+            const inningname = $(this).data("inningname");
+            const overnumber = $(this).data("overnumber");
 
             $.ajax({
                 url: preicturl,
@@ -163,32 +166,40 @@
                     matchid: matchid,
                 },
                 success: function (response) {
-                    // Clear existing data
-                    table.clear();
+                    if (response.status == true) {
+                        // Clear existing data
+                        table.clear();
 
-                    // Generate new rows
-                    const rows = response.data.map((pridectuser) => {
-                        const worong = 8 - pridectuser.win_count;
-                        const totalquestion = 8;
-                        let status;
-                        if (pridectuser.win_count === 8) {
-                            status = "<p>Goliath Winner</p>";
-                        } else if (pridectuser.win_count >= 5 && pridectuser.win_count < 8) {
-                            status = "<p>Winner</p>";
-                        } else {
-                            status = "<p>Loser</p>";
-                        }
-                        return [pridectuser.full_name, pridectuser.win_count, worong, totalquestion, status];
-                    });
+                        // Generate new rows
+                        const rows = response.data.map((pridectuser) => {
+                            const worong = 8 - pridectuser.win_count;
+                            const totalquestion = 8;
+                            let status;
+                            if (pridectuser.win_count === 8) {
+                                status = "<p>Goliath Winner</p>";
+                            } else if (pridectuser.win_count >= 5 && pridectuser.win_count < 8) {
+                                status = "<p>Winner</p>";
+                            } else {
+                                status = "<p>Loser</p>";
+                            }
+                            return [pridectuser.full_name, pridectuser.win_count, worong, totalquestion, status];
+                        });
 
-                    // Add rows to the table
-                    table.rows.add(rows);
+                        // Add rows to the table
+                        table.rows.add(rows);
 
-                    // Draw the table with new data
-                    table.draw();
+                        // Draw the table with new data
+                        table.draw();
 
-                    // Show user prediction section if hidden
-                    $userPrediction.removeClass("d-none");
+                        // Show user prediction section if hidden
+                        $userPrediction.removeClass("d-none");
+                    }else{
+                         // Show user prediction section if hidden
+                         $userPrediction.addClass("d-none");
+                         alert('Match Prediction Result Not Found');
+                    }
+                    $('#predictedText').text('Displaying results for the '+overnumber+'th over of '+inningname);
+
                 },
                 error: function (xhr, status, error) {
                     console.error("AJAX Error:", status, error);
