@@ -5,7 +5,7 @@
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
-        <span class="text-primary fw-light">Users</span>
+        <span class="text-primary fw-light">Total Registered Users</span>
     </h5>
     <div class="row">
         <div class="col-xl-12 col-lg-12">
@@ -32,12 +32,12 @@
                                             @if($user->status == "active")
                                                 <span class="badge bg-label-success me-1">Active</span>
                                             @else
-                                                <span class="badge bg-label-danger me-1">Inactive</span>
+                                                <span class="badge bg-label-danger me-1">Disable Account</span>
                                             @endif
                                         </td>
                                         <td>
                                             @if($user->status == "active")
-                                                <button type="button" class="btn btn-sm btn-danger" onclick="userStatus({{$user->id}},`inactive`)">Inactive</button>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="userStatus({{$user->id}},`inactive`)">Disable Account</button>
                                             @else
                                                 <button type="button" class="btn btn-sm btn-success" onclick="userStatus({{$user->id}},`active`)">Active</button>
                                             @endif

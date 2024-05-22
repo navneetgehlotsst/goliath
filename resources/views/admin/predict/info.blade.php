@@ -7,7 +7,7 @@
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
-        <span class="text-primary fw-light">Matches Info</span>
+        <span class="text-primary fw-light">Match Information</span>
     </h5>
     <div class="row mb-5">
         <div class="col-md-12 col-lg-12">
@@ -63,7 +63,7 @@
                                 @elseif ($transformedMatch['matchdetail']['status'] == 'Completed')
                                     <span class="badge bg-label-success">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @else
-                                    <span class="badge bg-label-success">{{$transformedMatch['matchdetail']['status']}}</span>
+                                    <span class="badge bg-label-danger">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @endif
                                 <br>
                                 <span>Date & Time :- {{$transformedMatch['matchdetail']['match_start_date']}} / {{$transformedMatch['matchdetail']['match_start_time']}}</span>
@@ -78,7 +78,7 @@
               <div class="card-body">
                 <div class="row gy-3">
                   <div class="col-md-12">
-                    <h6>Match Prediction</h6>
+                    <h5>Below are the overs where predictions have been placed</h5>
                   </div>
                   @foreach ($transformedMatch['matchdetail']['innings'] as $innings)
                   <div class="col-xl-6">
@@ -108,9 +108,9 @@
                 <table id="getpredictUser" class="table">
                     <thead>
                         <tr>
-                            <th>User</th>
-                            <th>Score</th>
-                            <th>Result Status</th>
+                            <th>Username</th>
+                            <th>Prediction Score</th>
+                            <th>Prediction Result</th>
                         </tr>
                     </thead>
                     <tbody class="table-border-bottom-0">

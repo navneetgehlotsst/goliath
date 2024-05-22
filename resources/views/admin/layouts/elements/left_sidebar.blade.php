@@ -32,7 +32,7 @@
         <li class="menu-item {{ request()->is('admin/transactions') ? 'active' : ''}}">
 			<a href="{{route('admin.transaction.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-list-ul"></i>
-				<div data-i18n="transactions">Transactions</div>
+				<div data-i18n="transactions">All Transactions</div>
 			</a>
 		</li>
 
@@ -67,12 +67,12 @@
 			</ul>
 		</li>
 
-		<li class="menu-item {{ request()->is('admin/notifications/index') ? 'active' : ''}}">
+		{{-- <li class="menu-item {{ request()->is('admin/notifications/index') ? 'active' : ''}}">
 			<a href="{{route('admin.notifications.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-bell"></i>
 				<div data-i18n="Notifications">Notifications</div>
 			</a>
-		</li>
+		</li> --}}
 
 		{{-- <li class="menu-item {{ request()->is('admin/contacts') ? 'active' : ''}}">
 			<a href="{{route('admin.contacts.index')}}" class="menu-link">
@@ -82,12 +82,12 @@
 		</li> --}}
 
 
-        <li class="menu-item {{ request()->is('admin/how-to-play*') ? 'active' : ''}}">
+        {{-- <li class="menu-item {{ request()->is('admin/how-to-play*') ? 'active' : ''}}">
 			<a href="{{route('admin.how-to-play.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-list-ul"></i>
 				<div data-i18n="HowToPLay">How to Play</div>
 			</a>
-		</li>
+		</li> --}}
 
 		 @php
             $pages = Helper::pages();

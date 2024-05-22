@@ -7,7 +7,7 @@
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
-        <span class="text-primary fw-light">Transactions</span>
+        <span class="text-primary fw-light">All Platform Transactions</span>
     </h5>
     <div class="row">
         <div class="col-xl-12 col-lg-12">
@@ -18,9 +18,9 @@
                             <thead>
                                 <tr>
                                     <th>User Detail</th>
-                                    <th>Transiction id</th>
+                                    <th>Transaction id</th>
                                     <th>Amount</th>
-                                    <th>Transiction Type</th>
+                                    <th>Transaction Type</th>
                                     {{--  <th>Action</th>  --}}
                                 </tr>
                             </thead>

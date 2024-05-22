@@ -18,7 +18,7 @@
                             <thead>
                                 <tr>
                                     <th>Competition id</th>
-                                    <th>Competitions</th>
+                                    <th>Competitions Name</th>
                                     <th>Category</th>
                                     <th>Format</th>
                                     <th>Date Start / Date End</th>

@@ -18,7 +18,7 @@
                             <thead>
                                 <tr>
                                     <th>Match</th>
-                                    <th>Short Title</th>
+                                    <th>Team Logos</th>
                                     <th>Format</th>
                                     <th>Match Date / Time</th>
                                     <th>Status</th>

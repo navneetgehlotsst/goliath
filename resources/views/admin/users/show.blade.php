@@ -44,7 +44,7 @@
                     </div>
                     <h4 class="ms-1 mb-0">{{$transactionTypes['add-wallet']}}</h4>
                 </div>
-                <p class="mb-1">Deposit Amount</p>
+                <p class="mb-1">Total amount deposited on Goliath</p>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
                     </div>
                     <h4 class="ms-1 mb-0">{{$transactionTypes['pay']}}</h4>
                 </div>
-                <p class="mb-1">Fee Amount</p>
+                <p class="mb-1">Total prediction fee paid</p>
                 </div>
             </div>
         </div>
@@ -70,7 +70,7 @@
                     </div>
                     <h4 class="ms-1 mb-0">{{$transactionTypes['winning-amount']}}</h4>
                 </div>
-                <p class="mb-1">Winning Amount</p>
+                <p class="mb-1">Total amount won</p>
                 </div>
             </div>
         </div>
@@ -83,7 +83,7 @@
                     </div>
                     <h4 class="ms-1 mb-0">{{$transactionTypes['withdrawal-amount']}}</h4>
                 </div>
-                <p class="mb-1">Withdraw Amount</p>
+                <p class="mb-1">Total amount withdrawn</p>
                 </div>
             </div>
         </div>
@@ -96,7 +96,7 @@
                     </div>
                     <h4 class="ms-1 mb-0">{{$user->wallet}}</h4>
                 </div>
-                <p class="mb-1">Wallet Amount</p>
+                <p class="mb-1">Current wallet balance</p>
                 </div>
             </div>
         </div>
@@ -111,7 +111,7 @@
                 <div class="card-body row g-4">
                     <div class="col-md-6 pe-md-4 card-separator">
                         <div class="card-title d-flex align-items-start justify-content-between">
-                            <h6 class="mb-0">Winning Position</h6>
+                            <h6 class="mb-0">Position by total winnings</h6>
                         </div>
                         <div class="d-flex justify-content-between" style="position: relative;">
                             <div class="mt-auto">
@@ -121,7 +121,7 @@
                     </div>
                     <div class="col-md-6 ps-md-4">
                         <div class="card-title d-flex align-items-start justify-content-between">
-                            <h6 class="mb-0">Amount Position</h6>
+                            <h6 class="mb-0">Position by total earnings</h6>
                         </div>
                         <div class="d-flex justify-content-between" style="position: relative;">
                             <div class="mt-auto">
@@ -136,7 +136,7 @@
             <div class="nav-align-top mb-4">
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-prediction" aria-controls="navs-top-prediction" aria-selected="true">Prediction Matches</button>
+                        <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-prediction" aria-controls="navs-top-prediction" aria-selected="true">Predicted Matches</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-transactionlist" aria-controls="navs-top-prediction" aria-selected="true">Transaction List</button>
@@ -168,7 +168,7 @@
                                                         <td>{{$match['competitionMatch']->match_start_date}}/{{$match['competitionMatch']->match_start_time}}</td>
                                                         <td><img class="teamlogo" src="{{$match['competitionMatch']->teama_img}}" alt=""> V/S <img class="teamlogo" src="{{$match['competitionMatch']->teamb_img}}" alt=""></td>
                                                         <td>
-                                                            <a href="{{ route("admin.users.match.prediction", ['user' => $user->id, 'matchId' => $match['competitionMatch']->match_id]) }}" class="btn btn-sm btn-primary">Match Detail</a>
+                                                            <a href="{{ route("admin.users.match.prediction", ['user' => $user->id, 'matchId' => $match['competitionMatch']->match_id]) }}" class="btn btn-sm btn-primary">Prediction Detail</a>
                                                         </td>
                                                     </tr>
                                                 @endforeach
