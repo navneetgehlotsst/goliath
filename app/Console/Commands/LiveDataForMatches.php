@@ -37,10 +37,11 @@ class LiveDataForMatches extends Command
     public function handle()
     {
         try {
+            \Log::info("LiveDataForMatches: INIT");
             //$apicount = DB::table('api_count')->where('name', 'match_live')->value('count');
             //if ($apicount < 30000) {
                 // API Token
-                $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
+                $token = env('SPORT_API_TOKEN');
 
                 $currentUtcTime = Carbon::now('UTC');
                 $oneHourBefore = $currentUtcTime->copy()->subHour();
@@ -218,13 +219,14 @@ class LiveDataForMatches extends Command
                                     }
                                 }
         
-                                \Log::error("LiveDataForMatches: Match Not Found! MATCH ID: ".$matchid);
+                                \Log::error("LiveDataForMatches: (info level 2) Match Not Found! MATCH ID: ".$matchid);
                             }
                         } else {
                             // Log error if API not working
                             \Log::error("LiveDataForMatches: Api Not Working");
                             break;
                         }
+
                     }
                 }
                 // Log success message after updating scores

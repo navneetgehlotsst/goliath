@@ -45,7 +45,7 @@ class AddQuestionToMatch extends Command
 
                 // Initialize variables
                 $page = 1;
-                $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
+                $token = env('SPORT_API_TOKEN');
                 $perPage = 500;
 
                 // Construct API URL
@@ -98,20 +98,6 @@ class AddQuestionToMatch extends Command
 
                             Competition::updateOrCreate(['competiton_id' => $compdatavalue['cid']],$competitiondata);
                             
-                            /* //\Log::info("C_ID".$compdatavalue['cid']);
-                            // Check if competition already exists
-                            if ($existingCompetitions->has($compdatavalue['cid'])) {
-                                // Update existing competition
-                                $existingCompetitions[$compdatavalue['cid']]->update($competitiondata);
-
-                                //\Log::info("Find");
-                            } else {
-                                // Create new competition
-                                Competition::create($competitiondata);
-
-                                //\Log::info("New");
-                            }*/ 
-
                             //========================== Now get competitions matches ==================//
                             $cId = $compdatavalue['cid'];
 
@@ -148,6 +134,9 @@ class AddQuestionToMatch extends Command
                                 // Check if match API call was successful
                                 if ($matchscheduledresponsedata['status'] == 'ok') {
                                     foreach ($matchscheduleddata as $matchvalue) {
+                                        if($matchvalue['match_id'] == "74388"){
+                                            \Log::info(json_encode($matchvalue));
+                                        }
                                         // Check if match already exists
                                         if (!$existingMatches->has($matchvalue['match_id'])) {
 

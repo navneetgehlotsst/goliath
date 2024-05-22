@@ -140,6 +140,7 @@ class UserPredictionController extends Controller
             $datamatches = Prediction::with(['competitionMatch'])
             ->where('user_id', $userId)
             ->groupBy('match_id')
+            ->orderBy('created_at','DESC')
             ->paginate(10);
 
 
@@ -341,15 +342,21 @@ class UserPredictionController extends Controller
             if($userPredictions[0]->your_result == "ND"){
                 $predictedData['result_message'] = "Result Not Declared.";
                 $predictedData['is_result'] = false;
+            }else if($userPredictions[0]->your_result == "NR"){
+                $predictedData['result_message'] = "Result Not Declared! Due to over incomplete.";
+                $predictedData['cancel_message'] = "Match ended early. Full amount will be credited to your wallet.";
+                $predictedData['is_result'] = true;
+                $predictedData['is_cancelled'] = true;
             }else{
                 $predictedData['result_message'] = "Result Declared.";
                 $predictedData['is_result'] = true;
             }
 
-            if($userPredictions[0]->match_status == "Completed"){
-                $predictedData['is_cancelled'] = true;
-                $predictedData['result_message'] = "Result Not Declared! Due to over incomplete.";
-            }
+            // if($userPredictions[0]->match_status == "Completed" || $userPredictions[0]->match_status == "Cancelled"){
+            //     $predictedData['is_cancelled'] = true;
+            //     $predictedData['result_message'] = "Result Not Declared! Due to over incomplete.";
+            //     $predictedData['cancel_message'] = "Match ended early. Full amount will be credited to your wallet.";
+            // }
             
             // Modify your_answer field to be 1 or 0 based on the string value
             $userPredictions->transform(function ($prediction) {
@@ -367,7 +374,12 @@ class UserPredictionController extends Controller
             $predictedData['correct_counts'] = $countResult;
 
             // Winning Amount of correct predictions
-            $predictedData['winning_amount'] = "100";
+            $winningAmount = "100";
+            $predictedData['winning_amount'] = $winningAmount;
+            $predictedData['winning_message'] = "";
+            if($countResult >= 5){
+                $predictedData['winning_message'] = env('CURRENCY_SYMBOL').$winningAmount." will be transferred to your wallet.";
+            }
 
             // Message for result
             $predictedData['message'] = $message = $countResult >= 5 ? "You are a winner" : "You have lost this time";

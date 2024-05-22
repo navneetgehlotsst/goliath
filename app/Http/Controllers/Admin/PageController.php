@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 use App\Models\Page;
 use Mail,Hash,File,Auth,DB,Helper,Exception,Session,Redirect,Validator;
 
+use App\Models\{
+    MatchInnings,
+    CompetitionMatches,
+    Competition,
+    Overballes,
+    Prediction
+};
 class PageController extends Controller
 {
     /**
@@ -27,6 +34,7 @@ class PageController extends Controller
      */
     public function create($key)
     {
+
         try{
             $page = Page::where('key',$key)->first();
             return view('admin.pages.create',compact('page'));

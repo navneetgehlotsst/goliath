@@ -128,13 +128,12 @@ class MatchesController extends Controller
 
         // Adding 1 to the integer part if necessary
         $current_over = ceil($currentover);
-        $nextover = $current_over + 3;
+        $nextover = $current_over + 4;
 
         // Fetching all innings data for the match
         $matchInnings = MatchInnings::where('match_id', $input['match_id'])->get();
 
-        $datamatchescomp = Competition::where('competiton_id', $datamatches->competiton_id)
-                ->first();
+        $datamatchescomp = Competition::where('competiton_id', $datamatches->competiton_id)->first();
         // dd($datamatchescomp);
 
         $transformedMatch = [
@@ -196,8 +195,10 @@ class MatchesController extends Controller
                             $over_status = "Ongoing";
                         } elseif ($matchInningsOversvalue->overs >= $nextover) {
                             $over_status = "Not Available";
-                        } else {
+                        }else if(($matchInningsOversvalue->overs == ($current_over+2)) || ($matchInningsOversvalue->overs == ($current_over+3))){
                             $over_status = "Available";
+                        } else {
+                            $over_status = "Not Available";
                         }
                     }
                     $innings_status = "Ongoing";
