@@ -110,7 +110,7 @@ Route::name('admin.')->prefix('admin')->group(function () {
 
         Route::prefix('predict')->name('predict.')->group(function () {
             Route::get('info/{key}', [PredictedController::class, 'pridictedInfo'])->name('info');
-            Route::get('user/{overid}/{matchid}', [PredictedController::class, 'pridictedUser'])->name('user');
+            Route::post('user', [PredictedController::class, 'pridictedUser'])->name('user');
         });
     });
 });

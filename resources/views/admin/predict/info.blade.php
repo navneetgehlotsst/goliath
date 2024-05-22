@@ -88,9 +88,9 @@
                       <p>
                         @if (!empty($innings['overs']))
                             @foreach ($innings['overs'] as $matchdatainningsone)
-                                <a href="{{ route('admin.predict.user', ['overid' => $matchdatainningsone['over_id'],'matchid' => $transformedMatch['matchdetail']['match_id']]) }}" class="badge badge-center rounded-pill bg-success">
-                                    {{$matchdatainningsone['over_number']}}
-                                </a>
+                            <a href="javascript:void(0)" data-overid="{{ $matchdatainningsone['over_id'] }}" data-matchid="{{ $transformedMatch['matchdetail']['match_id'] }}" class="badge badge-center rounded-pill bg-success getPredictionData">
+                                {{ $matchdatainningsone['over_number'] }}
+                            </a>
                             @endforeach
                         @else
                             <span>No Pridiction In this Innings</span>
@@ -102,7 +102,22 @@
                 </div>
               </div>
             </div>
-          </div>
+        </div>
+        <div class="col-md-12">
+            <div id="userprediction" class="table-responsive text-nowrap d-none">
+                <table id="getpredictUser" class="table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Score</th>
+                            <th>Result Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-border-bottom-0">
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -112,5 +127,47 @@
 @endsection
 @section('script')
 
+<script>
+    $(document).ready(function(){
+        $('.getPredictionData').click(function(){
+            var preicturl = '{{ route('admin.predict.user') }}';
+            var overid = $(this).data("overid");
+            var matchid = $(this).data("matchid");
+
+            $.ajax({
+                url: preicturl,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}', // Include CSRF token
+                    overid: overid,
+                    matchid: matchid
+                },
+                success: function(response) {
+                    var tbody = $('#getpredictUser tbody');
+                    tbody.empty(); // Clear the table
+                    $.each(response.data, function(index, pridectuser){
+
+                        $('#userprediction').removeClass('d-none');
+                        var status;
+                        if (pridectuser.win_count == 8) {
+                            status = '<p>Goliath</p>';
+                        } else if (pridectuser.win_count >= 5 && pridectuser.win_count < 8) {
+                            status = '<p>Winner</p>';
+                        } else {
+                            status = '<p>Loser</p>';
+                        }
+
+                        var row = '<tr>' +
+                            '<td>' + pridectuser.full_name + '</td>' +
+                            '<td>' + pridectuser.win_count + '/8</td>' +
+                            '<td>' + status + '</td>' +
+                            '</tr>';
+                        tbody.append(row);
+                    });
+                }
+            });
+        });
+    });
+</script>
 
 @endsection

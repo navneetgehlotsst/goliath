@@ -23,13 +23,23 @@
                                     <thead>
                                         <tr>
                                             <th>User</th>
+                                            <th>Result Status</th>
                                         </tr>
                                     </thead>
                                     <tbody class="table-border-bottom-0">
-                                        @foreach ($predictionUsers as $predictionUser )
+                                        @foreach ($userPredictionResult as $predictionUser )
                                             <tr>
                                                 <td>
                                                     {{$predictionUser->full_name}}
+                                                </td>
+                                                <td>
+                                                    @if ($predictionUser->win_count == '8')
+                                                        <p>Goliath</p>
+                                                    @elseif($predictionUser->win_count >= '5' && $predictionUser->win_count < '8')
+                                                        <p>Winner</p>
+                                                    @else
+                                                        <p>Losser</p>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach

@@ -22,8 +22,11 @@
                             </h4>
                             <hr />
                             <div class="text-left mb-3">
-                                <p class="text-muted"><strong>Email Address :</strong> <span class="ml-2">{{$user->email}}</span></p>
-                                <p class="text-muted"><strong>Phone Number :</strong> <span class="ml-2">{{$user->phone}}</span></p>
+                                @if (!empty($user->email))
+                                    <p class="text-muted"><strong>Email Address :</strong> <span class="ml-2">{{$user->email}}</span></p>
+                                @else
+                                    <p class="text-muted"><strong>Phone Number :</strong> <span class="ml-2">{{$user->phone}}</span></p>
+                                @endif
                             </div>
                         </div>
                     </div>

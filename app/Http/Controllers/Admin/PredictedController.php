@@ -17,6 +17,9 @@ use Helper;
 
 use Carbon\Carbon;
 
+// use Illuminate\Support\Facades\DB;
+use DB;
+
 class PredictedController extends Controller
 {
     public function pridictedInfo($matchid)
@@ -114,24 +117,28 @@ class PredictedController extends Controller
 
     }
 
-    public function pridictedUser($overid,$matchid)
+    public function pridictedUser(Request $request)
     {
         try {
-
-            $predictionUsers = Prediction::select('predictions.match_id', 'users.full_name')
-                                ->join('users', 'predictions.user_id', '=', 'users.id')
-                                ->where([
-                                    ['predictions.match_id', '=', $matchid],
-                                    ['predictions.over_id', '=', $overid],
-                                    ['predictions.status', '=', 'complete']
-                                ])
-                                ->groupBy('predictions.user_id', 'predictions.match_id')
-                                ->get();
-
-            return view('admin.predict.user', compact('predictionUsers'));
-
+            $overid = $request->overid;
+            $matchid = $request->matchid;
+            $userPredictionResult = Prediction::select('users.full_name', DB::raw('COUNT(case when predictions.result = "W" then 1 else null end) as win_count'))
+                                    ->join('users', 'predictions.user_id', '=', 'users.id')
+                                    ->where([
+                                        ['predictions.match_id', '=', $matchid],
+                                        ['predictions.over_id', '=', $overid],
+                                        ['predictions.status', '=', 'complete']
+                                    ])
+                                    ->groupBy('predictions.user_id', 'users.full_name')
+                                    ->get();
+            if($userPredictionResult){
+                return response()->json(['status' => true, 'data' => $userPredictionResult]);
+            }else{
+                return response()->json(['status' => false, 'data' => 'Data not Found']);
+            }
         } catch (\Throwable $th) {
             dd($th);
+            return response()->json(['status' => false, 'data' => $th->message]);
         }
 
     }
