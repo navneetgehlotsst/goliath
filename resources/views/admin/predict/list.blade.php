@@ -7,22 +7,24 @@
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
-        <span class="text-primary fw-bold">Predictions</span>
+        <span class="text-primary fw-bold">Completed Predictions</span>
     </h5>
     <div class="row mb-5">
         <div class="col-md-12 col-lg-12">
             <div class="card mb-4">
                 <div class="card-body">
-                    <div class="table-responsive text-nowrap">
-                        <div class="row">
-                            <h6 class="text-primary fw-bold">Date Filter</h6>
-                            <div class="col-md-4">
-                                <input type="date" class="form-control" id="start_date">
-                            </div>
-                            <div class="col-md-4">
-                                <input type="date" class="form-control" id="end_date">
-                            </div>
+                    <div class="row">
+                        <h6 class="text-primary fw-bold">Date Filter</h6>
+                        <div class="col-md-4">
+                            <label for="exampleFormControlInput1" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date">
                         </div>
+                        <div class="col-md-4">
+                            <label for="exampleFormControlInput1" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date">
+                        </div>
+                    </div>
+                    <div class="table-responsive text-nowrap">
                         <!-- Date filter inputs -->
                         <table class="table table-bordered" id="PredictionsTable">
                             <thead>
