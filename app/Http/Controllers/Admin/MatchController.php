@@ -153,7 +153,7 @@ class MatchController extends Controller
 
         try {
             $inningsQuestionsData = OverQuestions::select('over_questions.*','questions.question')->where('innings_over_id', $overid)->join('questions', 'over_questions.question_id', '=', 'questions.id')->get();
-            $questionList = Question::where('type', 'supplementry')->get();
+            $questionList = Question::where('status','active')->where('type', 'supplementry')->get();
 
             return view('admin.matches.questionchange', compact('inningsQuestionsData','questionList'));
         } catch (\Throwable $th) {
