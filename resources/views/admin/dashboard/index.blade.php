@@ -62,7 +62,7 @@
         <div class="col-md-3 col-lg-3 order-2 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                        <h5 class="card-title m-0 me-2">Recently Predictions</h5>
+                        <h5 class="card-title m-0 me-2">Recent Predictions</h5>
                         <a href="{{ route('admin.predict.list' ) }}" class="">View All</a>
                 </div>
                 <div class="card-body">
@@ -94,7 +94,7 @@
         <div class="col-md-12 col-lg-12 order-2 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title m-0 me-2">Users Register</h5>
+                    <h5 class="card-title m-0 me-2">User Registration</h5>
                 </div>
                 <div class="card-body">
                     <div id="userchart"></div>

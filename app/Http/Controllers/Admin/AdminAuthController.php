@@ -284,7 +284,7 @@ class AdminAuthController extends Controller
         $predictionMonthCount =  Prediction::select(
                 'user_id',
                 'over_id'
-            )->where('status','complete')->groupBy('user_id', 'over_id')->get();
+            )->where('status','complete')->groupBy('over_id')->get();
         foreach ($predictionMonthCount as $predictedvalue) {
             $predictcount++;
         }

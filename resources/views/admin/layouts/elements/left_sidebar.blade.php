@@ -29,6 +29,14 @@
 				<div data-i18n="User">Users</div>
 			</a>
 		</li>
+
+        <li class="menu-item {{ request()->is('admin/predict/list') ? 'active' : ''}}">
+			<a href="{{ route('admin.predict.list') }}" class="menu-link">
+				<i class="menu-icon tf-icons bx bx-list-ul"></i>
+				<div data-i18n="Recent Predictions">All Predictions</div>
+			</a>
+		</li>
+
         <li class="menu-item {{ request()->is('admin/transactions') ? 'active' : ''}}">
 			<a href="{{route('admin.transaction.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-list-ul"></i>
