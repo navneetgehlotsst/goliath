@@ -46,12 +46,11 @@ class PredictionResult extends Command
             // Get Prediction data
             $pendingPredictionMatchIds = Prediction::where('result','ND')->where('status','pending')->groupBy('match_id')->pluck('match_id');
             $completedMatches = CompetitionMatches::whereIn('match_id',$pendingPredictionMatchIds)->whereIn('status',['Completed','Cancelled'])->get();
-            \Log::info(json_encode($completedMatches));
+            //\Log::info("PredictionResult: 49: ".json_encode($completedMatches));
             if(!empty($completedMatches)){
                 foreach($completedMatches as $completedMatch){
                     $matchid = $completedMatch->match_id;
 
-                    
                     //check predictions
                     $predictions = Prediction::select('predictions.*','innings_overs.overs','innings_overs.match_innings_id','match_innings.innings as match_innings_no')->join('innings_overs', 'predictions.over_id', '=', 'innings_overs.id')->join('match_innings', 'innings_overs.match_innings_id', '=', 'match_innings.id')->where('predictions.result', 'ND')->where('predictions.status', 'pending')->where('predictions.match_id', $matchid)->groupBy('over_id')->get();
                     //\Log::info(json_encode($predictions));

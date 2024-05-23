@@ -36,7 +36,7 @@ class AddQuestionToMatch extends Command
      */
     public function handle()
     {
-        \Log::error("AddQuestionToMatch:");
+        \Log::error("AddQuestionToMatch: INIT");
         try {
             // $apicount = DB::table('api_count')->where('name', 'match_live')->value('count');
             // if ($apicount < 30000) {
@@ -93,6 +93,9 @@ class AddQuestionToMatch extends Command
                                 'competition_type' => $compdatavalue['match_format'],
                                 'date_start' => $compdatavalue['datestart'],
                                 'date_end' => $compdatavalue['dateend'],
+                                'total_matches' => $compdatavalue['total_matches'],
+                                'total_rounds' => $compdatavalue['total_rounds'],
+                                'total_teams' => $compdatavalue['total_teams'],
                                 'status' => $compdatavalue['status'],
                             ];
 
@@ -103,9 +106,9 @@ class AddQuestionToMatch extends Command
 
                             // Fetch existing matches
                             //$existingMatches = CompetitionMatches::whereIn('competiton_id', $cId)->count('id');
-                            $existingMatches = CompetitionMatches::where('competiton_id', $cId)->get();
-                            //\Log::info("existingMatches:".count($existingMatches));
-                            if (count($existingMatches) == '0') {
+                            $existingMatches = CompetitionMatches::where('competiton_id', $cId)->where('match','not like','%TBA%')->get();
+                            //\Log::info("existingMatches:".json_encode($existingMatches));
+                            if (count($existingMatches) == '0' || (count($existingMatches) < $compdatavalue['total_matches'])) {
                                 $pagedatacount = 100;
                                 $apiurlScheduled = "https://rest.entitysport.com/v2/competitions/$cId/matches/?token=$token&per_page=$pagedatacount&paged=$page";
                                 
@@ -134,43 +137,46 @@ class AddQuestionToMatch extends Command
                                 // Check if match API call was successful
                                 if ($matchscheduledresponsedata['status'] == 'ok') {
                                     foreach ($matchscheduleddata as $matchvalue) {
-                                        if($matchvalue['match_id'] == "74388"){
-                                            \Log::info(json_encode($matchvalue));
-                                        }
+                                        
                                         // Check if match already exists
-                                        if (!$existingMatches->has($matchvalue['match_id'])) {
+                                        $checkExistingMatch = CompetitionMatches::where('match_id', $matchvalue['match_id'])->first();
 
-                                            // Prepare match data
-                                            $dateTime = $matchvalue['date_start'];
-                                            $datearray = explode(" ", $dateTime);
-                                            $matchesdata = [
-                                                'competiton_id' => $cId,
-                                                'match_id' => $matchvalue['match_id'],
-                                                'match' => $matchvalue['title'],
-                                                'subtitle' => $matchvalue['subtitle'],
-                                                'note' => $matchvalue['status_note'],
-                                                'teamaid' => $matchvalue['teama']['team_id'],
-                                                'teama_name' => $matchvalue['teama']['name'],
-                                                'teama_short_name' => $matchvalue['teama']['short_name'],
-                                                'teama_img' => $matchvalue['teama']['logo_url'],
-                                                'teamascorefull' => $matchvalue['teama']['scores_full'] ?? '0',
-                                                'teamascore' => $matchvalue['teama']['scores'] ?? '0',
-                                                'teamaover' => $matchvalue['teama']['overs'] ?? '0',
-                                                'teambid' => $matchvalue['teamb']['team_id'],
-                                                'teamb_name' => $matchvalue['teamb']['name'],
-                                                'teamb_short_name' => $matchvalue['teamb']['short_name'],
-                                                'teamb_img' => $matchvalue['teamb']['logo_url'],
-                                                'teambscorefull' => $matchvalue['teamb']['scores_full'] ?? '0',
-                                                'teambscore' => $matchvalue['teamb']['scores'] ?? '0',
-                                                'teambover' => $matchvalue['teamb']['overs'] ?? '0',
-                                                'formate' => $matchvalue['format_str'],
-                                                'match_start_date' => $datearray['0'],
-                                                'match_start_time' => $datearray['1'],
-                                                'status' => $matchvalue['status_str'],
-                                            ];
 
-                                            // Create new match
-                                            CompetitionMatches::create($matchesdata);
+                                        // Prepare match data
+                                        $dateTime = $matchvalue['date_start'];
+                                        $datearray = explode(" ", $dateTime);
+                                        $matchesdata = [
+                                            'competiton_id' => $cId,
+                                            'match' => $matchvalue['title'],
+                                            'subtitle' => $matchvalue['subtitle'],
+                                            'note' => $matchvalue['status_note'],
+                                            'teamaid' => $matchvalue['teama']['team_id'],
+                                            'teama_name' => $matchvalue['teama']['name'],
+                                            'teama_short_name' => $matchvalue['teama']['short_name'],
+                                            'teama_img' => $matchvalue['teama']['logo_url'],
+                                            'teamascorefull' => $matchvalue['teama']['scores_full'] ?? '0',
+                                            'teamascore' => $matchvalue['teama']['scores'] ?? '0',
+                                            'teamaover' => $matchvalue['teama']['overs'] ?? '0',
+                                            'teambid' => $matchvalue['teamb']['team_id'],
+                                            'teamb_name' => $matchvalue['teamb']['name'],
+                                            'teamb_short_name' => $matchvalue['teamb']['short_name'],
+                                            'teamb_img' => $matchvalue['teamb']['logo_url'],
+                                            'teambscorefull' => $matchvalue['teamb']['scores_full'] ?? '0',
+                                            'teambscore' => $matchvalue['teamb']['scores'] ?? '0',
+                                            'teambover' => $matchvalue['teamb']['overs'] ?? '0',
+                                            'formate' => $matchvalue['format_str'],
+                                            'match_start_date' => $datearray['0'],
+                                            'match_start_time' => $datearray['1'],
+                                            'status' => $matchvalue['status_str'],
+                                        ];
+
+                                        // Create new match
+                                        CompetitionMatches::updateOrCreate(['match_id' => $matchvalue['match_id']],$matchesdata);
+
+                                        
+                                        // Check if match already exists
+                                        if (empty($checkExistingMatch)) {
+                                            \Log::info("Ye to aa gya: ".$matchvalue['match_id']);
 
                                             // Determine over limit based on match format
                                             $format = $matchvalue['format'];

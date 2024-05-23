@@ -43,8 +43,8 @@ class MatchesController extends Controller
         ]);
 
         $datamatches = CompetitionMatches::where('competition_matches.status', $input['status'])
-                    ->where('teamaid', '!=', '127770')
-                    ->where('teambid', '!=', '127775')
+                    // ->where('teamaid', '!=', '127770')
+                    // ->where('teambid', '!=', '127775')
                     ->orderBy('competition_matches.match_start_date', 'ASC')
                     ->orderBy('competition_matches.match_start_time', 'ASC')
                     ->paginate(10);
@@ -97,8 +97,8 @@ class MatchesController extends Controller
 
 
         return $datamatches->count()
-            ? ApiResponse::successResponse($matchesdata, "Matches Data Found")
-            : ApiResponse::errorResponse("Matches Data Not Found");
+            ? ApiResponse::successResponse($matchesdata, "Matches Found")
+            : ApiResponse::errorResponse("No Match Available Right Now!");
     }
 
     public function matchesDetail(Request $request)
