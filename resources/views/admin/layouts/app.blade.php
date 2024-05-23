@@ -24,6 +24,7 @@
         <script src="{{asset('assets/admin/vendor/js/helpers.js')}}"></script>
         <script src="{{asset('assets/admin/js/config.js')}}"></script>
         <link rel="stylesheet" href="{{asset('assets/admin/css/sweet-alert.css')}}" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
         @yield('style')
         <style>
 
@@ -57,6 +58,7 @@
                 <script src="{{asset('assets/admin/js/moment.min.js')}}"></script>
                 <script src="{{asset('assets/admin/js/main.js')}}"></script>
                 <script async defer src="https://buttons.github.io/buttons.js"></script>
+                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
                 @yield('script')
                 @include('admin.layouts.elements.sweet_alerts')
             </div>

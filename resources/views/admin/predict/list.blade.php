@@ -15,13 +15,8 @@
                 <div class="card-body">
                     <div class="row">
                         <h6 class="text-primary fw-bold">Date Filter</h6>
-                        <div class="col-md-4">
-                            <label for="exampleFormControlInput1" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="start_date">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="exampleFormControlInput1" class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="end_date">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" name="daterange" value="" />
                         </div>
                     </div>
                     <div class="table-responsive text-nowrap">
@@ -45,65 +40,77 @@
 @endsection
 @section('script')
 <script>
-    $(document).ready(function() {
-        var dataTable = $('#PredictionsTable').DataTable({
-            processing: true,
-            searching: false,
-            serverSide: true, // Enable server-side processing
-            ajax: {
-                url: "{{ route('admin.predict.allpridicted') }}",
-                data: function (d) {
-                    // Add start and end date parameters to the AJAX request
-                    d.start_date = $('#start_date').val();
-                    d.end_date = $('#end_date').val();
-                }
-            },
-            order: [],
-            columns: [
-                {
-                    // Define column data
-                    data: null,
-                    // Render function for custom HTML
-                    render: (data, type, row) => {
-                        console.log('Row data:', row);  // Log row data to debug
-                        // Return HTML for displaying team logos
-                        return `<img src="${row.competition_match.teama_img}" alt="" class="predicted_match_logo" data-bs-toggle="tooltip" data-bs-placement="top" title="${row.competition_match.teama_name}" />
-                                V/S
-                                <img src="${row.competition_match.teamb_img}" alt="" class="predicted_match_logo" data-bs-toggle="tooltip" data-bs-placement="top" title="${row.competition_match.teamb_name}" />`;
+   $(document).ready(function() {
+        let startdate = null;
+        let enddate = null;
+
+        function initializeDataTable() {
+            if ($.fn.DataTable.isDataTable('#PredictionsTable')) {
+                $('#PredictionsTable').DataTable().destroy();
+            }
+
+            $('#PredictionsTable').DataTable({
+                processing: true,
+                searching: false,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('admin.predict.allpridicted') }}",
+                    data: function (d) {
+                        d.start_date = $('#start_date').val();
+                        d.end_date = $('#end_date').val();
                     }
                 },
-                {
-                    // Define column data
-                    data: null,
-                    // Render function for displaying match start date
-                    // Convert the string to a Date object
-                    render: (data, type, row) => {
-                        // Parse the updated_at string to a Date object
-                        var updatedate = new Date(row.updated_at);
-                        // Format the date to yyyy-mm-dd
-                        var formattedDate = updatedate.getFullYear() + "-" +
-                                            ('0' + (updatedate.getMonth() + 1)).slice(-2) + "-" +
-                                            ('0' + updatedate.getDate()).slice(-2);
-                        return formattedDate;
+                order: [],
+                columns: [
+                    {
+                        data: null,
+                        render: (data, type, row) => {
+                            console.log('Row data:', row);  // Log row data to debug
+                            return `<img src="${row.competition_match.teama_img}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="${row.competition_match.teama_name}" />
+                                    V/S
+                                    <img src="${row.competition_match.teamb_img}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="${row.competition_match.teamb_name}" />`;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: (data, type, row) => {
+                            var updatedate = new Date(row.updated_at);
+                            var formattedDate = updatedate.getFullYear() + "-" +
+                                                ('0' + (updatedate.getMonth() + 1)).slice(-2) + "-" +
+                                                ('0' + updatedate.getDate()).slice(-2);
+                            return formattedDate;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: (data, type, row) => {
+                            const matchId = row.competition_match ? row.competition_match.match_id : '';
+                            const detailUrl = `{{ route('admin.predict.info', ':id') }}`.replace(':id', matchId);
+                            return `<a href="${detailUrl}" class="btn btn-sm btn-primary">Match Detail</a>`;
+                        }
                     }
-                },
-                {
-                    // Define column data
-                    data: null,
-                    // Render function for generating match detail link
-                    render: (data, type, row) => {
-                        const matchId = row.competition_match ? row.competition_match.match_id : '';
-                        const detailUrl = `{{ route('admin.predict.info', ':id') }}`.replace(':id', matchId);
-                        return `<a href="${detailUrl}" class="btn btn-sm btn-primary">Match Detail</a>`;
-                    }
-                }
-            ]
+                ]
+            });
+        }
+
+        // Initialize the date range picker
+        $('input[name="daterange"]').daterangepicker({
+            opens: 'left'
+        }, function(start, end, label) {
+            startdate = start.format('YYYY-MM-DD');
+            enddate = end.format('YYYY-MM-DD');
+            $('#start_date').val(startdate);  // Update hidden input
+            $('#end_date').val(enddate);      // Update hidden input
+            initializeDataTable();  // Redraw the table with new date range
         });
 
-        // Update table when the date range filters change
-        $('#start_date, #end_date').change(function() {
-            dataTable.draw(); // Redraw the table with new date range
-        });
+        // Create hidden inputs to store start and end dates
+        $('body').append('<input type="hidden" id="start_date" />');
+        $('body').append('<input type="hidden" id="end_date" />');
+
+        // Initial table draw
+        initializeDataTable();
     });
+
 </script>
 @endsection

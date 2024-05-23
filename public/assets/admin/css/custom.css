@@ -59,7 +59,7 @@ a.menu-link {
 }
 
 img.teamlogo {
-    width: 30px;
+    width: 11%;
     height: auto;
 }
 
@@ -69,6 +69,11 @@ img.teamlogo {
 
 .predicted_match_logo{
     width: 15%;
+    height: auto;
+}
+
+.predicted_match_all {
+    width: 10%;
     height: auto;
 }
 
