@@ -7,7 +7,7 @@
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
-        <span class="text-primary fw-light">Leaderboard</span>
+        <span class="text-primary fw-light">Leaderboard(Prediction Winning)</span>
     </h5>
     <div class="row">
         <div class="col-xl-12">

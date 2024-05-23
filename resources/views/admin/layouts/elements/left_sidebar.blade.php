@@ -30,31 +30,10 @@
 			</a>
 		</li>
 
-        <li class="menu-item {{ request()->is('admin/predict/list') ? 'active' : ''}}">
-			<a href="{{ route('admin.predict.list') }}" class="menu-link">
-				<i class="menu-icon tf-icons bx bx-list-ul"></i>
-				<div data-i18n="Recent Predictions">All Predictions</div>
-			</a>
-		</li>
-
-        <li class="menu-item {{ request()->is('admin/leaderboard/list') ? 'active' : ''}}">
-			<a href="{{ route('admin.leaderboard.list') }}" class="menu-link">
-				<i class="menu-icon tf-icons bx bx-list-ul"></i>
-				<div data-i18n="Recent Predictions">Leaderboard</div>
-			</a>
-		</li>
-
         <li class="menu-item {{ request()->is('admin/transactions') ? 'active' : ''}}">
 			<a href="{{route('admin.transaction.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-list-ul"></i>
 				<div data-i18n="transactions">All Transactions</div>
-			</a>
-		</li>
-
-        <li class="menu-item {{ request()->is('admin/questions*') ? 'active' : ''}}">
-			<a href="{{route('admin.questions.index')}}" class="menu-link">
-				<i class="menu-icon tf-icons bx bx-list-ul"></i>
-				<div data-i18n="questions">Questions</div>
 			</a>
 		</li>
 
@@ -80,6 +59,38 @@
                     </a>
                 </li>
 			</ul>
+		</li>
+
+        <li class="menu-item {{ request()->is('admin/predict/list') ? 'active' : ''}}">
+			<a href="{{ route('admin.predict.list') }}" class="menu-link">
+				<i class="menu-icon tf-icons bx bx-list-ul"></i>
+				<div data-i18n="Recent Predictions">All Predictions</div>
+			</a>
+		</li>
+        <li class="menu-item {{ request()->is('admin/leaderboard*') ? 'active open' : ''}}">
+			<a href="javascript:void(0);" class="menu-link menu-toggle">
+				<i class="menu-icon tf-icons bx bx-book-content"></i>
+				<div data-i18n="Pages">Leaderboard</div>
+			</a>
+			<ul class="menu-sub">
+                <li class="menu-item {{ request()->is('admin/leaderboard/list') ? 'active' : ''}}">
+                    <a href="{{ route('admin.leaderboard.list') }}" class="menu-link">
+                        <div data-i18n="Live">Winning Prediction</div>
+                    </a>
+                </li>
+                {{-- <li class="menu-item">
+                    <a href="" class="menu-link">
+                        <div data-i18n="Completed">Winning Amount</div>
+                    </a>
+                </li> --}}
+			</ul>
+		</li>
+
+        <li class="menu-item {{ request()->is('admin/questions*') ? 'active' : ''}}">
+			<a href="{{route('admin.questions.index')}}" class="menu-link">
+				<i class="menu-icon tf-icons bx bx-list-ul"></i>
+				<div data-i18n="questions">Questions</div>
+			</a>
 		</li>
 
 		{{-- <li class="menu-item {{ request()->is('admin/notifications/index') ? 'active' : ''}}">
