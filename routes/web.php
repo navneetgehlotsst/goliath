@@ -111,6 +111,8 @@ Route::name('admin.')->prefix('admin')->group(function () {
         Route::prefix('predict')->name('predict.')->group(function () {
             Route::get('info/{key}', [PredictedController::class, 'pridictedInfo'])->name('info');
             Route::post('user', [PredictedController::class, 'pridictedUser'])->name('user');
+            Route::get('list', [PredictedController::class, 'pridictedlist'])->name('list');
+            Route::get('all', [PredictedController::class, 'getallpridicted'])->name('allpridicted');
         });
     });
 });

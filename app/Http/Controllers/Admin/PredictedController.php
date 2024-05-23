@@ -142,4 +142,44 @@ class PredictedController extends Controller
 
     }
 
+    public function pridictedlist()
+    {
+        return view('admin.predict.list');
+    }
+
+    public function getallpridicted(Request $request)
+    {
+        // Retrieve start and end date parameters from the request
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Base query
+        $query = Prediction::with('competitionMatch')
+            ->groupBy('predictions.match_id')
+            ->where('status', 'complete')
+            ->orderBy('updated_at', 'desc');
+
+        // Apply date range filter if provided
+        if ($startDate && $endDate) {
+            // Convert start and end dates to appropriate format
+            $startDateTime = date('Y-m-d H:i:s', strtotime($startDate));
+            $endDateTime = date('Y-m-d H:i:s', strtotime($endDate));
+
+            $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
+        }
+
+        // Paginate the results
+        $predictions = $query->paginate(10);
+
+        // Return JSON response with pagination information
+        return response()->json([
+            'draw' => $request->input('draw'),
+            'recordsTotal' => $predictions->total(),
+            'recordsFiltered' => $predictions->total(),
+            'data' => $predictions->items()
+        ]);
+    }
+
+
+
 }

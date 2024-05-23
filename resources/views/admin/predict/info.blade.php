@@ -136,29 +136,30 @@
 
 <script>
     $(document).ready(function () {
-        // Cache the table and user prediction container
+        // Cache jQuery selectors for the table and user prediction container
         const $tableElement = $("#getpredictUser");
         const $userPrediction = $("#userprediction");
 
-        // Initialize DataTable
+        // Initialize DataTable with specified options
         const table = $tableElement.DataTable({
             processing: true,
             ordering: true,
             searching: true,
             paging: true,
-            columnDefs: [{ searchable: false, targets: 3 }]
+            columnDefs: [{ searchable: false, targets: 3 }] // Disable search on the 4th column (index 3)
         });
 
-        // Event delegation for click events
+        // Event delegation for click events on elements with class 'getPredictionData'
         $(document).on("click", ".getPredictionData", function () {
-            const preicturl = "{{ route('admin.predict.user') }}";
+            const predictUrl = "{{ route('admin.predict.user') }}";
             const overid = $(this).data("overid");
             const matchid = $(this).data("matchid");
             const inningname = $(this).data("inningname");
             const overnumber = $(this).data("overnumber");
 
+            // AJAX request to fetch prediction data
             $.ajax({
-                url: preicturl,
+                url: predictUrl,
                 method: "POST",
                 data: {
                     _token: "{{ csrf_token() }}",
@@ -166,40 +167,45 @@
                     matchid: matchid,
                 },
                 success: function (response) {
-                    if (response.status == true) {
-                        // Clear existing data
+                    if (response.status) {
+                        // Clear existing data in the table
                         table.clear();
 
-                        // Generate new rows
-                        const rows = response.data.map((pridectuser) => {
-                            const worong = 8 - pridectuser.win_count;
-                            const totalquestion = 8;
+                        // Map response data to table rows
+                        const rows = response.data.map(pridectuser => {
+                            const wrong = 8 - pridectuser.win_count;
+                            const totalQuestions = 8;
+                            const userShowUrl = `{{ route('admin.users.show', ':id') }}`.replace(':id', pridectuser.id);
+
+                            // Determine user status based on win count
                             let status;
                             if (pridectuser.win_count === 8) {
                                 status = "<p>Goliath Winner</p>";
-                            } else if (pridectuser.win_count >= 5 && pridectuser.win_count < 8) {
+                            } else if (pridectuser.win_count >= 5) {
                                 status = "<p>Winner</p>";
                             } else {
                                 status = "<p>Loser</p>";
                             }
-                            return [pridectuser.full_name, pridectuser.win_count, worong, totalquestion, status];
+
+                            // Construct full name with a link to the user's profile
+                            const fullName = `<a href="${userShowUrl}">${pridectuser.full_name}</a>`;
+
+                            return [fullName, pridectuser.win_count, wrong, totalQuestions, status];
                         });
 
-                        // Add rows to the table
-                        table.rows.add(rows);
+                        // Add rows to the DataTable and redraw
+                        table.rows.add(rows).draw();
 
-                        // Draw the table with new data
-                        table.draw();
-
-                        // Show user prediction section if hidden
+                        // Show user prediction section if it is hidden
                         $userPrediction.removeClass("d-none");
-                    }else{
-                         // Show user prediction section if hidden
-                         $userPrediction.addClass("d-none");
-                         alert('Match Prediction Result Not Found');
+                    } else {
+                        // Hide user prediction section and alert if no data found
+                        $userPrediction.addClass("d-none");
+                        alert('Match Prediction Result Not Found');
                     }
-                    $('#predictedText').text('Displaying results for the '+overnumber+'th over of '+inningname);
 
+                    // Update the prediction text
+                    $('#predictedText').text(`Displaying results for the ${overnumber}th over of ${inningname}`);
                 },
                 error: function (xhr, status, error) {
                     console.error("AJAX Error:", status, error);

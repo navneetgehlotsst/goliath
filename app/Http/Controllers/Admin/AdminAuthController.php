@@ -277,53 +277,55 @@ class AdminAuthController extends Controller
     public function adminDashboard()
     {
         // User count Query
-        $userCount = Cache::remember('active_user_count', now()->addMinutes(10), function() {
-            return User::where('status', 'active')->count();
-        });
+        $userCount =  User::where('status', 'active')->where('role', 'user')->count();
 
         // Total Prediction Count
-        $predictionMonthCount = Cache::remember('total_prediction_count', now()->addMinutes(10), function() {
-            return Prediction::groupBy('predictions.over_id')->count();
-        });
-
+        $predictcount = 0;
+        $predictionMonthCount =  Prediction::select(
+                'user_id',
+                'over_id'
+            )->where('status','complete')->groupBy('user_id', 'over_id')->get();
+        foreach ($predictionMonthCount as $predictedvalue) {
+            $predictcount++;
+        }
         // Get Top 5 latest predicted matches
-        $latestPredictions = Cache::remember('latest_predictions', now()->addMinutes(10), function() {
-            return Prediction::with('competitionMatch')
+        $latestPredictions = Prediction::with('competitionMatch')
                 ->groupBy('predictions.match_id')
                 ->where('status','complete')
                 ->orderBy('updated_at', 'desc')
                 ->take(5)
                 ->get();
-        });
 
-        // monthly prediction
+        // Monthly prediction result
         $monthpredicted = [];
         $currentDate = now();
 
+        // Loop through the last 12 months
         for ($i = 0; $i < 12; $i++) {
             $monthYear = $currentDate->copy()->subMonths($i)->format('Y-m');
 
-
+            // Fetch monthly predictions for each user
             $monthlypredicteduser = Prediction::select(
                 'user_id',
                 'over_id',
                 DB::raw('MONTHNAME(created_at) AS Month'),
                 DB::raw('SUM(IF(result = "W", 1, 0)) AS win_count')
             )
+            ->where('status','complete')
             ->whereYear('created_at', Carbon::parse($monthYear)->year)
             ->whereMonth('created_at', Carbon::parse($monthYear)->month)
             ->groupBy('user_id', 'over_id')
             ->get();
 
-
-
+            // Initialize counters
             $total_golith_winner = 0;
             $total_winner = 0;
             $total_loser = 0;
 
+            // Count the types of predictions
             foreach ($monthlypredicteduser as $predictedvalue) {
                 if($predictedvalue->win_count == 8) {
-                    $total_golith_winner ++;
+                    $total_golith_winner++;
                 } elseif ($predictedvalue->win_count < 8 && $predictedvalue->win_count >= 5) {
                     $total_winner++;
                 } else {
@@ -331,12 +333,13 @@ class AdminAuthController extends Controller
                 }
             }
 
+            // Store results for each month
             $monthpredicted[$i]['month'] = $monthYear;
             $monthpredicted[$i]['total_golith_winner'] = $total_golith_winner;
             $monthpredicted[$i]['total_winner'] = $total_winner;
             $monthpredicted[$i]['total_loser'] = $total_loser;
-
         }
+
         // Sort the $monthpredicted array by month in ascending order
         usort($monthpredicted, function($a, $b) {
             return strcmp($a['month'], $b['month']);
@@ -355,14 +358,56 @@ class AdminAuthController extends Controller
             $winner[$key] = $value['total_winner'];
             $loser[$key] = $value['total_loser'];
         }
+
         // Convert PHP arrays to JavaScript arrays
         $monthjson = json_encode($month);
         $golithwinnerjson = json_encode($golith_winner);
         $winnerjson = json_encode($winner);
         $loserjson = json_encode($loser);
 
+        // User registration result
+        $monthuserresgistration = [];
 
-        return view("admin.dashboard.index" , compact('userCount','predictionMonthCount','latestPredictions','monthjson','golithwinnerjson','winnerjson','loserjson'));
+        // Loop through the last 12 months
+        for ($i = 0; $i < 12; $i++) {
+            $monthYear = $currentDate->copy()->subMonths($i)->format('Y-m');
+
+            // Fetch monthly user registrations
+            $monthlyuser = User::where('role','user')
+                ->whereYear('created_at', Carbon::parse($monthYear)->year)
+                ->whereMonth('created_at', Carbon::parse($monthYear)->month)
+                ->get();
+
+            // Count the number of users registered in each month
+            $total_user = $monthlyuser->count();
+
+            // Store results for each month
+            $monthuserresgistration[$i]['month'] = $monthYear;
+            $monthuserresgistration[$i]['total_user'] = $total_user;
+        }
+
+        // Sort the $monthuserresgistration array by month in ascending order
+        usort($monthuserresgistration, function($a, $b) {
+            return strcmp($a['month'], $b['month']);
+        });
+
+        // Initialize arrays to store sorted data
+        $user_month = [];
+        $user_resitertion = [];
+
+        // Populate sorted data into respective arrays
+        foreach ($monthuserresgistration as $key => $value) {
+            $user_month[$key] = $value['month'];
+            $user_resitertion[$key] = $value['total_user'];
+        }
+
+        // Convert PHP arrays to JavaScript arrays
+        $usermonthjson = json_encode($user_month);
+        $usertotaljson = json_encode($user_resitertion);
+
+        // Pass data to the view
+        return view("admin.dashboard.index" , compact('userCount','predictcount','latestPredictions','monthjson','golithwinnerjson','winnerjson','loserjson','usermonthjson','usertotaljson'));
+
     }
 
     private function handleAvatarUpload($file)
