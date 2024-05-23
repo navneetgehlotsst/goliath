@@ -37,6 +37,13 @@
 			</a>
 		</li>
 
+        <li class="menu-item {{ request()->is('admin/leaderboard/list') ? 'active' : ''}}">
+			<a href="{{ route('admin.leaderboard.list') }}" class="menu-link">
+				<i class="menu-icon tf-icons bx bx-list-ul"></i>
+				<div data-i18n="Recent Predictions">Leaderboard</div>
+			</a>
+		</li>
+
         <li class="menu-item {{ request()->is('admin/transactions') ? 'active' : ''}}">
 			<a href="{{route('admin.transaction.index')}}" class="menu-link">
 				<i class="menu-icon tf-icons bx bx-list-ul"></i>

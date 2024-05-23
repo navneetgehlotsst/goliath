@@ -14,7 +14,8 @@ use App\Http\Controllers\Admin\{
     HowToPlayController,
     CompetitionController,
     MatchController,
-    PredictedController
+    PredictedController,
+    LeaderboardController
 };
 
 /*
@@ -113,6 +114,10 @@ Route::name('admin.')->prefix('admin')->group(function () {
             Route::post('user', [PredictedController::class, 'pridictedUser'])->name('user');
             Route::get('list', [PredictedController::class, 'pridictedlist'])->name('list');
             Route::get('all', [PredictedController::class, 'getallpridicted'])->name('allpridicted');
+        });
+
+        Route::prefix('leaderboard')->name('leaderboard.')->group(function () {
+            Route::get('list', [LeaderboardController::class, 'leaderboardlist'])->name('list');
         });
     });
 });
