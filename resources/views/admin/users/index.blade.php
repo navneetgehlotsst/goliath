@@ -4,8 +4,8 @@
 @endsection
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
-    <h5 class="py-2 mb-2">
-        <span class="text-primary fw-light">Total Registered Users</span>
+    <h5 class="py-3 mb-4">
+        <span class="text-muted fw-light"><a href="{{route('admin.dashboard')}}">Home</a> /</span> Total Registered Users
     </h5>
     <div class="row">
         <div class="col-xl-12 col-lg-12">

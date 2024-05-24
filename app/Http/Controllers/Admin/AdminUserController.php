@@ -185,7 +185,7 @@ class AdminUserController extends Controller
                 "overs" => $overs,
             ];
         }
-        return view('admin.users.pridection_info', compact('transformedMatch','userid'));
+        return view('admin.users.pridection_info', compact('transformedMatch','userid','matchid'));
     }
 
     public function predictionResult($userid,$matchid,$overid){
@@ -217,7 +217,7 @@ class AdminUserController extends Controller
         // Winning Amount of correct predictions
         $predictedData['winning_amount'] = "100";
 
-        return view('admin.users.pridection_question', compact('predictedData'));
+        return view('admin.users.pridection_question', compact('predictedData','userid','matchid'));
     }
 
 }

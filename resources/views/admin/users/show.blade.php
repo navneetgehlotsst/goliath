@@ -3,8 +3,11 @@
 
 
 <div class="container-fluid flex-grow-1 container-p-y">
-    <h5 class="py-2 mb-2">
+    {{-- <h5 class="py-2 mb-2">
         <span class="text-primary fw-light">User Detail</span>
+    </h5> --}}
+    <h5 class="py-3 mb-4">
+        <span class="text-muted fw-light"><a href="{{route('admin.dashboard')}}">Home</a> / <a href="{{route('admin.users.index')}}">Users /</a></span> User Detail
     </h5>
     <div class="row mt-3">
         <div class="col-md-12">
