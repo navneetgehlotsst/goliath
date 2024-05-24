@@ -34,8 +34,8 @@ class PageController extends Controller
      */
     public function create($key)
     {
-        // Clearing all session data
-        Session::flush();
+        // Removing a value from the session
+        Session::forget('previousURL');
         try{
             $page = Page::where('key',$key)->first();
             return view('admin.pages.create',compact('page'));
