@@ -276,8 +276,6 @@ class AdminAuthController extends Controller
 
     public function adminDashboard()
     {
-        // Removing a value from the session
-        Session::forget('previousURL');
         // User count Query
         $userCount =  User::where('status', 'active')->where('role', 'user')->count();
 

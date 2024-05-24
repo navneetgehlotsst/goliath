@@ -118,7 +118,10 @@ class MatchesController extends Controller
         }
 
         $live_innings = $datamatches->live_innings;
-
+        if($live_innings == 0){
+            $live_innings = 1;
+        }
+        
         // Fetching current innings data
         $datamatchinnings = MatchInnings::where('match_id', $input['match_id'])
             ->where('innings', $live_innings)
@@ -174,49 +177,67 @@ class MatchesController extends Controller
                 "innings" => [], // Initialize innings array
             ]
         ];
-
+        
+        $totalInnings = !empty($matchInnings) ? count($matchInnings) : 0;
         foreach ($matchInnings as $match_inning) {
             $innings_status = '';
             $over = [];
-
             $matchInningsOversData = InningsOver::where('match_innings_id', $match_inning->id)->get();
 
             foreach ($matchInningsOversData as $matchInningsOversvalue) {
                 $over_status = '';
                 $prediction = Prediction::where('over_id', $matchInningsOversvalue->id)->where('user_id', $userId)->first();
 
-                if ($match_inning->innings == $live_innings) {
-                    if ($prediction) {
-                        $over_status = "Predicted";
-                    } else {
-                        if ($matchInningsOversvalue->overs < $current_over) {
-                            $over_status = "Completed";
-                        } elseif ($matchInningsOversvalue->overs == $current_over) {
-                            $over_status = "Ongoing";
-                        } elseif ($matchInningsOversvalue->overs >= $nextover) {
-                            $over_status = "Not Available";
-                        }else if(($matchInningsOversvalue->overs == ($current_over+2)) || ($matchInningsOversvalue->overs == ($current_over+3))){
-                            $over_status = "Available";
+                $over_status = "Upcoming";
+                $innings_status = "Upcoming";
+                if($datamatches->status == "Live"){
+                    if ($match_inning->innings == $live_innings) {
+                        if ($prediction) {
+                            $over_status = "Predicted";
                         } else {
+                            if ($matchInningsOversvalue->overs < $current_over) {
+                                $over_status = "Completed";
+                            } elseif ($matchInningsOversvalue->overs == $current_over) {
+                                $over_status = "Ongoing";
+                            } elseif ($matchInningsOversvalue->overs >= $nextover) {
+                                $over_status = "Not Available";
+                            }else if(($matchInningsOversvalue->overs == ($current_over+2)) || ($matchInningsOversvalue->overs == ($current_over+3)) || ($current_over == 0)){
+                                $over_status = "Available";
+                            } else {
+                                $over_status = "Not Available";
+                            }
+                        }
+                        $innings_status = "Ongoing";
+
+                        if($datamatches->game_state == "Rain Delay"){
                             $over_status = "Not Available";
+                            $innings_status = "Upcoming";
                         }
                     }
-                    $innings_status = "Ongoing";
-                }
 
-                if ($match_inning->innings < $live_innings) {
-                    $over_status = "Completed";
-                    $innings_status = "Completed";
-                }
+                    if ($match_inning->innings < $live_innings) {
+                        $innings_status = "Completed";
+                        if ($prediction) {
+                            $over_status = "Predicted";
+                        }else{
+                            $over_status = "Completed";
+                        }
+                    }
 
-                if ($match_inning->innings > $live_innings) {
-                    $over_status = "Upcoming";
-                    $innings_status = "Upcoming";
-                }
+                    if (($live_innings != 0) && ($match_inning->innings > $live_innings)) {
+                        if(($currentover != 0) && ($currentover == $datamatches->max_over)){
+                            $over_status = "Available";
+                            $innings_status = "Ongoing";
+                        }else{
+                            $over_status = "Upcoming";
+                            $innings_status = "Upcoming";
+                        }
+                    }
 
-                if(!empty($datamatches->max_over) && ($datamatches->max_over < $matchInningsOversvalue->overs)){
-                    $over_status = "unavailable";
-                    //$innings_status = "unavailable";
+                    if(!empty($datamatches->max_over) && ($datamatches->max_over < $matchInningsOversvalue->overs)){
+                        $over_status = "unavailable";
+                        //$innings_status = "unavailable";
+                    }
                 }
 
                 $over[] = [

@@ -168,6 +168,7 @@ class AddQuestionToMatch extends Command
                                             'match_start_date' => $datearray['0'],
                                             'match_start_time' => $datearray['1'],
                                             'status' => $matchvalue['status_str'],
+                                            'game_state' => $matchvalue['game_state_str'],
                                         ];
 
                                         // Create new match

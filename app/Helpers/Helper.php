@@ -270,7 +270,7 @@ class Helper
     public static function CalculateForMoreThanTwoBoundary($matchid,$liveinningnumber,$over){
         //============== calculate here
         $twoboundary = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->where('four' , '1')->count();
-        if($twoboundary < 2){
+        if($twoboundary > 2){
             return "true";
         }else{
             return "false";
@@ -280,7 +280,6 @@ class Helper
     public static function CalculateForMoreThanSevenRun($matchid,$liveinningnumber,$over){
         //========== calculation here======//
         $sevenrun = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->sum('run');
-
         if ($sevenrun > 7) {
             return "true";
         } else {
@@ -291,7 +290,6 @@ class Helper
     public static function CalculateForNoBallInOver($matchid,$liveinningnumber,$over){
         //========== calculation here======//
         $noball = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->where('noball' , '1')->count();
-
         if ($noball != 0) {
             return "true";
         } else {
@@ -302,7 +300,6 @@ class Helper
     public static function CalculateForWideInOver($matchid,$liveinningnumber,$over){
        //========== calculation here======//
        $wideball = Overballes::where('match_id' , $matchid)->where('innings' , $liveinningnumber)->where('over_no' , $over)->where('wideball' , '1')->count();
-
        if ($wideball != 0) {
            return "true";
        } else {

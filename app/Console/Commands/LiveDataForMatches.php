@@ -44,12 +44,13 @@ class LiveDataForMatches extends Command
                 $token = env('SPORT_API_TOKEN');
 
                 $currentUtcTime = Carbon::now('UTC');
-                $oneHourBefore = $currentUtcTime->copy()->subHour();
+                $oneHourBefore = $currentUtcTime->copy()->addHour();
+                //\Log::info("currentUtcTime:".$currentUtcTime." | oneHourBefore:".$oneHourBefore);
                 $matchesData = CompetitionMatches::where('status', 'Live')
                     ->orWhere(function ($query) use ($currentUtcTime, $oneHourBefore) {
                         $query->where('status', 'Scheduled')
-                            ->where(DB::raw('TIMESTAMP(CONCAT(match_start_date, " ", match_start_time))'), '>', $oneHourBefore)
-                            ->where(DB::raw('TIMESTAMP(CONCAT(match_start_date, " ", match_start_time))'), '<=', $currentUtcTime);
+                            ->where(DB::raw('TIMESTAMP(CONCAT(match_start_date, " ", match_start_time))'), '>=', $currentUtcTime)
+                            ->where(DB::raw('TIMESTAMP(CONCAT(match_start_date, " ", match_start_time))'), '<', $oneHourBefore);
                     })->get();
 
                 // If there are live and Completed matches
@@ -93,6 +94,7 @@ class LiveDataForMatches extends Command
                                         'teamaover' => $matchesData['live_score']['overs'],
                                         'live_innings' => $matchesData['live_inning_number'],
                                         'status' => $matchesData['status_str'],
+                                        'game_state' => ($matchesData['game_state_str'] ?? ''),
                                         'max_over' => ($matchesData['live_inning']['max_over'] ?? 0)
                                     ];
                                 } else {
@@ -102,6 +104,7 @@ class LiveDataForMatches extends Command
                                         'teambover' => $matchesData['live_score']['overs'],
                                         'live_innings' => $matchesData['live_inning_number'],
                                         'status' => $matchesData['status_str'],
+                                        'game_state' => ($matchesData['game_state_str'] ?? ''),
                                         'max_over' => ($matchesData['live_inning']['max_over'] ?? 0)
                                     ];
                                 }
@@ -164,7 +167,10 @@ class LiveDataForMatches extends Command
                                     ->get();
                                 if ($predictiondata) {
                                     foreach ($predictiondata as $predictionkey => $predictionvalue) {
-                                        if ($predictionvalue->overs < $matchesData['live_score']['overs']) {
+                                        if($predictionvalue->overs == 20 && $matchid == 76378){
+                                            \Log::info("Live over No: ".$matchesData['live_score']['overs']);
+                                        }
+                                        if ($predictionvalue->overs <= $matchesData['live_score']['overs']) {
                                             $type = $predictionvalue->question_constant;
                                             $over = $predictionvalue->overs;
                                             $answer = $predictionvalue->answere;
