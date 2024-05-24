@@ -16,4 +16,11 @@ class OverQuestions extends Model
     public function over() {
         return $this->belongsTo(InningsOver::class);
     }
+
+    // Define the relationship with the Question model
+    public function loadquestion()
+    {
+        return $this->belongsTo(Question::class, 'question_id', 'id');
+    }
+
 }

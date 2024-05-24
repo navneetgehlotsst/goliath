@@ -29,7 +29,7 @@
                         </div>
                         <h4 class="ms-1 mb-0">{{$predictcount}}</h4>
                     </div>
-                    <p class="mb-1">Total Predictions</p>
+                    <p class="mb-1">Total Completed Predictions</p>
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
                         <div class="avatar me-2">
                             <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-coin-stack"></i></span>
                         </div>
-                        <h4 class="ms-1 mb-0">5000</h4>
+                        <h4 class="ms-1 mb-0">$ 5000</h4>
                     </div>
                     <p class="mb-1">Total Amount Earned by platform</p>
                 </div>
@@ -53,7 +53,7 @@
                         <div class="avatar me-2">
                             <span class="avatar-initial rounded bg-label-primary"><i class="bx bx-coin-stack"></i></span>
                         </div>
-                        <h4 class="ms-1 mb-0">1500</h4>
+                        <h4 class="ms-1 mb-0">$ 1500</h4>
                     </div>
                     <p class="mb-1">Total Amount distributed as winnings</p>
                 </div>
@@ -83,7 +83,7 @@
         <div class="col-md-9 col-lg-9 order-2 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title m-0 me-2">Monthly Predictions User Result</h5>
+                    <h5 class="card-title m-0 me-2">Yearly Winners' Graphs</h5>
                 </div>
                 <div class="card-body">
                     <div id="monthlyprediction"></div>
@@ -94,7 +94,7 @@
         <div class="col-md-12 col-lg-12 order-2 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title m-0 me-2">User Registration</h5>
+                    <h5 class="card-title m-0 me-2">Yearly User Registrations</h5>
                 </div>
                 <div class="card-body">
                     <div id="userchart"></div>
@@ -153,7 +153,7 @@
             toolbar: { show: false }
         },
         xaxis: { categories: monthjson },
-        yaxis: { title: { text: "Users" } },
+        yaxis: { title: { text: "Registered Users" } },
         tooltip: {
             y: {
                 formatter: function (val) {
@@ -167,13 +167,13 @@
 
     var userChart = new ApexCharts(document.querySelector("#userchart"), {
         series: [{ name: 'Total Users', data: usertotaljson }],
-        chart: { type: 'bar', height: 350 },
+        chart: { type: 'bar', height: 300 , toolbar: { show: false }},
         xaxis: { categories: usermonthjson },
-        yaxis: { title: { text: 'Total User' } },
+        yaxis: { title: { text: 'Registered Users' } },
         tooltip: {
             y: {
                 formatter: function (val) {
-                    return "$ " + val + " thousands";
+                    return val;
                 },
             },
         },

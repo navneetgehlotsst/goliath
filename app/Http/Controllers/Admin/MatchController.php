@@ -21,7 +21,14 @@ class MatchController extends Controller
 {
     public function index($cId)
     {
-        $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)->get();
+        $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)->orderByRaw("CASE
+                WHEN status = 'Live' THEN 1
+                WHEN status = 'Scheduled' THEN 2
+                WHEN status = 'Completed' THEN 3
+                WHEN status = 'Cancelled' THEN 4
+                ELSE 5
+            END")
+            ->get();
         return view('admin.matches.index', compact('CompetitionMatchData'));
     }
 
@@ -152,10 +159,25 @@ class MatchController extends Controller
     public function matchQuestion($overid){
 
         try {
-            $inningsQuestionsData = OverQuestions::select('over_questions.*','questions.question')->where('innings_over_id', $overid)->join('questions', 'over_questions.question_id', '=', 'questions.id')->get();
-            $questionList = Question::where('status','active')->where('type', 'supplementry')->get();
+            // Fetch OverQuestions data
+            $inningsQuestionsData = OverQuestions::where('innings_over_id', $overid)
+            ->get();
 
-            return view('admin.matches.questionchange', compact('inningsQuestionsData','questionList'));
+            // Extract question IDs from $inningsQuestionsData
+            $questionIdArray = $inningsQuestionsData->pluck('question_id')->all();
+
+            // Fetch questions corresponding to the extracted question IDs
+            $questionList = Question::where('status', 'active')
+            ->whereNotIn('id', $questionIdArray)
+            ->get();
+
+            // Load the question for each OverQuestions object
+            $inningsQuestionsData->load('loadquestion');
+
+            // Pass the data to the view
+            return view('admin.matches.questionchange', compact('inningsQuestionsData', 'questionList'));
+
+
         } catch (\Throwable $th) {
             dd($th);
         }

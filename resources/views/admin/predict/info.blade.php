@@ -93,7 +93,7 @@
                             </a>
                             @endforeach
                         @else
-                            <span>No Pridiction In this Innings</span>
+                            <span>No predictions were made for this innings</span>
                         @endif
                       </p>
                     </div>
@@ -114,10 +114,10 @@
                         <table id="getpredictUser" class="table table-bordered" style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th>Username</th>
-                                    <th>Prediction Correct Answer</th>
-                                    <th>Prediction Wrong Answer</th>
-                                    <th>Total Predict Questions</th>
+                                    <th>Player Name</th>
+                                    <th>Total Correct Predictions</th>
+                                    <th>Incorrect Predictions</th>
+                                    <th>Total Predictions</th>
                                     <th>Prediction Result</th>
                                 </tr>
                             </thead>
@@ -201,7 +201,7 @@
                     } else {
                         // Hide user prediction section and alert if no data found
                         $userPrediction.addClass("d-none");
-                        alert('Match Prediction Result Not Found');
+                        alert('Prediction results not declared. Try later');
                     }
 
                     // Update the prediction text

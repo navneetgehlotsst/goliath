@@ -7,7 +7,7 @@
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
-        <span class="text-primary fw-light">Leaderboard(Prediction Winning)</span>
+        <span class="text-primary fw-light">Leaderboard(Position by total winnings)</span>
     </h5>
     <div class="row">
         <div class="col-xl-12">
@@ -31,7 +31,7 @@
                                     <tr>
                                         <th>Position</th>
                                         <th>Name</th>
-                                        <th>Prediction Winning</th>
+                                        <th>Total Winnings</th>
                                     </tr>
                                 </thead>
                                 <tbody class="table-border-bottom-0">
@@ -56,7 +56,7 @@
                                     <tr>
                                         <th>Position</th>
                                         <th>Name</th>
-                                        <th>Prediction Winning</th>
+                                        <th>Total Winnings</th>
                                     </tr>
                                 </thead>
                                 <tbody class="table-border-bottom-0">
@@ -81,7 +81,7 @@
                                     <tr>
                                         <th>Position</th>
                                         <th>Name</th>
-                                        <th>Prediction Winning</th>
+                                        <th>Total Winnings</th>
                                     </tr>
                                 </thead>
                                 <tbody class="table-border-bottom-0">

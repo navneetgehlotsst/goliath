@@ -10,7 +10,7 @@
 
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
-        <span class="text-primary fw-light">Matches Change Question</span>
+        <span class="text-primary fw-light">Change Question</span>
     </h5>
     <div class="row mb-5">
         <div class="col-12">
@@ -30,8 +30,8 @@
                                         @foreach ($inningsQuestionsData as $inningsQuestionsDatas )
                                             <tr>
                                                 <td>
-                                                    {{$inningsQuestionsDatas->question}}
-                                                    <input class="question" type="hidden" name="questionid" value="{{$inningsQuestionsDatas->question}}">
+                                                    {{$inningsQuestionsDatas->loadquestion->question}}
+                                                    <input class="question" type="hidden" name="questionid" value="{{$inningsQuestionsDatas->loadquestion->question}}">
                                                 </td>
                                                 <td><button type="button" class="btn btn-primary" onclick="changequestion(`{{$inningsQuestionsDatas->id}}`,`{{$inningsQuestionsDatas->question}}`)">Change Question</button></td>
                                             </tr>
@@ -61,7 +61,7 @@
               <div class="row">
                 <div class="col mb-3">
                   <input type="hidden" name="inningquestion" id="inningquestion" value="">
-                  <label for="questionList" class="form-label">Question List</label>
+                  <label for="questionList" class="form-label">Available Supplement Questions</label>
                   <select id="questionList" name="questionid" class="form-select form-select-sm" required>
                     <option>Select Question</option>
                     @foreach ($questionList as $questionLists)

@@ -17,11 +17,11 @@
                         <table class="table table-bordered" id="competitionTable">
                             <thead>
                                 <tr>
-                                    <th>Competition id</th>
-                                    <th>Competitions Name</th>
+                                    <th>Competition ID</th>
+                                    <th>Competition Name</th>
                                     <th>Category</th>
                                     <th>Format</th>
-                                    <th>Date Start / Date End</th>
+                                    <th>Start Date / End Date</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>

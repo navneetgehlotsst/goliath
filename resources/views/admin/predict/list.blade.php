@@ -14,7 +14,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="row">
-                        <h6 class="text-primary fw-bold">Date Filter</h6>
+                        <h6 class="text-primary fw-bold">Filter predictions by date</h6>
                         <div class="col-md-6">
                             <input type="text" class="form-control" name="daterange" value="" />
                         </div>
@@ -86,7 +86,7 @@
                         render: (data, type, row) => {
                             const matchId = row.competition_match ? row.competition_match.match_id : '';
                             const detailUrl = `{{ route('admin.predict.info', ':id') }}`.replace(':id', matchId);
-                            return `<a href="${detailUrl}" class="btn btn-sm btn-primary">Match Detail</a>`;
+                            return `<a href="${detailUrl}" class="btn btn-sm btn-primary">Prediction Details</a>`;
                         }
                     }
                 ]

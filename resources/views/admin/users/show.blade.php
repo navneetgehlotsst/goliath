@@ -152,7 +152,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>Match</th>
-                                                    <th>Date/Time</th>
+                                                    <th>Match Date & Time</th>
                                                     <th>Teams</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -166,7 +166,7 @@
                                                     <tr>
                                                         <td>{{$match['competitionMatch']->match}}</td>
                                                         <td>{{$match['competitionMatch']->match_start_date}}/{{$match['competitionMatch']->match_start_time}}</td>
-                                                        <td><img class="teamlogo" src="{{$match['competitionMatch']->teama_img}}" alt=""> V/S <img class="teamlogo" src="{{$match['competitionMatch']->teamb_img}}" alt=""></td>
+                                                        <td><img class="predicted_match_logo" src="{{$match['competitionMatch']->teama_img}}" alt=""> V/S <img class="predicted_match_logo" src="{{$match['competitionMatch']->teamb_img}}" alt=""></td>
                                                         <td>
                                                             <a href="{{ route("admin.users.match.prediction", ['user' => $user->id, 'matchId' => $match['competitionMatch']->match_id]) }}" class="btn btn-sm btn-primary">Prediction Detail</a>
                                                         </td>

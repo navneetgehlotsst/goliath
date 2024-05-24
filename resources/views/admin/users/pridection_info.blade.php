@@ -86,7 +86,7 @@
                                 </a>
                             @endforeach
                         @else
-                            <span>No Pridiction In this Innings</span>
+                            <span>User made no predictions in this innings</span>
                         @endif
                       </p>
                     </div>

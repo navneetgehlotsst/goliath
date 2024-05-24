@@ -9,10 +9,11 @@
 	<div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
 		<!-- Search -->
 		<div class="navbar-nav align-items-center">
-			{{-- <div class="nav-item d-flex align-items-center text-primary">
-				<i class="bx bx-calendar fs-4 lh-0"></i>&nbsp;
-				<span class="">{{ date('D') }} {{ date('d M Y') }}</span>
-			</div> --}}
+			<div class="nav-item d-flex align-items-center text-primary">
+				{{-- <i class="bx bx-calendar fs-4 lh-0"></i>&nbsp;
+				<span class="">{{ date('D') }} {{ date('d M Y') }}</span> --}}
+                <a href="{{ url()->previous() }}"><i class='bx bx-arrow-back'></i></a>
+			</div>
 		</div>
 		<!-- /Search -->
 

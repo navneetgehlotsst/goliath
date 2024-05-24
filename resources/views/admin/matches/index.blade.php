@@ -14,6 +14,17 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive text-nowrap">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <select class="form-control" id="column-filter">
+                                    <option value="">Show All</option>
+                                    <option value="Live">Live</option>
+                                    <option value="Scheduled">Scheduled</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
                         <table class="table table-bordered" id="MatchesTable">
                             <thead>
                                 <tr>
@@ -64,6 +75,21 @@
     $('#MatchesTable').DataTable({
         processing: true,
         ordering: false
+    });
+    $(document).ready(function() {
+        var table = $('#MatchesTable').DataTable();
+
+        // Filter event handler
+        $('#column-filter').on('change', function() {
+            var selectedValue = $(this).val();
+
+            // Use DataTables search to filter the table
+            if (selectedValue) {
+                table.column(4).search('^' + selectedValue + '$', true, false).draw();
+            } else {
+                table.column(4).search('').draw();
+            }
+        });
     });
 </script>
 @endsection

@@ -161,13 +161,15 @@ class PredictedController extends Controller
 
         // Apply date range filter if provided
         if ($startDate && $endDate) {
-            // Convert start and end dates to appropriate format
-            $startDateTime = date('Y-m-d H:i:s', strtotime($startDate));
-            $endDateTime = date('Y-m-d H:i:s', strtotime($endDate));
+          // Convert start and end dates to appropriate format
+            $startDate = date('Y-m-d', strtotime($startDate));
+            $endDate = date('Y-m-d', strtotime($endDate));
 
-            $query->whereBetween('updated_at', [$startDateTime, $endDateTime]);
+            // Use whereDate clause to filter by date range
+            $query->whereDate('updated_at', '>=', $startDate)
+                ->whereDate('updated_at', '<=', $endDate);
+
         }
-
         // Paginate the results
         $predictions = $query->paginate(10);
 
