@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Notification;
 use App\Models\NotificationUser;
 use Carbon\Carbon;
-use Exception,Auth;
+use Mail,Hash,File,Auth,DB,Helper,Exception,Session,Redirect;
 
 class NotificationController extends Controller
 {

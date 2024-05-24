@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Mail,Hash,File,Auth,DB,Helper,Exception,Session,Redirect;
 use App\Models\{
     Competition,
 };

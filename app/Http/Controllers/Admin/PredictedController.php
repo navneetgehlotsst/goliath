@@ -13,12 +13,9 @@ use App\Models\{
     CompetitionMatches,
     Prediction
 };
-use Helper;
+use Mail,Hash,File,Auth,DB,Helper,Exception,Session,Redirect;
 
 use Carbon\Carbon;
-
-// use Illuminate\Support\Facades\DB;
-use DB;
 
 class PredictedController extends Controller
 {
