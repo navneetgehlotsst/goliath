@@ -23,6 +23,8 @@ class AdminUserController extends Controller
     //========================= User Member Funcations ========================//
 
     public function index() {
+        // Removing a value from the session
+        Session::forget('previousURL');
         $users = User::where('role', 'user')->orderBy('id', 'desc')->get();
         return view('admin.users.index',compact('users'));
     }

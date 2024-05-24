@@ -120,6 +120,8 @@ class PredictedController extends Controller
     public function pridictedUser(Request $request)
     {
         try {
+                // Removing a value from the session
+                Session::forget('previousURL');
                 $overid = $request->overid;
                 $matchid = $request->matchid;
 
@@ -144,6 +146,8 @@ class PredictedController extends Controller
 
     public function pridictedlist()
     {
+        // Removing a value from the session
+        Session::forget('previousURL');
         return view('admin.predict.list');
     }
 

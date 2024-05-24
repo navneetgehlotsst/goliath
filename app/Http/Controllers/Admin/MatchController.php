@@ -23,11 +23,16 @@ class MatchController extends Controller
 {
     public function index($cId)
     {
-        // Retrieve the previous URL
-        $previousURL = url()->previous();
 
-        // Storing a value in the session
-        Session::put('previousURL', $previousURL);
+        if (session()->has('previousURL')) {
+            $previousURL = session()->get('previousURL');
+        }else{
+            // Retrieve the previous URL
+            $previousURL = url()->previous();
+
+            // Storing a value in the session
+            Session::put('previousURL', $previousURL);
+        }
         $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)->orderByRaw("CASE
                 WHEN status = 'Live' THEN 1
                 WHEN status = 'Scheduled' THEN 2

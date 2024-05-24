@@ -17,6 +17,8 @@ class LeaderboardController extends Controller
 {
     public function leaderboardlist()
     {
+        // Removing a value from the session
+        Session::forget('previousURL');
         // Get the current date, month, and year
         $currentDate = Carbon::today();
         $currentMonth = $currentDate->format('m');

@@ -276,6 +276,8 @@ class AdminAuthController extends Controller
 
     public function adminDashboard()
     {
+        // Removing a value from the session
+        Session::forget('previousURL');
         // User count Query
         $userCount =  User::where('status', 'active')->where('role', 'user')->count();
 
@@ -300,6 +302,9 @@ class AdminAuthController extends Controller
         $monthpredicted = [];
         $currentDate = now();
 
+        // Initialize Year Array
+        $yearsData = [];
+
         // Loop through the last 12 months
         for ($i = 0; $i < 12; $i++) {
             $monthYear = $currentDate->copy()->subMonths($i)->format('Y-m');
@@ -308,6 +313,7 @@ class AdminAuthController extends Controller
             $monthlypredicteduser = Prediction::select(
                 'user_id',
                 'over_id',
+                DB::raw('YEAR(created_at) AS Year'),
                 DB::raw('MONTHNAME(created_at) AS Month'),
                 DB::raw('SUM(IF(result = "W", 1, 0)) AS win_count')
             )
@@ -317,6 +323,7 @@ class AdminAuthController extends Controller
             ->groupBy('user_id', 'over_id')
             ->get();
 
+
             // Initialize counters
             $total_golith_winner = 0;
             $total_winner = 0;
@@ -324,6 +331,10 @@ class AdminAuthController extends Controller
 
             // Count the types of predictions
             foreach ($monthlypredicteduser as $predictedvalue) {
+                if (!in_array($predictedvalue->Year, $yearsData)) {
+                    // If not present, add the value
+                    $yearsData[] = $predictedvalue->Year;
+                }
                 if($predictedvalue->win_count == 8) {
                     $total_golith_winner++;
                 } elseif ($predictedvalue->win_count < 8 && $predictedvalue->win_count >= 5) {
@@ -406,7 +417,7 @@ class AdminAuthController extends Controller
         $usertotaljson = json_encode($user_resitertion);
 
         // Pass data to the view
-        return view("admin.dashboard.index" , compact('userCount','predictcount','latestPredictions','monthjson','golithwinnerjson','winnerjson','loserjson','usermonthjson','usertotaljson'));
+        return view("admin.dashboard.index" , compact('userCount','predictcount','latestPredictions','monthjson','golithwinnerjson','winnerjson','loserjson','usermonthjson','usertotaljson','yearsData'));
 
     }
 

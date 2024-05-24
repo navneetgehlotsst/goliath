@@ -15,6 +15,8 @@ class QuestionsController extends Controller
 {
     public function index()
     {
+        // Removing a value from the session
+        Session::forget('previousURL');
         return view('admin.questions.index');
     }
 

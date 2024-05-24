@@ -13,8 +13,10 @@ use Exception,Auth;
 class NotificationController extends Controller
 {
     public function index(){
-                                 
+
         try{
+            // Removing a value from the session
+            Session::forget('previousURL');
             $user = Auth::user();
             $user_notifications = NotificationUser::where('user_id',$user->id)->pluck('notification_id')->toArray();
             $notifications = Notification::select('*','id as uuid')->whereIn('id',$user_notifications)->orderBy('created_at', 'desc')->paginate(10);

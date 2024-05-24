@@ -86,6 +86,16 @@
                     <h5 class="card-title m-0 me-2">Yearly Winners' Graphs</h5>
                 </div>
                 <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <select class="form-select" aria-label="Default select example">
+                                <option selected>Select Year</option>
+                                @foreach ( $yearsData as $year)
+                                    <option value="{{$year}}">{{$year}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                     <div id="monthlyprediction"></div>
                 </div>
             </div>

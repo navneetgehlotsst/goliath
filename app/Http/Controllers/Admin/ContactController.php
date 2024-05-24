@@ -15,6 +15,8 @@ class ContactController extends Controller
 {
     public function index()
     {
+        // Removing a value from the session
+        Session::forget('previousURL');
         return view('admin.contacts.index');
     }
 
@@ -26,13 +28,13 @@ class ContactController extends Controller
 
     public function contactUsSubmit(Request $request)
     {
-        
+
         $request->validate([
-            'name' => 'required', 
-            'email' => 'required|email', 
+            'name' => 'required',
+            'email' => 'required|email',
             'message' => 'required'
         ]);
-        
+
         try {
             //======================== Submit Feedback   ===============//
             $contact = new Contact();
