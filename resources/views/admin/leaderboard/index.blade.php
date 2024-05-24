@@ -39,11 +39,13 @@
                                         $dalysn = 1;
                                     @endphp
                                     @foreach ($topDailyPredictions as $dailyPredictiondata)
-                                        <tr>
-                                            <td>{{$dalysn++}}</td>
-                                            <td>{{$dailyPredictiondata['name']}}</td>
-                                            <td>{{$dailyPredictiondata['total_winning']}}</td>
-                                        </tr>
+                                        @if ($dailyPredictiondata['total_winning'] != 0)
+                                            <tr>
+                                                <td>{{$dalysn++}}</td>
+                                                <td>{{$dailyPredictiondata['name']}}</td>
+                                                <td>{{$dailyPredictiondata['total_winning']}}</td>
+                                            </tr>
+                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>
@@ -64,11 +66,13 @@
                                         $monthsn = 1;
                                     @endphp
                                     @foreach ($topMonthlyPredictions as $topMonthlyPrediction)
-                                        <tr>
-                                            <td>{{$monthsn++}}</td>
-                                            <td>{{$topMonthlyPrediction['name']}}</td>
-                                            <td>{{$topMonthlyPrediction['total_winning']}}</td>
-                                        </tr>
+                                        @if ($topMonthlyPrediction['total_winning'] != 0)
+                                            <tr>
+                                                <td>{{$monthsn++}}</td>
+                                                <td>{{$topMonthlyPrediction['name']}}</td>
+                                                <td>{{$topMonthlyPrediction['total_winning']}}</td>
+                                            </tr>
+                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>
@@ -89,11 +93,13 @@
                                         $yealysn = 1;
                                     @endphp
                                     @foreach ($topYearlyPredictions as $topYearlyPrediction)
-                                        <tr>
-                                            <td>{{$yealysn++}}</td>
-                                            <td>{{$topYearlyPrediction['name']}}</td>
-                                            <td>{{$topYearlyPrediction['total_winning']}}</td>
-                                        </tr>
+                                        @if ($topYearlyPrediction['total_winning'] != 0)
+                                            <tr>
+                                                <td>{{$yealysn++}}</td>
+                                                <td>{{$topYearlyPrediction['name']}}</td>
+                                                <td>{{$topYearlyPrediction['total_winning']}}</td>
+                                            </tr>
+                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>
