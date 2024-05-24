@@ -6,8 +6,11 @@
 @endsection
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
-    <h5 class="py-2 mb-2">
+    {{-- <h5 class="py-2 mb-2">
         <span class="text-primary fw-light">All Platform Transactions</span>
+    </h5> --}}
+    <h5 class="py-3 mb-4">
+        <span class="text-muted fw-light"><a href="{{route('admin.dashboard')}}">Home</a> / </span> All Platform Transactions
     </h5>
     <div class="row">
         <div class="col-xl-12 col-lg-12">
