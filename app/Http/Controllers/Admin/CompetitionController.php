@@ -31,7 +31,7 @@ class CompetitionController extends Controller
     public function upcoming()
     {
         $CompetitionLiveData = Competition::where('status','upcoming')->get();
-        $titel = "Upconing";
+        $titel = "Upcoming";
         return view('admin.competition.index',compact('CompetitionLiveData','titel'));
     }
 }

@@ -6,8 +6,8 @@
 @endsection
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
-    <h5 class="py-2 mb-2">
-        <span class="text-primary fw-light">Match Info</span>
+    <h5 class="py-3 mb-4">
+        <span class="text-muted fw-light"><a href="{{route('admin.dashboard')}}">Home</a> / <a href="{{ $previousURL }}">Competitions</a> /  <a href="{{ route('admin.match.index', $transformedMatch['matchdetail']['competition_id']) }}">Matches</a> / </span> Match Info
     </h5>
     <div class="row mb-5">
         <div class="col-md-12 col-lg-12">

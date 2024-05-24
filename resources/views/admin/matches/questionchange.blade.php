@@ -9,8 +9,11 @@
 
 
 <div class="container-fluid flex-grow-1 container-p-y">
-    <h5 class="py-2 mb-2">
+    {{-- <h5 class="py-2 mb-2">
         <span class="text-primary fw-light">Change Question</span>
+    </h5> --}}
+    <h5 class="py-3 mb-4">
+        <span class="text-muted fw-light"><a href="{{route('admin.dashboard')}}">Home</a> / <a href="{{ $previousURL }}">Competitions</a> /  <a href="{{ route('admin.match.index', $competiton_id) }}">Matches</a> / <a href="{{ route('admin.match.info', $match_id ) }}">Match Info</a> / </span> Change Question
     </h5>
     <div class="row mb-5">
         <div class="col-12">

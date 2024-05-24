@@ -17,10 +17,17 @@ use Helper;
 
 use Carbon\Carbon;
 
+use Illuminate\Support\Facades\Session;
+
 class MatchController extends Controller
 {
     public function index($cId)
     {
+        // Retrieve the previous URL
+        $previousURL = url()->previous();
+
+        // Storing a value in the session
+        Session::put('previousURL', $previousURL);
         $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)->orderByRaw("CASE
                 WHEN status = 'Live' THEN 1
                 WHEN status = 'Scheduled' THEN 2
@@ -29,13 +36,16 @@ class MatchController extends Controller
                 ELSE 5
             END")
             ->get();
-        return view('admin.matches.index', compact('CompetitionMatchData'));
+        return view('admin.matches.index', compact('CompetitionMatchData','previousURL'));
     }
 
     public function matchInfo($id)
     {
 
         try {
+
+            // Retrieving a value from the session
+            $previousURL = Session::get('previousURL');
 
              // Fetching match data
             $datamatches = CompetitionMatches::where('match_id', $id)->first();
@@ -148,7 +158,7 @@ class MatchController extends Controller
                 ];
             }
 
-            return view('admin.matches.info', compact('transformedMatch'));
+            return view('admin.matches.info', compact('transformedMatch','previousURL'));
 
         } catch (\Throwable $th) {
             dd($th);
@@ -159,10 +169,21 @@ class MatchController extends Controller
     public function matchQuestion($overid){
 
         try {
+            // Retrieving a value from the session
+            $previousURL = Session::get('previousURL');
             // Fetch OverQuestions data
             $inningsQuestionsData = OverQuestions::where('innings_over_id', $overid)
             ->get();
+            // Get InningsOver
+            $InningsOverData = InningsOver::where('id', $overid)->first();
 
+            // Get MatchInnings
+            $MatchInningsData = MatchInnings::where('id', $InningsOverData->match_innings_id)->first();
+
+            // Get CompetitionMatches
+            $CompetitionMatchesData = CompetitionMatches::where('match_id', $MatchInningsData->match_id)->first();
+            $competiton_id = $CompetitionMatchesData->competiton_id;
+            $match_id = $MatchInningsData->match_id;
             // Extract question IDs from $inningsQuestionsData
             $questionIdArray = $inningsQuestionsData->pluck('question_id')->all();
 
@@ -174,8 +195,9 @@ class MatchController extends Controller
             // Load the question for each OverQuestions object
             $inningsQuestionsData->load('loadquestion');
 
+
             // Pass the data to the view
-            return view('admin.matches.questionchange', compact('inningsQuestionsData', 'questionList'));
+            return view('admin.matches.questionchange', compact('inningsQuestionsData', 'questionList','previousURL','competiton_id','match_id'));
 
 
         } catch (\Throwable $th) {
