@@ -6,11 +6,14 @@
         max-height: 500px;
     }
 </style>
-@endsection  
+@endsection
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
-    <h5 class="py-2 mb-2">
+    {{-- <h5 class="py-2 mb-2">
         <span class="text-primary fw-light">Pages</span>
+    </h5> --}}
+    <h5 class="py-3 mb-4">
+        <span class="text-muted fw-light"><a href="{{route('admin.dashboard')}}">Home</a> / <a href="">Pages</a></span> {{$page->name}}
     </h5>
     <div class="row">
         <div class="col-xl-12 col-lg-12">
@@ -32,11 +35,11 @@
                                 <button type="submit" class="btn btn-primary">Save</button>
                             </div>
                         </div>
-                    </form>                
+                    </form>
                 </div>
             </div>
         </div>
-       
+
     </div>
 </div>
 @endsection
@@ -72,7 +75,7 @@ $("form").submit(function(e) {
                 setFlesh('error','There is some problem to create or update page!Please contact to your server adminstrator');
             }
         }
-    });       
+    });
 });
 </script>
 @endsection
