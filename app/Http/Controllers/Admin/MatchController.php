@@ -171,38 +171,49 @@ class MatchController extends Controller
     }
 
     public function matchQuestion($overid){
-
         try {
             // Retrieving a value from the session
             $previousURL = Session::get('previousURL');
-            // Fetch OverQuestions data
-            $inningsQuestionsData = OverQuestions::where('innings_over_id', $overid)
-            ->get();
-            // Get InningsOver
-            $InningsOverData = InningsOver::where('id', $overid)->first();
 
-            // Get MatchInnings
-            $MatchInningsData = MatchInnings::where('id', $InningsOverData->match_innings_id)->first();
+            // Fetch OverQuestions data for the given over ID
+            $inningsQuestionsData = OverQuestions::where('innings_over_id', $overid)->get();
 
-            // Get CompetitionMatches
-            $CompetitionMatchesData = CompetitionMatches::where('match_id', $MatchInningsData->match_id)->first();
+            // If there are no OverQuestions data, handle it gracefully
+            if ($inningsQuestionsData->isEmpty()) {
+                // Redirect or return an error view if needed
+                return redirect()->back()->with('error', 'No data found for the given over ID');
+            }
+
+            // Get the first InningsOver and related MatchInnings and CompetitionMatches data in a single query
+            $InningsOverData = InningsOver::with(['matchInnings' => function($query) {
+                $query->with('competitionMatch');
+            }])->where('id', $overid)->first();
+
+            // Check if InningsOverData exists
+            if (!$InningsOverData) {
+                // Redirect or return an error view if needed
+                return redirect()->back()->with('error', 'No InningsOver data found');
+            }
+
+            // Extract the nested data
+            $MatchInningsData = $InningsOverData->matchInnings;
+            $CompetitionMatchesData = $MatchInningsData->competitionMatch;
             $competiton_id = $CompetitionMatchesData->competiton_id;
             $match_id = $MatchInningsData->match_id;
+
             // Extract question IDs from $inningsQuestionsData
             $questionIdArray = $inningsQuestionsData->pluck('question_id')->all();
 
-            // Fetch questions corresponding to the extracted question IDs
+            // Fetch active questions that are not in the extracted question IDs
             $questionList = Question::where('status', 'active')
-            ->whereNotIn('id', $questionIdArray)
-            ->get();
+                ->whereNotIn('id', $questionIdArray)
+                ->get();
 
-            // Load the question for each OverQuestions object
+            // Load the related 'loadquestion' for each OverQuestions object efficiently
             $inningsQuestionsData->load('loadquestion');
 
-
             // Pass the data to the view
-            return view('admin.matches.questionchange', compact('inningsQuestionsData', 'questionList','previousURL','competiton_id','match_id'));
-
+            return view('admin.matches.questionchange', compact('inningsQuestionsData', 'questionList', 'previousURL', 'competiton_id', 'match_id'));
 
         } catch (\Throwable $th) {
             dd($th);
