@@ -34,9 +34,9 @@ class PageController extends Controller
      */
     public function create($key)
     {
-        // Removing a value from the session
-        Session::forget('previousURL');
         try{
+            // Removing a value from the session
+            Session::forget('previousURL');
             $page = Page::where('key',$key)->first();
             return view('admin.pages.create',compact('page'));
         }catch(Exception $e){

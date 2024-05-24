@@ -22,30 +22,33 @@ class MatchController extends Controller
 {
     public function index($cId)
     {
+        try {
+            if (session()->has('previousURL')) {
+                $previousURL = session()->get('previousURL');
+            }else{
+                // Retrieve the previous URL
+                $previousURL = url()->previous();
 
-        if (session()->has('previousURL')) {
-            $previousURL = session()->get('previousURL');
-        }else{
-            // Retrieve the previous URL
-            $previousURL = url()->previous();
-
-            // Storing a value in the session
-            Session::put('previousURL', $previousURL);
+                // Storing a value in the session
+                Session::put('previousURL', $previousURL);
+            }
+            $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)->orderByRaw("CASE
+                    WHEN status = 'Live' THEN 1
+                    WHEN status = 'Scheduled' THEN 2
+                    WHEN status = 'Completed' THEN 3
+                    WHEN status = 'Cancelled' THEN 4
+                    ELSE 5
+                END")
+                ->get();
+            return view('admin.matches.index', compact('CompetitionMatchData','previousURL'));
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th);
         }
-        $CompetitionMatchData = CompetitionMatches::where('competiton_id', $cId)->orderByRaw("CASE
-                WHEN status = 'Live' THEN 1
-                WHEN status = 'Scheduled' THEN 2
-                WHEN status = 'Completed' THEN 3
-                WHEN status = 'Cancelled' THEN 4
-                ELSE 5
-            END")
-            ->get();
-        return view('admin.matches.index', compact('CompetitionMatchData','previousURL'));
     }
 
     public function matchInfo($id)
     {
-
         try {
 
             // Retrieving a value from the session

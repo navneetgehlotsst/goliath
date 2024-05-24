@@ -17,35 +17,40 @@ class LeaderboardController extends Controller
 {
     public function leaderboardlist()
     {
-        // Removing a value from the session
-        Session::forget('previousURL');
-        // Get the current date, month, and year
-        $currentDate = Carbon::today();
-        $currentMonth = $currentDate->format('m');
-        $currentYear = $currentDate->format('Y');
+        try {
+            // Removing a value from the session
+            Session::forget('previousURL');
+            // Get the current date, month, and year
+            $currentDate = Carbon::today();
+            $currentMonth = $currentDate->format('m');
+            $currentYear = $currentDate->format('Y');
 
-        // Initialize arrays for storing predictions
-        $dailyPrediction = [];
-        $monthlyPrediction = [];
-        $yearlyPrediction = [];
+            // Initialize arrays for storing predictions
+            $dailyPrediction = [];
+            $monthlyPrediction = [];
+            $yearlyPrediction = [];
 
-        // Fetch active users with the role 'user'
-        $activeUsers = User::where('status', 'active')->where('role', 'user')->get();
+            // Fetch active users with the role 'user'
+            $activeUsers = User::where('status', 'active')->where('role', 'user')->get();
 
-        foreach ($activeUsers as $user) {
-            // Fetch and process daily predictions
-            $dailyPrediction[$user->id] = $this->processPredictions($user->id, $currentDate, 'daily');
-            // Fetch and process monthly predictions
-            $monthlyPrediction[$user->id] = $this->processPredictions($user->id, $currentYear, 'monthly', $currentMonth);
-            // Fetch and process yearly predictions
-            $yearlyPrediction[$user->id] = $this->processPredictions($user->id, $currentYear, 'yearly');
+            foreach ($activeUsers as $user) {
+                // Fetch and process daily predictions
+                $dailyPrediction[$user->id] = $this->processPredictions($user->id, $currentDate, 'daily');
+                // Fetch and process monthly predictions
+                $monthlyPrediction[$user->id] = $this->processPredictions($user->id, $currentYear, 'monthly', $currentMonth);
+                // Fetch and process yearly predictions
+                $yearlyPrediction[$user->id] = $this->processPredictions($user->id, $currentYear, 'yearly');
+            }
+
+            // Sort and limit the predictions to the top 10 entries
+            $topDailyPredictions = $this->getTopPredictions($dailyPrediction);
+            $topMonthlyPredictions = $this->getTopPredictions($monthlyPrediction);
+            $topYearlyPredictions = $this->getTopPredictions($yearlyPrediction);
+            return view('admin.leaderboard.index',compact('topDailyPredictions','topMonthlyPredictions','topYearlyPredictions'));
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th);
         }
-
-        // Sort and limit the predictions to the top 10 entries
-        $topDailyPredictions = $this->getTopPredictions($dailyPrediction);
-        $topMonthlyPredictions = $this->getTopPredictions($monthlyPrediction);
-        $topYearlyPredictions = $this->getTopPredictions($yearlyPrediction);
-        return view('admin.leaderboard.index',compact('topDailyPredictions','topMonthlyPredictions','topYearlyPredictions'));
     }
 
 

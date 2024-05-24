@@ -150,37 +150,42 @@ class PredictedController extends Controller
 
     public function getallpridicted(Request $request)
     {
-        // Retrieve start and end date parameters from the request
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        try {
+            // Retrieve start and end date parameters from the request
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
 
-        // Base query
-        $query = Prediction::with('competitionMatch')
-            ->groupBy('predictions.match_id')
-            ->where('status', 'complete')
-            ->orderBy('updated_at', 'desc');
+            // Base query
+            $query = Prediction::with('competitionMatch')
+                ->groupBy('predictions.match_id')
+                ->where('status', 'complete')
+                ->orderBy('updated_at', 'desc');
 
-        // Apply date range filter if provided
-        if ($startDate && $endDate) {
-          // Convert start and end dates to appropriate format
-            $startDate = date('Y-m-d', strtotime($startDate));
-            $endDate = date('Y-m-d', strtotime($endDate));
+            // Apply date range filter if provided
+            if ($startDate && $endDate) {
+            // Convert start and end dates to appropriate format
+                $startDate = date('Y-m-d', strtotime($startDate));
+                $endDate = date('Y-m-d', strtotime($endDate));
 
-            // Use whereDate clause to filter by date range
-            $query->whereDate('updated_at', '>=', $startDate)
-                ->whereDate('updated_at', '<=', $endDate);
+                // Use whereDate clause to filter by date range
+                $query->whereDate('updated_at', '>=', $startDate)
+                    ->whereDate('updated_at', '<=', $endDate);
 
+            }
+            // Paginate the results
+            $predictions = $query->paginate(10);
+
+            // Return JSON response with pagination information
+            return response()->json([
+                'draw' => $request->input('draw'),
+                'recordsTotal' => $predictions->total(),
+                'recordsFiltered' => $predictions->total(),
+                'data' => $predictions->items()
+            ]);
+        } catch (\Throwable $th) {
+            dd($th);
+            return response()->json(['status' => false, 'data' => $th->message]);
         }
-        // Paginate the results
-        $predictions = $query->paginate(10);
-
-        // Return JSON response with pagination information
-        return response()->json([
-            'draw' => $request->input('draw'),
-            'recordsTotal' => $predictions->total(),
-            'recordsFiltered' => $predictions->total(),
-            'data' => $predictions->items()
-        ]);
     }
 
 

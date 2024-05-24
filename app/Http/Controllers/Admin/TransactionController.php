@@ -21,7 +21,12 @@ class TransactionController extends Controller
     }
 
     public function getalltransaction(Request $request){
-        $transactions = Transaction::select('transactions.id','transactions.user_id','transactions.amount','transactions.transaction_id','transactions.transaction_type','users.full_name')->join('users', 'transactions.user_id', '=', 'users.id')->orderBy('id','desc')->get();
-        return response()->json(['data' => $transactions]);
+        try {
+            $transactions = Transaction::select('transactions.id','transactions.user_id','transactions.amount','transactions.transaction_id','transactions.transaction_type','users.full_name')->join('users', 'transactions.user_id', '=', 'users.id')->orderBy('id','desc')->get();
+            return response()->json(['data' => $transactions]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            dd($th);
+        }
     }
 }
