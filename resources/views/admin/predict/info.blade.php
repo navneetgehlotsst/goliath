@@ -65,6 +65,8 @@
                                     <span class="badge bg-label-secondary">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @elseif ($transformedMatch['matchdetail']['status'] == 'Completed')
                                     <span class="badge bg-label-success">{{$transformedMatch['matchdetail']['status']}}</span>
+                                @elseif ($transformedMatch['matchdetail']['status'] == 'Live')
+                                    <span class="badge bg-label-success">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @else
                                     <span class="badge bg-label-danger">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @endif
