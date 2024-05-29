@@ -51,7 +51,7 @@
                 data: "full_name",
             },
             {
-                data: "transaction_id",
+                data: "payment_id",
             },
             {
                 data: "amount",

@@ -597,36 +597,40 @@ class AuthController extends Controller
 
     public function addWallet(Request $request){
         $data   =   $request->all();
-        $id = auth()->user()->id;
+        $userId = auth()->user()->id;
 
         $validator = Validator::make($data, [
-            'wallet' => 'required|string',
+            'amount' => "required|integer|between:1,10000",
+        ],[
+            'amount.required'   =>  "Please enter amount between ".env('CURRENCY_SYMBOL')."1 to ".env('CURRENCY_SYMBOL')."100000",
+            'amount.integer'    =>  "Enter a valid amount between ".env('CURRENCY_SYMBOL')."1 to ".env('CURRENCY_SYMBOL')."100000"
         ]);
-
 
         if($validator->fails()) {
             $message = $validator->errors()->first();
             return ApiResponse::errorResponse($message);
         }
 
-
         try{
-            $amount = $request->wallet;
-            User::where('id', $id)->increment('wallet', $amount);
+            $amount = $request->amount;
+            User::where('id', $userId)->increment('wallet', $amount);
 
             $datatran = [
-                'user_id' => $id,
+                'user_id' => $userId,
                 'amount' =>  $amount,
-                'transaction_id' =>  "mCQF63epGk",
-                'transaction_type' => "add-wallet",
+                'payment_id' =>  rand(000001,999999),
+                'transaction_type' => "wallet",
                 'payment_mode' => "credit"
             ];
 
             Transaction::create($datatran);
 
-            $message = 'Amount Added successfully.';
-            return ApiResponse::successResponsenoData($message);
+            $availableWalletBalance = User::where('id', $userId)->value('wallet');
 
+            $message = 'Amount Added successfully.';
+            $resData = ['wallet_balance'=>$availableWalletBalance, 'wallet_balance_show'=>env("CURRENCY_SYMBOL").$availableWalletBalance, 'currency_symbol'=>env("CURRENCY_SYMBOL")];
+
+            return ApiResponse::successResponse($resData,$message);
         }catch(Exception $e){
             $message = $e->getMessage();
             return ApiResponse::errorResponse($message);

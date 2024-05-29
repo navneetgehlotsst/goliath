@@ -18,6 +18,7 @@
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
+                                    <th>Wallet</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -28,6 +29,7 @@
                                         <td>{{$user->full_name}}</td>
                                         <td>{{$user->email ?? '-'}}</td>
                                         <td>{{$user->phone ?? '-'}}</td>
+                                        <td>{{$user->wallet ?? '0'}}</td>
                                         <td>
                                             @if($user->status == "active")
                                                 <span class="badge bg-label-success me-1">Active</span>

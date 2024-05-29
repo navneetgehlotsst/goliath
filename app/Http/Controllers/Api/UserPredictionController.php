@@ -28,8 +28,7 @@ use App\Http\Response\ApiResponse;
 
 class UserPredictionController extends Controller
 {
-    private $token = 'dbe24b73486a731d9fa8aab6c4be02ef';
-
+    
     private function makeCurlRequest($url)
     {
         $curl = curl_init();
@@ -79,10 +78,10 @@ class UserPredictionController extends Controller
             }
 
             // Check wallet balance (if needed)
-            // $payAmount = env('BETING_AMOUNT');
-            // if ($userWallet < $payAmount) {
-            //     return ApiResponse::errorResponse("Your Wallet balance is insufficient");
-            // }
+            $payAmount = env('BETING_AMOUNT');
+            if ($userWallet < $payAmount) {
+                return ApiResponse::errorResponse("Your Wallet balance is insufficient",['is_wallet_recharge'=>true]);
+            }
 
             // Get innings data
             $innings = MatchInnings::where('match_id', $matchId)->where('innings', $match->live_innings)->first();
@@ -101,16 +100,14 @@ class UserPredictionController extends Controller
 
             // Iterate over question answers
             foreach ($questionAns as $question) {
-                $existingQuestion = OverQuestions::where('innings_over_id', $overId)
-                                                ->where('question_id', $question['question_id'])
-                                                ->exists();
-
+                
                 if($question['answere'] == 1){
                     $answer = "true";
                 }else{
                     $answer = "false";
                 }
-
+                
+                $existingQuestion = OverQuestions::where('innings_over_id', $overId)->where('question_id', $question['question_id'])->exists();
                 if ($existingQuestion) {
                     Prediction::create([
                         'user_id' => $userId,
@@ -392,6 +389,10 @@ class UserPredictionController extends Controller
         }
 
     }
+
+
+
+
 
     public function testresult()
     {

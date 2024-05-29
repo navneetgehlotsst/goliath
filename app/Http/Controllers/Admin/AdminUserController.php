@@ -14,7 +14,8 @@ use App\Models\{
     NotificationUser,
     Prediction,
     CompetitionMatches,
-    Transaction
+    Transaction,
+    Winning
 
 };
 
@@ -61,53 +62,51 @@ class AdminUserController extends Controller
     }
 
     public function show($id) {
-        try
-        {
-            $user = User::find($id);
-            if(!$user) {
-                return redirect()->route('admin.users.index')->withError('User not found!');
-            }
+        try {
+            // Retrieve user and handle the case where user is not found
+            $user = User::findOrFail($id);
 
-            $datamatches = Prediction::with(['competitionMatch'])
+            // Retrieve predictions with eager loading and pagination
+            $datamatches = Prediction::with('competitionMatch')
                 ->where('user_id', $id)
                 ->groupBy('match_id')
                 ->paginate(10);
 
-            $transactions = Transaction::select('id', 'user_id', 'amount', 'transaction_id', 'transaction_type')
+            // Retrieve transactions and calculate totals using SQL
+            $transactions = Transaction::select('id', 'user_id', 'amount', 'payment_id', 'transaction_type', 'created_at')
                 ->where('user_id', $id)
                 ->orderBy('id', 'desc')
                 ->get();
 
             $transactionscount = $transactions->count();
 
-            $transactionTypes = [
+            // Calculate transaction types totals
+            $transactionTypes = Transaction::where('user_id', $id)
+                ->selectRaw('transaction_type, SUM(amount) as total')
+                ->groupBy('transaction_type')
+                ->pluck('total', 'transaction_type')
+                ->toArray();
+
+            // Ensure all keys are present in the $transactionTypes array
+            $transactionTypes = array_merge([
                 'add-wallet' => 0,
                 'pay' => 0,
                 'winning-amount' => 0,
                 'withdrawal-amount' => 0
-            ];
+            ], $transactionTypes);
 
-            foreach ($transactions as $transaction) {
-                switch ($transaction->transaction_type) {
-                    case 'add-wallet':
-                        $transactionTypes['add-wallet'] += $transaction->amount;
-                        break;
-                    case 'pay':
-                        $transactionTypes['pay'] += $transaction->amount;
-                        break;
-                    case 'winning-amount':
-                        $transactionTypes['winning-amount'] += $transaction->amount;
-                        break;
-                    case 'withdrawal-amount':
-                        $transactionTypes['withdrawal-amount'] += $transaction->amount;
-                        break;
-                }
-            }
+            // Retrieve winnings with eager loading
+            $datawinning = Winning::with(['competitionMatch', 'inningsOvers'])
+                ->where('user_id', $id)
+                ->get();
 
-            return view('admin.users.show', compact('user', 'datamatches', 'transactions', 'transactionTypes', 'transactionscount'));
+            // Return the view with the compacted data
+            return view('admin.users.show', compact('user', 'datamatches', 'transactions', 'transactionTypes', 'transactionscount', 'datawinning'));
 
-        }catch(Exception $e){
-            return back()->withError($e->getMessage());
+        } catch (Exception $e) {
+            // Log the exception message for debugging purposes
+            Log::error('Error fetching user data: ' . $e->getMessage());
+            return back()->withError('An error occurred while fetching user data.');
         }
     }
 

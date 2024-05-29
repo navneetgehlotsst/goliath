@@ -69,9 +69,15 @@
                         data: null,
                         render: (data, type, row) => {
                             console.log('Row data:', row);  // Log row data to debug
-                            return `<img src="${row.competition_match.teama_img}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="${row.competition_match.teama_name}" />
+                            return `<figure class="figure" style="width: 100px;">
+                                        <img src="${row.competition_match.teama_img}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
+                                        <figcaption class="figure-caption">${row.competition_match.teama_name}</figcaption>
+                                    </figure>
                                     V/S
-                                    <img src="${row.competition_match.teamb_img}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="${row.competition_match.teamb_name}" />`;
+                                    <figure class="figure" style="width: 100px;">
+                                        <img src="${row.competition_match.teamb_img}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
+                                        <figcaption class="figure-caption">${row.competition_match.teamb_name}</figcaption>
+                                    </figure>`;
                         }
                     },
                     {

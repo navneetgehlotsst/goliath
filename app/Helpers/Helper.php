@@ -12,7 +12,8 @@ use App\Models\{
     Prediction,
     Notification,
     NotificationUser,
-    Competition
+    Competition,
+    Transaction
 };
 
 
@@ -346,5 +347,14 @@ class Helper
         $dataPrediction = Prediction::where('match_id', $matchId)->count();
         return $dataPrediction;
     }
+
+
+    // Get Predicted Overs Count
+    public static function UserTransictionSum($userid){
+        $dataPrediction = Transaction::where('user_id', $userid)->where('transaction_type','wallet')->sum();
+        return $dataPrediction;
+    }
+
+
 
 }

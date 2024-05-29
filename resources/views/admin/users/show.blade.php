@@ -114,7 +114,7 @@
                 <div class="card-body row g-4">
                     <div class="col-md-6 pe-md-4 card-separator">
                         <div class="card-title d-flex align-items-start justify-content-between">
-                            <h6 class="mb-0">Position by total winnings</h6>
+                            <h6 class="mb-0">Winnings</h6>
                         </div>
                         <div class="d-flex justify-content-between" style="position: relative;">
                             <div class="mt-auto">
@@ -124,7 +124,7 @@
                     </div>
                     <div class="col-md-6 ps-md-4">
                         <div class="card-title d-flex align-items-start justify-content-between">
-                            <h6 class="mb-0">Position by total earnings</h6>
+                            <h6 class="mb-0">Earnings</h6>
                         </div>
                         <div class="d-flex justify-content-between" style="position: relative;">
                             <div class="mt-auto">
@@ -143,6 +143,9 @@
                     </li>
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-transactionlist" aria-controls="navs-top-prediction" aria-selected="true">Transaction List</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-top-winings" aria-controls="navs-top-prediction" aria-selected="true">Winings List</button>
                     </li>
                 </ul>
                 <div class="tab-content">
@@ -169,7 +172,17 @@
                                                     <tr>
                                                         <td>{{$match['competitionMatch']->match}}</td>
                                                         <td>{{$match['competitionMatch']->match_start_date}}/{{$match['competitionMatch']->match_start_time}}</td>
-                                                        <td><img class="predicted_match_logo" src="{{$match['competitionMatch']->teama_img}}" alt=""> V/S <img class="predicted_match_logo" src="{{$match['competitionMatch']->teamb_img}}" alt=""></td>
+                                                        <td>
+                                                            <figure class="figure" style="width: 51px;">
+                                                                <img src="{{$match['competitionMatch']->teama_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
+                                                                <figcaption class="figure-caption">{{$match['competitionMatch']->teama_name}}</figcaption>
+                                                            </figure>
+                                                            V/S
+                                                            <figure class="figure" style="width: 51px;">
+                                                                <img src="{{$match['competitionMatch']->teamb_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
+                                                                <figcaption class="figure-caption">{{$match['competitionMatch']->teamb_name}}</figcaption>
+                                                            </figure>
+                                                        </td>
                                                         <td>
                                                             <a href="{{ route("admin.users.match.prediction", ['user' => $user->id, 'matchId' => $match['competitionMatch']->match_id]) }}" class="btn btn-sm btn-primary">Prediction Detail</a>
                                                         </td>
@@ -187,7 +200,7 @@
                             <div class="card">
                                 <div class="card-body">
                                     <div class="table-responsive text-nowrap">
-                                        <table class="table table-bordered">
+                                        <table class="table table-bordered" id="TransictionTable" style="width: 100%">
                                             <thead>
                                                 <tr>
                                                     <th>Transiction id</th>
@@ -196,19 +209,55 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @if ($transactionscount != 0)
                                                     @foreach ($transactions as $key => $transaction)
                                                         <tr>
-                                                            <td>{{$transaction->transaction_id}}</td>
+                                                            <td>{{$transaction->payment_id}}</td>
                                                             <td>{{$transaction->amount}}</td>
                                                             <td>{{$transaction->transaction_type}}</td>
                                                         </tr>
                                                     @endforeach
-                                                @else
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="navs-top-winings" role="tabpanel">
+                        <div class="row">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive text-nowrap">
+                                        <table class="table table-bordered" id="TransictionTable" style="width: 100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Match</th>
+                                                    <th>Team Logos</th>
+                                                    <th>Over</th>
+                                                    <th>Type</th>
+                                                    <th>Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                    @foreach ($datawinning as $key => $datawinnings)
                                                         <tr>
-                                                            <td>No Data Found</td>
+                                                            <td>{{$datawinnings->competitionMatch->match}}</td>
+                                                            <td>
+                                                                <figure class="figure" style="width: 100px;">
+                                                                    <img src="{{$datawinnings->competitionMatch->teama_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
+                                                                    <figcaption class="figure-caption">{{$datawinnings->competitionMatch->teama_name}}</figcaption>
+                                                                </figure>
+                                                                V/S
+                                                                <figure class="figure" style="width: 100px;">
+                                                                    <img src="{{$datawinnings->competitionMatch->teamb_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
+                                                                    <figcaption class="figure-caption">{{$datawinnings->competitionMatch->teamb_name}}</figcaption>
+                                                                </figure>
+                                                            </td>
+                                                            <td>{{$datawinnings->inningsOvers->overs}}</td>
+                                                            <td>{{$datawinnings->win_type}}/8</td>
+                                                            <td>{{$datawinnings->win_amount}}</td>
                                                         </tr>
-                                                @endif
+                                                    @endforeach
                                             </tbody>
                                         </table>
                                     </div>
@@ -225,6 +274,10 @@
 @section('script')
 <script>
     $('#PredictionTable').DataTable({
+        processing: true,
+    });
+
+    $('#TransictionTable').DataTable({
         processing: true,
     });
 </script>

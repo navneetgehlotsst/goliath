@@ -167,9 +167,6 @@ class LiveDataForMatches extends Command
                                     ->get();
                                 if ($predictiondata) {
                                     foreach ($predictiondata as $predictionkey => $predictionvalue) {
-                                        if($predictionvalue->overs == 20 && $matchid == 76378){
-                                            \Log::info("Live over No: ".$matchesData['live_score']['overs']);
-                                        }
                                         if ($predictionvalue->overs <= $matchesData['live_score']['overs']) {
                                             $type = $predictionvalue->question_constant;
                                             $over = $predictionvalue->overs;
