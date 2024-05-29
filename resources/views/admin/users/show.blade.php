@@ -173,14 +173,16 @@
                                                         <td>{{$match['competitionMatch']->match}}</td>
                                                         <td>{{$match['competitionMatch']->match_start_date}}/{{$match['competitionMatch']->match_start_time}}</td>
                                                         <td>
-                                                            <figure class="figure" style="width: 51px;">
-                                                                <img src="{{$match['competitionMatch']->teama_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
-                                                                <figcaption class="figure-caption">{{$match['competitionMatch']->teama_name}}</figcaption>
+                                                            <figure class="figure" style="width: 100px; text-align: center;">
+                                                                <img src="{{$match['competitionMatch']->teama_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="" />
+                                                                <figcaption class="figure-caption mt-2">{{$match['competitionMatch']->teama_name}}</figcaption>
                                                             </figure>
-                                                            V/S
-                                                            <figure class="figure" style="width: 51px;">
-                                                                <img src="{{$match['competitionMatch']->teamb_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
-                                                                <figcaption class="figure-caption">{{$match['competitionMatch']->teamb_name}}</figcaption>
+                                                            <figure class="figure" style="width: 51px; text-align: center; bottom: 30px; position: relative; font-size: 20px;">
+                                                                <figcaption class="figure-caption text-muted" style="">VS</figcaption>
+                                                            </figure>
+                                                            <figure class="figure" style="width: 100px; text-align: center;">
+                                                                <img src="{{$match['competitionMatch']->teamb_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="" />
+                                                                <figcaption class="figure-caption mt-2">{{$match['competitionMatch']->teamb_name}}</figcaption>
                                                             </figure>
                                                         </td>
                                                         <td>
@@ -243,14 +245,16 @@
                                                         <tr>
                                                             <td>{{$datawinnings->competitionMatch->match}}</td>
                                                             <td>
-                                                                <figure class="figure" style="width: 100px;">
-                                                                    <img src="{{$datawinnings->competitionMatch->teama_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
-                                                                    <figcaption class="figure-caption">{{$datawinnings->competitionMatch->teama_name}}</figcaption>
+                                                                <figure class="figure" style="width: 100px; text-align: center;">
+                                                                    <img src="{{$datawinnings->competitionMatch->teama_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="" />
+                                                                    <figcaption class="figure-caption mt-2">{{$datawinnings->competitionMatch->teama_name}}</figcaption>
                                                                 </figure>
-                                                                V/S
-                                                                <figure class="figure" style="width: 100px;">
-                                                                    <img src="{{$datawinnings->competitionMatch->teamb_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" />
-                                                                    <figcaption class="figure-caption">{{$datawinnings->competitionMatch->teamb_name}}</figcaption>
+                                                                <figure class="figure" style="width: 51px; text-align: center; bottom: 30px; position: relative; font-size: 20px;">
+                                                                    <figcaption class="figure-caption text-muted" style="">VS</figcaption>
+                                                                </figure>
+                                                                <figure class="figure" style="width: 100px; text-align: center;">
+                                                                    <img src="{{$datawinnings->competitionMatch->teamb_img}}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="" />
+                                                                    <figcaption class="figure-caption mt-2">{{$datawinnings->competitionMatch->teamb_name}}</figcaption>
                                                                 </figure>
                                                             </td>
                                                             <td>{{$datawinnings->inningsOvers->overs}}</td>
