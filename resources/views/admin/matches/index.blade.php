@@ -42,7 +42,12 @@
                                         <td>{{$CompetitionMatchDatas->match}}</td>
                                         <td><img src="{{$CompetitionMatchDatas->teama_img}}" alt="" class="teamlogo"> V/S <img src="{{$CompetitionMatchDatas->teamb_img}}" alt="" class="teamlogo"></td>
                                         <td>{{$CompetitionMatchDatas->formate}}</td>
-                                        <td>{{$CompetitionMatchDatas->match_start_date}} / {{$CompetitionMatchDatas->match_start_time}}</td>
+                                        @php
+                                        $datetime = $CompetitionMatchDatas->match_start_time;
+                                        $returnresult = Helper::timezone($datetime);
+
+                                    @endphp
+                                        <td>{{$CompetitionMatchDatas->match_start_date}} / {{$returnresult}}</td>
                                         <td>
                                             @if($CompetitionMatchDatas->status == 'Completed')
                                                 <span class="badge bg-success">Completed</span>

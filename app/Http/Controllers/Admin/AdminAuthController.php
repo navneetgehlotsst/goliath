@@ -16,7 +16,8 @@ use App\Models\{
     OverQuestions,
     CompetitionMatches,
     Prediction,
-    User
+    User,
+    TimeZone
 };
 
 class AdminAuthController extends Controller
@@ -41,8 +42,6 @@ class AdminAuthController extends Controller
             return back()->with("error",$e->getMessage());
         }
     }
-
-
 
     public function login()
     {
@@ -208,8 +207,6 @@ class AdminAuthController extends Controller
         }
     }
 
-
-
     public function logout()
     {
         try{
@@ -226,7 +223,8 @@ class AdminAuthController extends Controller
     {
         try {
             $user = Auth::user();
-            return view("admin.auth.profile", ['user' => $user]);
+            $timeZone = TimeZone::get();
+            return view("admin.auth.profile", ['user' => $user , 'timezones' => $timeZone]);
         } catch (\Throwable $e) {
             return back()->with('error', 'An unexpected error occurred. Please try again.');
         }
@@ -242,6 +240,7 @@ class AdminAuthController extends Controller
             $validator = Validator::make($data, [
                 "first_name" => "required",
                 "last_name" => "required",
+                "timezone" => "required",
                 "phone" => "required|min:9|unique:users,phone," . $user->id,
                 "email" => "required|email|unique:users,email," . $user->id,
                 "avatar" => "sometimes|image|mimes:jpeg,jpg,png|max:5000"
@@ -256,14 +255,15 @@ class AdminAuthController extends Controller
             if ($request->hasFile('avatar')) {
                 $user->avatar = $this->handleAvatarUpload($request->file('avatar'));
             }
-
-            $user->update([
+            $dataUpdate = [
                 'first_name' => $request->first_name,
                 'last_name' => $request->last_name,
+                'timezone' => $request->timezone,
                 'full_name' => $request->first_name . " " . $request->last_name,
                 'phone' => $request->phone,
                 'email' => $request->email,
-            ]);
+            ];
+            $user->update($dataUpdate);
 
             DB::commit();
 

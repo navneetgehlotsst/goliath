@@ -61,7 +61,12 @@
                                     <span class="badge bg-label-danger">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @endif
                                 <br>
-                                <span>Date & Time :- {{$transformedMatch['matchdetail']['match_start_date']}} / {{$transformedMatch['matchdetail']['match_start_time']}}</span>
+                                @php
+                                    $datetime = $transformedMatch['matchdetail']['match_start_time'];
+                                    $returnresult = Helper::timezone($datetime);
+
+                                @endphp
+                                <span>Date & Time :- {{$transformedMatch['matchdetail']['match_start_date']}} / {{$returnresult}}</span>
                             </div>
                         </div>
                     </div>

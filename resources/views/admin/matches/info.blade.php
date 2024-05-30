@@ -68,7 +68,12 @@
                                     <span class="badge bg-label-danger">{{$transformedMatch['matchdetail']['status']}}</span>
                                 @endif
                                 <br>
-                                <span>Date & Time :- {{$transformedMatch['matchdetail']['match_start_date']}} / {{$transformedMatch['matchdetail']['match_start_time']}}</span>
+                                @php
+                                    $datetime = $transformedMatch['matchdetail']['match_start_time'];
+                                    $returnresult = Helper::timezone($datetime);
+
+                                @endphp
+                                <span>Date & Time :- {{$transformedMatch['matchdetail']['match_start_date']}} / {{$returnresult}}</span>
                             </div>
                         </div>
                     </div>
@@ -93,7 +98,6 @@
                   <div class="col-xl-6">
                     <div class="mb-2 fw-bolder">{{$innings['inning_name']}}</div>
                     <div class="demo-inline-spacing">
-
                       <p>
                         @foreach ($innings['overs'] as $matchdatainningsone)
                             <a href="{{ route('admin.match.question', ['overid' => $matchdatainningsone['over_id']]) }}"

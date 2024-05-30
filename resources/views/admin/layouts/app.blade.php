@@ -21,6 +21,8 @@
         <link rel="stylesheet" href="{{asset('assets/admin/css/bootstrapDataTable.css')}}" />
         <link rel="stylesheet" href="{{asset('assets/admin/vendor/libs/perfect-scrollbar/perfect-scrollbar.css')}}" />
         <link rel="stylesheet" href="{{asset('assets/admin/vendor/libs/apex-charts/apex-charts.css')}}" />
+        <link rel="stylesheet" href="{{asset('assets/admin/vendor/libs/select2/select2.css')}}" />
+        <link rel="stylesheet" href="{{asset('assets/admin/vendor/libs/bootstrap-select/bootstrap-select.css')}}"></link>
         <script src="{{asset('assets/admin/vendor/js/helpers.js')}}"></script>
         <script src="{{asset('assets/admin/js/config.js')}}"></script>
         <link rel="stylesheet" href="{{asset('assets/admin/css/sweet-alert.css')}}" />
@@ -51,12 +53,14 @@
                 <script src="{{asset('assets/admin/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')}}"></script>
                 <script src="{{asset('assets/admin/vendor/js/menu.js')}}"></script>
                 <script src="{{asset('assets/admin/vendor/libs/apex-charts/apexcharts.js')}}"></script>
+                <script src="{{asset('assets/admin/vendor/libs/select2/select2.js')}}"></script>
                 <script src="{{asset('assets/admin/js/dataTable.js')}}"></script>
                 <script src="{{asset('assets/admin/js/bootstrapDataTable.js')}}"></script>
                 <script src="{{asset('assets/admin/js/tables-datatables-basic.js')}}"></script>
                 <script src="{{asset('assets/admin/js/dashboards-analytics.js')}}"></script>
                 <script src="{{asset('assets/admin/js/moment.min.js')}}"></script>
                 <script src="{{asset('assets/admin/js/main.js')}}"></script>
+                <script src="{{asset('assets/admin/js/forms-selects.js')}}"></script>
                 <script async defer src="https://buttons.github.io/buttons.js"></script>
                 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
                 @yield('script')

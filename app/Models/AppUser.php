@@ -25,6 +25,7 @@ class AppUser extends Model
         'avatar',
         'device_token',
         'device_type',
-        'status'
+        'status',
+        'timezone'
     ];
 }

@@ -7,16 +7,16 @@
     border:1px dotted lightgray;
     padding:4px;
     margin: 0 auto;
- }  
+ }
 </style>
-@endsection 
+@endsection
 @section('content')
 <div class="container-fluid flex-grow-1 container-p-y">
     <h5 class="py-2 mb-2">
         <span class="text-primary fw-light">My Profile</span>
     </h5>
     <div class="row">
-        <div class="col-xl-6 col-lg-6">
+        <div class="col-xl-12 col-lg-12">
             <div class="card profile-card">
                 <div class="card-body  pb-5">
                     <form action="{{ route('admin.update.profile') }}" method="POST" enctype="multipart/form-data">
@@ -58,6 +58,16 @@
                                     @enderror
                                 </div>
                             </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="form-group">
+                                    <label class="form-label" id="timezone">TimeZone*</label>
+                                    <select id="timezone" name="timezone" class="select2 form-select form-select-lg" data-allow-clear="true">
+                                        @foreach ($timezones as $timezoneData)
+                                            <option value="{{$timezoneData->timezone}}" {{ $user->timezone == $timezoneData->timezone ? 'selected' : '' }}>{{$timezoneData->timezone}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="form-label">Profile Picture</label>
@@ -65,7 +75,7 @@
                                     <div class="input-group">
                                         <input type="file" name="avatar" accept="image/*" class="form-control" id="avatar" aria-describedby="inputGroupFileAddon04" aria-label="Upload" onchange="document.getElementById('user-image').src = window.URL.createObjectURL(this.files[0])">
                                     </div>
-                    
+
                                     @error('avatar')
                                         <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -79,10 +89,10 @@
                                 @endif
                             </div>
                         </div>
-                       
+
                         <div class="pt-4">
                             <div class="col-md-12 submit-btn">
-                                <button type="submit" class="btn btn-primary">Save</button> 
+                                <button type="submit" class="btn btn-primary">Save</button>
                             </div>
                         </div>
                     </form>
@@ -98,5 +108,5 @@
     $(".timezone").select2().on('select2:opening', function(e) {
         $(this).data('select2').$dropdown.find(':input.select2-search__field').attr('placeholder', 'Search your timezone')
     })
-</script> 
+</script>
 @endsection

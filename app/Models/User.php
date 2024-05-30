@@ -81,7 +81,8 @@ class User extends Authenticatable implements JWTSubject
         'avatar',
         'device_token',
         'device_type',
-        'status'
+        'status',
+        'timezone'
     ];
 
 
