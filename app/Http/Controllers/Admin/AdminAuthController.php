@@ -255,15 +255,7 @@ class AdminAuthController extends Controller
             if ($request->hasFile('avatar')) {
                 $user->avatar = $this->handleAvatarUpload($request->file('avatar'));
             }
-            $dataUpdate = [
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'timezone' => $request->timezone,
-                'full_name' => $request->first_name . " " . $request->last_name,
-                'phone' => $request->phone,
-                'email' => $request->email,
-            ];
-            $user->update($dataUpdate);
+            $user->update();
 
             DB::commit();
 

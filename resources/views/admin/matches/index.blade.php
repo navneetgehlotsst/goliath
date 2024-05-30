@@ -77,12 +77,13 @@
 @endsection
 @section('script')
 <script>
-    $('#MatchesTable').DataTable({
-        processing: true,
-        ordering: false
-    });
     $(document).ready(function() {
-        var table = $('#MatchesTable').DataTable();
+        // Initialize DataTable
+        var table = $('#MatchesTable').DataTable({
+            processing: true,
+            ordering: true,
+            order: [[3, "asc"]]
+        });
 
         // Filter event handler
         $('#column-filter').on('change', function() {
@@ -96,5 +97,6 @@
             }
         });
     });
+
 </script>
 @endsection

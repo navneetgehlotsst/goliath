@@ -86,16 +86,6 @@
                     <h5 class="card-title m-0 me-2">Yearly Winners' Graphs</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-4">
-                            <select class="form-select" aria-label="Default select example">
-                                <option selected>Select Year</option>
-                                @foreach ( $yearsData as $year)
-                                    <option value="{{$year}}">{{$year}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
                     <div id="monthlyprediction"></div>
                 </div>
             </div>
@@ -104,7 +94,7 @@
         <div class="col-md-12 col-lg-12 order-2 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title m-0 me-2">Yearly User Registrations</h5>
+                    <h5 class="card-title m-0 me-2">Monthly User Registrations</h5>
                 </div>
                 <div class="card-body">
                     <div id="userchart"></div>
@@ -163,7 +153,7 @@
             toolbar: { show: false }
         },
         xaxis: { categories: monthjson },
-        yaxis: { title: { text: "Registered Users" } },
+        yaxis: { title: { text: "Player" } },
         tooltip: {
             y: {
                 formatter: function (val) {
