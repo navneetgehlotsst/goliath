@@ -69,16 +69,14 @@
                         data: null,
                         render: (data, type, row) => {
                             console.log('Row data:', row);  // Log row data to debug
-                            return `<figure class="figure" style="width: 100px; text-align: center;">
+                            return `<figure class="figure" style="text-align: center;">
                                         <img src="${row.competition_match.teama_img}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="" />
-                                        <figcaption class="figure-caption mt-2">${row.competition_match.teama_name}</figcaption>
+                                        ${row.competition_match.teama_name}
                                     </figure>
-                                    <figure class="figure" style="width: 51px; text-align: center; bottom: 30px; position: relative; font-size: 20px;">
-                                        <figcaption class="figure-caption text-muted" style="">VS</figcaption>
-                                    </figure>
-                                    <figure class="figure" style="width: 100px; text-align: center;">
+                                    VS
+                                    <figure class="figure" style="text-align: center;">
                                         <img src="${row.competition_match.teamb_img}" alt="" class="predicted_match_all" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="" />
-                                        <figcaption class="figure-caption mt-2">${row.competition_match.teamb_name}</figcaption>
+                                        ${row.competition_match.teamb_name}
                                     </figure>`
                         }
                     },
